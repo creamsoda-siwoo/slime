@@ -1,20 +1,28 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 슬라임 헌터 (Slime Hunter)
 
-# Run and deploy your AI Studio app
+간단하지만 중독성 있는 클릭커 RPG 게임입니다. 슬라임을 물리치고, 레벨업하고, 장비를 업그레이드하여 최강의 헌터가 되세요!
 
-This contains everything you need to run your app locally.
+## ✨ 주요 기능 (Features)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1MsLeXY3CnYLmkKDIOVn3tL28xAURlUSi
+*   **클릭 기반 전투:** 화면의 슬라임을 클릭하여 공격하고 골드와 경험치를 획득하세요.
+*   **자동 공격 시스템:** 용병을 고용하여 자동으로 몬스터에게 피해를 입히는 DPS(초당 대미지)를 확보하세요.
+*   **레벨업 시스템:** 경험치를 모아 레벨업하고, 더 강력한 기본 공격력을 얻으세요.
+*   **다양한 몬스터:** 레벨이 오를수록 점점 더 강하고 다양한 몬스터와 보스가 등장합니다.
+*   **강화 시스템:** 골드를 사용하여 클릭 공격력과 자동 공격력을 영구적으로 업그레이드할 수 있습니다.
+*   **강력한 스킬:** '파워 샷' 스킬을 사용하여 막대한 피해를 입히고 위기를 극복하세요.
 
-## Run Locally
+## 🎮 게임 방법 (How to Play)
 
-**Prerequisites:**  Node.js
+1.  **공격:** 화면 중앙에 있는 몬스터를 클릭하여 공격합니다.
+2.  **골드 획득:** 몬스터를 처치하면 골드와 경험치를 얻을 수 있습니다.
+3.  **업그레이드:** 획득한 골드로 오른쪽 패널에서 '검 강화'나 '자동 공격 용병 고용' 등의 업그레이드를 진행하여 더 강해지세요.
+4.  **레벨업:** 경험치가 가득 차면 자동으로 레벨업하며 능력치가 상승합니다.
+5.  **스킬 사용:** 골드를 소모하여 강력한 '파워 샷' 스킬을 사용할 수 있습니다.
 
+## 🛠️ 기술 스택 (Tech Stack)
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+*   **Frontend:** React, Tailwind CSS
+*   **Transpiler:** Babel
+*   **Language:** JavaScript (with JSX)
+
+이 프로젝트는 별도의 빌드 과정 없이 `index.html` 파일 하나로 실행되도록 구성되었습니다. 웹 브라우저에서 `index.html` 파일을 열기만 하면 바로 게임을 플레이할 수 있습니다.
