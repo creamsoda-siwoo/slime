@@ -1,10 +1,10 @@
 
-
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 
 // --- TYPES ---
 interface Player {
+  nickname: string;
   level: number;
   xp: number;
   xpToNextLevel: number;
@@ -23,6 +23,7 @@ interface Monster {
   level: number;
   color: string;
   special?: 'HEAL';
+  image: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
 interface Upgrade {
@@ -45,7 +46,7 @@ interface DamageNumber {
 type EquipmentType = 'WEAPON' | 'ARMOR' | 'RING';
 type Rarity = 'COMMON' | 'UNCOMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
 
-type JewelType = 'RUBY' | 'SAPPHIRE' | 'EMERALD' | 'TOPAZ';
+type JewelType = 'RUBY' | 'SAPPHIRE' | 'EMERALD' | 'TOPAZ' | 'AMETHYST';
 type JewelShape = 'CIRCLE' | 'SQUARE' | 'TRIANGLE';
 
 interface Socket {
@@ -64,6 +65,7 @@ interface Jewel {
     dps?: number;
     goldBonus?: number;
     xpBonus?: number;
+    powerShotDamageBonus?: number;
   };
 }
 
@@ -79,6 +81,7 @@ interface Equipment {
     xpBonus?: number;
   };
   sockets: Socket[];
+  cost?: number;
 }
 
 
@@ -103,22 +106,6 @@ const SwordIcon = (props: React.SVGProps<SVGSVGElement>) => (
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
     </svg>
 );
-const SlimeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
-        <defs>
-            <radialGradient id="slimeGradient" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
-                <stop offset="0%" style={{ stopColor: 'rgba(255,255,255,0.5)' }} />
-                <stop offset="100%" style={{ stopColor: 'rgba(255,255,255,0)' }} />
-            </radialGradient>
-        </defs>
-        <path d="M 10,60 C 10,30 30,10 50,10 C 70,10 90,30 90,60 C 90,80 80,90 50,90 C 20,90 10,80 10,60 Z" fill="currentColor" />
-        <circle cx="50" cy="50" r="40" fill="url(#slimeGradient)" />
-        <circle cx="35" cy="45" r="5" fill="white" />
-        <circle cx="65" cy="45" r="5" fill="white" />
-        <circle cx="36" cy="46" r="2" fill="black" />
-        <circle cx="66" cy="46" r="2" fill="black" />
-    </svg>
-);
 const PowerShotIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -130,7 +117,71 @@ const CoinIconForSkill = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-// Fix: Added MonsterTemplate interface to correctly type monster data
+// --- MONSTER ICONS ---
+const SlimeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <defs><radialGradient id="slimeGradient" cx="50%" cy="50%" r="50%" fx="30%" fy="30%"><stop offset="0%" style={{ stopColor: 'rgba(255,255,255,0.5)' }} /><stop offset="100%" style={{ stopColor: 'rgba(255,255,255,0)' }} /></radialGradient></defs>
+        <path d="M 10,60 C 10,30 30,10 50,10 C 70,10 90,30 90,60 C 90,80 80,90 50,90 C 20,90 10,80 10,60 Z" fill="currentColor" />
+        <circle cx="50" cy="50" r="40" fill="url(#slimeGradient)" /><circle cx="35" cy="45" r="5" fill="white" /><circle cx="65" cy="45" r="5" fill="white" /><circle cx="36" cy="46" r="2" fill="black" /><circle cx="66" cy="46" r="2" fill="black" />
+    </svg>
+);
+const GoblinIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M50 10 C 25 10, 10 30, 10 55 C 10 80, 20 90, 40 90 L 60 90 C 80 90, 90 80, 90 55 C 90 30, 75 10, 50 10 Z" fill="currentColor"/>
+        <path d="M 20 50 L 10 30 L 30 45 Z" fill="currentColor" stroke="black" strokeWidth="2"/>
+        <path d="M 80 50 L 90 30 L 70 45 Z" fill="currentColor" stroke="black" strokeWidth="2"/>
+        <circle cx="35" cy="50" r="6" fill="yellow" /><circle cx="65" cy="50" r="6" fill="yellow" />
+        <circle cx="35" cy="50" r="3" fill="black" /> <circle cx="65" cy="50" r="3" fill="black" />
+        <rect x="30" y="70" width="40" height="5" rx="2" fill="black" />
+        <rect x="38" y="65" width="5" height="5" fill="white" /><rect x="57" y="65" width="5" height="5" fill="white" />
+    </svg>
+);
+const MushroomEntIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect x="35" y="50" width="30" height="45" fill="currentColor" />
+        <path d="M50 15 C 20 15, 10 30, 10 50 L 90 50 C 90 30, 80 15, 50 15 Z" fill="red" stroke="white" strokeWidth="3" />
+        <circle cx="25" cy="35" r="5" fill="white" /><circle cx="50" cy="30" r="6" fill="white" /><circle cx="75" cy="35" r="5" fill="white" />
+        <circle cx="42" cy="70" r="4" fill="black" /><circle cx="58" cy="70" r="4" fill="black" />
+    </svg>
+);
+const ShadowImpIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M50,10 C 80,40 90,80 50,90 C 10,80 20,40 50,10 Z" fill="currentColor" />
+        <path d="M 50 10 L 40 30 L 60 30 Z" fill="currentColor" stroke="black" strokeWidth="2"/>
+        <path d="M 20 70 L 10 90 L 30 80 Z" fill="currentColor" stroke="black" strokeWidth="1"/>
+        <path d="M 80 70 L 90 90 L 70 80 Z" fill="currentColor" stroke="black" strokeWidth="1"/>
+        <circle cx="40" cy="50" r="5" fill="red" /><circle cx="60" cy="50" r="5" fill="red" />
+    </svg>
+);
+const SkeletonWarriorIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <circle cx="50" cy="30" r="20" fill="currentColor" />
+        <circle cx="42" cy="28" r="5" fill="black" /><circle cx="58" cy="28" r="5" fill="black" />
+        <rect x="45" y="38" width="10" height="5" fill="black" /><rect x="35" y="50" width="30" height="5" rx="2" fill="currentColor" />
+        <rect x="30" y="55" width="5" height="20" fill="currentColor" /><rect x="65" y="55" width="5" height="20" fill="currentColor" />
+        <rect x="47.5" y="55" width="5" height="30" fill="currentColor" />
+    </svg>
+);
+const StoneGolemIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <rect x="20" y="15" width="60" height="40" rx="5" fill="currentColor"/>
+        <rect x="10" y="55" width="30" height="35" rx="5" fill="currentColor"/>
+        <rect x="60" y="55" width="30" height="35" rx="5" fill="currentColor"/>
+        <rect x="30" y="25" width="40" height="10" fill="darkslategray" />
+    </svg>
+);
+const GiantSlimeKingIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" {...props}>
+        <path d="M5,50 C 5,20 20,5 50,5 C 80,5 95,20 95,50 C 95,70 85,95 50,95 C 15,95 5,70 5,50 Z" fill="currentColor" />
+        <path d="M30 15 L 20 30 L 40 30 Z" fill="gold" stroke="black" strokeWidth="1" />
+        <path d="M50 5 L 40 25 L 60 25 Z" fill="gold" stroke="black" strokeWidth="1" />
+        <path d="M70 15 L 60 30 L 80 30 Z" fill="gold" stroke="black" strokeWidth="1" />
+        <circle cx="35" cy="45" r="7" fill="white" /><circle cx="65" cy="45" r="7" fill="white" />
+        <circle cx="36" cy="46" r="3" fill="black" /><circle cx="66" cy="46" r="3" fill="black" />
+        <path d="M 30 70 Q 50 85 70 70" stroke="black" strokeWidth="3" fill="none" />
+    </svg>
+);
+
 interface MonsterTemplate {
     name: string;
     baseHp: number;
@@ -139,34 +190,40 @@ interface MonsterTemplate {
     color: string;
     minLevel: number;
     special?: 'HEAL';
+    image: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
 // --- CONSTANTS & GAME DATA ---
-const SAVED_GAME_KEY = 'slimeHunterSaveData_v2';
-const INITIAL_PLAYER: Player = { level: 1, xp: 0, xpToNextLevel: 10, gold: 0, baseAttack: 1, dps: 0 };
-// Fix: Applied MonsterTemplate type to ensure type safety for monster properties like 'special'
+const SAVED_GAME_KEY = 'slimeHunterSaveData_v3';
+const INITIAL_PLAYER: Player = { nickname: '용사님', level: 1, xp: 0, xpToNextLevel: 10, gold: 0, baseAttack: 1, dps: 0 };
+
 const MONSTER_TEMPLATES: MonsterTemplate[] = [
-    { name: '초록 슬라임', baseHp: 8, baseGold: 2, baseXp: 5, color: 'text-green-400', minLevel: 1 },
-    { name: '파랑 슬라임', baseHp: 12, baseGold: 3, baseXp: 7, color: 'text-blue-400', minLevel: 2 },
-    { name: '고블린', baseHp: 20, baseGold: 5, baseXp: 10, color: 'text-emerald-500', minLevel: 4 },
-    { name: '버섯 엔트', baseHp: 35, baseGold: 6, baseXp: 12, color: 'text-orange-400', minLevel: 6, special: 'HEAL' },
-    { name: '그림자 임프', baseHp: 15, baseGold: 15, baseXp: 8, color: 'text-purple-500', minLevel: 8 },
-    { name: '스켈레톤 전사', baseHp: 50, baseGold: 10, baseXp: 20, color: 'text-gray-300', minLevel: 10 },
-    { name: '돌 골렘', baseHp: 80, baseGold: 15, baseXp: 30, color: 'text-slate-500', minLevel: 12 },
+    { name: '초록 슬라임', baseHp: 8, baseGold: 2, baseXp: 5, color: 'text-green-400', minLevel: 1, image: SlimeIcon },
+    { name: '파랑 슬라임', baseHp: 12, baseGold: 3, baseXp: 7, color: 'text-blue-400', minLevel: 2, image: SlimeIcon },
+    { name: '고블린', baseHp: 20, baseGold: 5, baseXp: 10, color: 'text-emerald-500', minLevel: 4, image: GoblinIcon },
+    { name: '버섯 엔트', baseHp: 35, baseGold: 6, baseXp: 12, color: 'text-orange-400', minLevel: 6, special: 'HEAL', image: MushroomEntIcon },
+    { name: '그림자 임프', baseHp: 15, baseGold: 15, baseXp: 8, color: 'text-purple-500', minLevel: 8, image: ShadowImpIcon },
+    { name: '스켈레톤 전사', baseHp: 50, baseGold: 10, baseXp: 20, color: 'text-gray-300', minLevel: 10, image: SkeletonWarriorIcon },
+    { name: '돌 골렘', baseHp: 80, baseGold: 15, baseXp: 30, color: 'text-slate-500', minLevel: 12, image: StoneGolemIcon },
 ];
-// Fix: Applied MonsterTemplate type to ensure type safety for boss properties
-const BOSS_TEMPLATE: MonsterTemplate = { name: '거대 슬라임 왕', baseHp: 100, baseGold: 50, baseXp: 100, color: 'text-yellow-400', minLevel: 5 };
+
+const BOSS_TEMPLATE: MonsterTemplate = { name: '거대 슬라임 왕', baseHp: 100, baseGold: 50, baseXp: 100, color: 'text-yellow-400', minLevel: 5, image: GiantSlimeKingIcon };
+
 const UPGRADES_CONFIG: Omit<Upgrade, 'level'>[] = [
     { id: 'CLICK_UPGRADE', name: '검 강화', description: (l, c, b) => `클릭 공격력을 +${b} 만큼 영구적으로 증가시킵니다.`, cost: (l) => Math.floor(10 * Math.pow(1.2, l - 1)), benefit: (l) => Math.floor(1 * Math.pow(1.1, l - 1)) },
     { id: 'DPS_UPGRADE', name: '자동 공격 용병 고용', description: (l, c, b) => `초당 ${b}의 자동 공격을 추가합니다.`, cost: (l) => Math.floor(25 * Math.pow(1.5, l)), benefit: (l) => Math.floor(1 * Math.pow(1.3, l)) },
-    { id: 'POWER_SHOT_UPGRADE', name: '파워 샷 강화', description: (l) => `파워 샷의 골드 소모량을 5% 감소시킵니다. (현재: -${Math.min(95, l * 5)}%)`, cost: (l) => Math.floor(150 * Math.pow(1.8, l)), benefit: () => 0.05 },
+    { id: 'POWER_SHOT_UPGRADE', name: '파워 샷 쿨타임 감소', description: (l) => `파워 샷의 재사용 대기시간을 5% 감소시킵니다. (현재: -${Math.min(90, l * 5)}%)`, cost: (l) => Math.floor(150 * Math.pow(1.8, l)), benefit: () => 0.05 },
+    { id: 'POWER_SHOT_DAMAGE_UPGRADE', name: '파워 샷 데미지 강화', description: (l, c, b) => `파워 샷의 데미지를 ${b * 100}% 만큼 영구적으로 증가시킵니다. (현재: +${(l * b * 100).toFixed(0)}%)`, cost: (l) => Math.floor(180 * Math.pow(1.8, l)), benefit: () => 0.1 },
+    { id: 'GOLD_BONUS_UPGRADE', name: '황금 탐지기', description: (l, c, b) => `레벨당 골드 획득량이 ${b * 100}% 만큼 영구적으로 증가합니다. (현재: +${(l * b * 100).toFixed(1)}%)`, cost: (l) => Math.floor(100 * Math.pow(1.6, l)), benefit: () => 0.02 },
+    { id: 'XP_BONUS_UPGRADE', name: '성장의 부적', description: (l, c, b) => `레벨당 경험치 획득량이 ${b * 100}% 만큼 영구적으로 증가합니다. (현재: +${(l * b * 100).toFixed(1)}%)`, cost: (l) => Math.floor(120 * Math.pow(1.7, l)), benefit: () => 0.015 },
+    { id: 'BLESSING_UPGRADE', name: '여신의 축복', description: (l, c, b) => `모든 능력치(공격력, DPS, 보너스)를 ${b}배 증가시킵니다. (현재: x${Math.pow(b, l)})`, cost: (l) => 10000 * Math.pow(10, l), benefit: () => 2 },
 ];
 const RARITY_CONFIG: { [key in Rarity]: { chance: number; multiplier: number; color: string } } = {
     COMMON: { chance: 0, multiplier: 1, color: 'text-white' },
-    UNCOMMON: { chance: 0.25, multiplier: 1.5, color: 'text-green-400' },
-    RARE: { chance: 0.10, multiplier: 2.5, color: 'text-blue-400' },
-    EPIC: { chance: 0.04, multiplier: 4, color: 'text-purple-500' },
-    LEGENDARY: { chance: 0.01, multiplier: 7, color: 'text-yellow-400' },
+    UNCOMMON: { chance: 0.25, multiplier: 1.8, color: 'text-green-400' },
+    RARE: { chance: 0.10, multiplier: 3.0, color: 'text-blue-400' },
+    EPIC: { chance: 0.04, multiplier: 5.0, color: 'text-purple-500' },
+    LEGENDARY: { chance: 0.01, multiplier: 8.0, color: 'text-yellow-400' },
 };
 const EQUIPMENT_BASES = {
     WEAPON: ['단검', '장검', '도끼', '망치', '마법 지팡이'],
@@ -178,6 +235,7 @@ const JEWEL_CONFIG: { [key in JewelType]: { name: string; stats: Jewel['stats'] 
     SAPPHIRE: { name: '사파이어', stats: { dps: 1 } },
     EMERALD: { name: '에메랄드', stats: { xpBonus: 0.01 } },
     TOPAZ: { name: '토파즈', stats: { goldBonus: 0.01 } },
+    AMETHYST: { name: '자수정', stats: { powerShotDamageBonus: 0.02 } },
 };
 const JEWEL_SHAPES: JewelShape[] = ['CIRCLE', 'SQUARE', 'TRIANGLE'];
 
@@ -189,7 +247,7 @@ const MONSTER_GENERATOR = (level: number): Monster => {
         const hp = Math.floor(template.baseHp * Math.pow(1.3, level - template.minLevel));
         const goldReward = Math.floor(template.baseGold * Math.pow(1.2, level - template.minLevel));
         const xpReward = Math.floor(template.baseXp * Math.pow(1.2, level - template.minLevel));
-        return { id: Date.now() + Math.random(), name: `${template.name} (Lv.${level})`, hp, maxHp: hp, goldReward, xpReward, level, color: template.color, special: template.special };
+        return { id: Date.now() + Math.random(), name: `${template.name} (Lv.${level})`, hp, maxHp: hp, goldReward, xpReward, level, color: template.color, special: template.special, image: template.image };
     }
     // Normal monster generation
     const availableMonsters = MONSTER_TEMPLATES.filter(m => level >= m.minLevel);
@@ -197,10 +255,10 @@ const MONSTER_GENERATOR = (level: number): Monster => {
     const hp = Math.floor(template.baseHp * Math.pow(1.25, level - 1));
     const goldReward = Math.floor(template.baseGold * Math.pow(1.15, level - 1));
     const xpReward = Math.floor(template.baseXp * Math.pow(1.12, level - 1));
-    return { id: Date.now() + Math.random(), name: `${template.name} (Lv.${level})`, hp, maxHp: hp, goldReward, xpReward, level, color: template.color, special: template.special };
+    return { id: Date.now() + Math.random(), name: `${template.name} (Lv.${level})`, hp, maxHp: hp, goldReward, xpReward, level, color: template.color, special: template.special, image: template.image };
 };
 
-const generateEquipment = (playerLevel: number): Equipment => {
+const generateEquipment = (playerLevel: number, isShopItem: boolean = false): Equipment => {
     const roll = Math.random();
     let rarity: Rarity = 'COMMON';
     if (roll < RARITY_CONFIG.LEGENDARY.chance) rarity = 'LEGENDARY';
@@ -232,8 +290,9 @@ const generateEquipment = (playerLevel: number): Equipment => {
         sockets.push({ shape: JEWEL_SHAPES[Math.floor(Math.random() * JEWEL_SHAPES.length)], jewelId: null });
     }
     const name = `${baseName} (+${socketCount})`;
+    const cost = isShopItem ? Math.floor((statPower * 15) * (1 + socketCount * 0.2) * multiplier) : undefined;
 
-    return { id: `eq-${Date.now()}`, name, type, rarity, stats, sockets };
+    return { id: `eq-${Date.now()}`, name, type, rarity, stats, sockets, cost };
 };
 
 const generateJewel = (playerLevel: number): Jewel => {
@@ -278,22 +337,64 @@ const StatBar = ({ value, maxValue, color, icon, label }: { value: number, maxVa
     );
 };
 
-const PlayerStats = ({ player, totalAttack, totalDps, goldBonus, xpBonus }) => (
-    <div className="flex flex-col gap-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
-        <h2 className="text-xl font-bold text-center text-yellow-300">플레이어 정보</h2>
-        <div className="flex justify-around text-center">
-            <div className="flex flex-col items-center"><LevelIcon className="w-8 h-8 text-green-400 mb-1" /><span className="text-sm text-gray-400">레벨</span><span className="text-lg font-bold">{player.level}</span></div>
-            <div className="flex flex-col items-center"><CoinIcon className="w-8 h-8 text-yellow-400 mb-1" /><span className="text-sm text-gray-400">골드</span><span className="text-lg font-bold">{player.gold}</span></div>
+const PlayerStats = ({ player, onNicknameChange, totalAttack, totalDps, goldBonus, xpBonus, powerShotDamageBonus }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [nickname, setNickname] = useState(player.nickname);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleSave = () => {
+        if (nickname.trim()) {
+            onNicknameChange(nickname.trim());
+        } else {
+            setNickname(player.nickname); // Revert if empty
+        }
+        setIsEditing(false);
+    };
+
+    useEffect(() => {
+        if (isEditing) {
+            inputRef.current?.focus();
+        }
+    }, [isEditing]);
+
+    return (
+        <div className="flex flex-col gap-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+            {isEditing ? (
+                 <input
+                    ref={inputRef}
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    onBlur={handleSave}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                    className="text-xl font-bold text-center bg-gray-800 text-yellow-300 rounded-md border border-yellow-500"
+                />
+            ) : (
+                <h2 
+                    className="text-xl font-bold text-center text-yellow-300 cursor-pointer hover:bg-gray-800/50 rounded-md p-1"
+                    onClick={() => setIsEditing(true)}
+                    title="닉네임 변경"
+                >
+                    {player.nickname} 정보
+                </h2>
+            )}
+            <div className="flex justify-around text-center">
+                <div className="flex flex-col items-center"><LevelIcon className="w-8 h-8 text-green-400 mb-1" /><span className="text-sm text-gray-400">레벨</span><span className="text-lg font-bold">{player.level}</span></div>
+                <div className="flex flex-col items-center"><CoinIcon className="w-8 h-8 text-yellow-400 mb-1" /><span className="text-sm text-gray-400">골드</span><span className="text-lg font-bold">{player.gold}</span></div>
+            </div>
+            <StatBar value={player.xp} maxValue={player.xpToNextLevel} color="bg-blue-500" icon={<XPIcon className="w-4 h-4" />} label="경험치" />
+            <div className="grid grid-cols-2 gap-2 text-center mt-2 border-t border-gray-700 pt-4 text-sm">
+                <div className="flex flex-col items-center"><span className="text-gray-400">클릭 공격력</span><span className="text-lg font-bold text-red-400">{totalAttack}</span></div>
+                <div className="flex flex-col items-center"><span className="text-gray-400">초당 공격력</span><span className="text-lg font-bold text-purple-400">{totalDps}</span></div>
+                <div className="flex flex-col items-center"><span className="text-gray-400">골드 보너스</span><span className="text-lg font-bold text-yellow-400">+{Math.round(goldBonus * 100)}%</span></div>
+                <div className="flex flex-col items-center"><span className="text-gray-400">경험치 보너스</span><span className="text-lg font-bold text-blue-400">+{Math.round(xpBonus * 100)}%</span></div>
+                {powerShotDamageBonus > 0 && (
+                    <div className="col-span-2 flex flex-col items-center mt-2"><span className="text-gray-400">파워 샷 보너스</span><span className="text-lg font-bold text-fuchsia-400">+{Math.round(powerShotDamageBonus * 100)}%</span></div>
+                )}
+            </div>
         </div>
-        <StatBar value={player.xp} maxValue={player.xpToNextLevel} color="bg-blue-500" icon={<XPIcon className="w-4 h-4" />} label="경험치" />
-        <div className="grid grid-cols-2 gap-2 text-center mt-2 border-t border-gray-700 pt-4 text-sm">
-            <div className="flex flex-col items-center"><span className="text-gray-400">클릭 공격력</span><span className="text-lg font-bold text-red-400">{totalAttack}</span></div>
-            <div className="flex flex-col items-center"><span className="text-gray-400">초당 공격력</span><span className="text-lg font-bold text-purple-400">{totalDps}</span></div>
-            <div className="flex flex-col items-center"><span className="text-gray-400">골드 보너스</span><span className="text-lg font-bold text-yellow-400">+{Math.round(goldBonus * 100)}%</span></div>
-            <div className="flex flex-col items-center"><span className="text-gray-400">경험치 보너스</span><span className="text-lg font-bold text-blue-400">+{Math.round(xpBonus * 100)}%</span></div>
-        </div>
-    </div>
-);
+    );
+};
 
 const MonsterDisplay = ({ monster, onAttack, damageNumbers }) => {
     const [isHit, setIsHit] = useState(false);
@@ -306,13 +407,17 @@ const MonsterDisplay = ({ monster, onAttack, damageNumbers }) => {
             return () => clearTimeout(timer);
         }
     }, [damageNumbers]);
+    
+    const MonsterImage = monster.image;
 
     return (
-        <div className="relative w-64 h-64 flex flex-col items-center justify-center cursor-pointer group" onClick={onAttack}>
+        <div className="relative w-80 h-80 flex flex-col items-center justify-center cursor-pointer group" onClick={onAttack}>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="mb-2 text-center"><h3 className="text-lg font-bold text-gray-200">{monster.name}</h3><p className="text-sm text-red-400 font-semibold">{monster.hp} / {monster.maxHp}</p></div>
-                <div className={`relative w-40 h-40 transition-transform duration-100 ${isHit ? 'transform scale-95' : 'group-hover:scale-110'}`}><SlimeIcon className={`w-full h-full ${monster.color} ${isHit ? 'animate-pulse' : ''}`} /></div>
-                <div className="w-48 bg-gray-700 rounded-full h-4 mt-4 border-2 border-gray-600"><div className="bg-red-500 h-full rounded-full transition-all duration-200 ease-linear" style={{ width: `${hpPercentage}%` }}></div></div>
+                <div className={`relative w-56 h-56 transition-transform duration-100 ${isHit ? 'transform scale-95' : 'group-hover:scale-110'}`}>
+                    <MonsterImage className={`w-full h-full ${monster.color} ${isHit ? 'animate-pulse' : ''}`} />
+                </div>
+                <div className="w-64 bg-gray-700 rounded-full h-4 mt-4 border-2 border-gray-600"><div className="bg-red-500 h-full rounded-full transition-all duration-200 ease-linear" style={{ width: `${hpPercentage}%` }}></div></div>
             </div>
             {damageNumbers.map(dn => {
                 let colorClass = '', animationClass = 'animate-damage-popup', style = {};
@@ -335,8 +440,8 @@ const UpgradePanel = ({ upgrades, onUpgrade, playerGold }) => (
             const benefit = upgrade.benefit(upgrade.level);
             const canAfford = playerGold >= cost;
             return (
-                <div key={upgrade.id} className="bg-gray-800 p-4 rounded-lg border border-gray-600">
-                    <div className="flex justify-between items-center"><h3 className="text-lg font-semibold text-green-400">{upgrade.name}</h3><span className="text-sm text-gray-400">레벨 {upgrade.level > 0 ? upgrade.level : '-'}</span></div>
+                <div key={upgrade.id} className={`bg-gray-800 p-4 rounded-lg border ${upgrade.id === 'BLESSING_UPGRADE' ? 'border-yellow-400' : 'border-gray-600'}`}>
+                    <div className="flex justify-between items-center"><h3 className={`text-lg font-semibold ${upgrade.id === 'BLESSING_UPGRADE' ? 'text-yellow-300' : 'text-green-400'}`}>{upgrade.name}</h3><span className="text-sm text-gray-400">레벨 {upgrade.level > 0 ? upgrade.level : '-'}</span></div>
                     <p className="text-sm text-gray-300 my-2">{upgrade.description(upgrade.level, cost, benefit)}</p>
                     <button onClick={() => onUpgrade(upgrade.id)} disabled={!canAfford} className={`w-full font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 ${canAfford ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}><CoinIcon className="w-5 h-5" /><span>{cost}</span></button>
                 </div>
@@ -354,21 +459,21 @@ const GameLog = ({ log }) => (
     </div>
 );
 
-const SkillsPanel = ({ player, onPowerShot, cooldown, powerShotCost }) => {
-    const canAfford = player.gold >= powerShotCost;
-    const isDisabled = cooldown > 0 || !canAfford;
+const SkillsPanel = ({ onPowerShot, cooldown, powerShotBaseCooldown }) => {
+    const isDisabled = cooldown > 0;
     return (
         <div className="w-full max-w-xs mt-4">
             <button onClick={onPowerShot} disabled={isDisabled} className={`w-full font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 relative overflow-hidden shadow-lg border border-gray-600 ${isDisabled ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}>
-                {cooldown > 0 && <div className="absolute top-0 left-0 h-full bg-black/50" style={{ width: `${(cooldown / 15) * 100}%` }}></div>}
+                {cooldown > 0 && <div className="absolute top-0 left-0 h-full bg-black/50" style={{ width: `${(cooldown / powerShotBaseCooldown) * 100}%` }}></div>}
                 <PowerShotIcon className="w-6 h-6 z-10" />
-                <div className="flex flex-col items-center z-10"><span className="text-md leading-tight">{cooldown > 0 ? `재사용 대기중 (${cooldown}s)` : '파워 샷'}</span><div className="flex items-center gap-1 text-xs text-yellow-200"><CoinIconForSkill /><span>{powerShotCost}</span></div></div>
+                <div className="flex flex-col items-center z-10">
+                    <span className="text-md leading-tight">{cooldown > 0 ? `재사용 대기중 (${cooldown}s)` : '파워 샷'}</span>
+                </div>
             </button>
         </div>
     );
 };
 
-// Fix: Changed to React.FC to correctly handle the 'key' prop provided in loops.
 const SocketShape: React.FC<{ shape: JewelShape, className?: string }> = ({ shape, className }) => {
     const baseStyle = "w-3 h-3 border border-gray-500";
     if (shape === 'CIRCLE') return <div className={`${baseStyle} rounded-full ${className}`}></div>
@@ -377,7 +482,6 @@ const SocketShape: React.FC<{ shape: JewelShape, className?: string }> = ({ shap
     return null;
 }
 
-// Fix: Added explicit prop types and made onSocketClick optional to support usage in different contexts.
 const SocketsDisplay = ({ sockets, allJewels, itemType, onSocketClick }: { sockets: Socket[], allJewels: Jewel[], itemType: EquipmentType, onSocketClick?: (itemType: EquipmentType, socketIndex: number) => void }) => (
     <div className="flex gap-1 mt-1">
         {sockets.map((socket, index) => {
@@ -409,7 +513,6 @@ const EquipmentPanel = ({ equippedItems, allJewels }: { equippedItems: Record<Eq
                                 <p className={`font-semibold text-sm ${RARITY_CONFIG[item.rarity].color}`}>{item.name}</p>
                                 <div className="text-xs text-cyan-300">
                                     {Object.entries(item.stats).map(([stat, value]) => (
-                                        // Fix: Cast 'value' to number to prevent arithmetic operation error on mixed types.
                                         <span key={stat}>{`${stat}: +${stat.includes('Bonus') ? `${((value as number) * 100).toFixed(0)}%` : value} `}</span>
                                     ))}
                                 </div>
@@ -431,7 +534,6 @@ const EquipmentInventoryPanel = ({ inventory, onEquip }) => (
                 <p className={`font-bold ${RARITY_CONFIG[item.rarity].color}`}>{item.name}</p>
                 <div className="text-sm text-cyan-300">
                     {Object.entries(item.stats).map(([stat, value]) => (
-                        // Fix: Cast 'value' to number to prevent arithmetic operation error on mixed types.
                         <span key={stat}>{`${stat}: +${stat.includes('Bonus') ? `${((value as number) * 100).toFixed(0)}%` : value} `}</span>
                     ))}
                 </div>
@@ -443,7 +545,6 @@ const EquipmentInventoryPanel = ({ inventory, onEquip }) => (
     </div>
 );
 
-// Fix: Added explicit prop types to ensure type safety for equipped items and jewels.
 const SocketingPanel = ({ equippedItems, allJewels, onSocket, onUnsocket }: {
     equippedItems: Record<EquipmentType, Equipment | null>,
     allJewels: Jewel[],
@@ -453,7 +554,7 @@ const SocketingPanel = ({ equippedItems, allJewels, onSocket, onUnsocket }: {
     const [selectedJewelId, setSelectedJewelId] = useState<string | null>(null);
     const socketedJewelIds = useMemo(() => {
         const ids = new Set<string>();
-        Object.values(equippedItems).forEach(item => {
+        Object.values(equippedItems).forEach((item: Equipment | null) => {
             if (item?.sockets) {
                 item.sockets.forEach(socket => {
                     if (socket.jewelId) ids.add(socket.jewelId);
@@ -510,7 +611,6 @@ const SocketingPanel = ({ equippedItems, allJewels, onSocket, onUnsocket }: {
                             </div>
                             <div className="text-sm text-cyan-300 ml-5">
                                 {Object.entries(jewel.stats).map(([stat, value]) => (
-                                    // Fix: Cast 'value' to number to prevent arithmetic operation error on mixed types.
                                     <span key={stat}>{`${stat}: +${stat.includes('Bonus') ? `${((value as number) * 100).toFixed(1)}%` : value} `}</span>
                                 ))}
                             </div>
@@ -520,7 +620,66 @@ const SocketingPanel = ({ equippedItems, allJewels, onSocket, onUnsocket }: {
             </div>
         </div>
     )
-}
+};
+
+const ShopPanel = ({ items, playerGold, onBuy, onRefresh, refreshCost, onGacha, gachaCost }) => {
+    const canAffordRefresh = playerGold >= refreshCost;
+    const canAffordGacha = playerGold >= gachaCost;
+    return (
+        <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-2">
+            <div className="sticky top-0 bg-gray-800/80 backdrop-blur-sm pb-2 z-10 space-y-2">
+                 <div className="bg-gray-800 p-3 rounded-lg border border-purple-500 text-center">
+                    <h3 className="text-lg font-semibold text-purple-400">랜덤 장비 뽑기</h3>
+                    <p className="text-sm text-gray-300 my-2">골드를 소모하여 무작위 등급의 장비를 획득합니다.</p>
+                    <button 
+                        onClick={onGacha} 
+                        disabled={!canAffordGacha}
+                        className={`w-full font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 ${canAffordGacha ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}
+                    >
+                        <CoinIcon className="w-5 h-5" />
+                        <span>{gachaCost}</span>
+                    </button>
+                </div>
+                <button 
+                    onClick={onRefresh} 
+                    disabled={!canAffordRefresh}
+                    className={`w-full font-bold py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 ${canAffordRefresh ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V4a1 1 0 011-1zm10 8a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 01-1-1z" clipRule="evenodd" /></svg>
+                    상품 목록 갱신
+                    <div className="flex items-center gap-1 text-xs text-yellow-200"><CoinIconForSkill /><span>{refreshCost}</span></div>
+                </button>
+            </div>
+            {items.length === 0 && <p className="text-center text-gray-500 mt-4">모든 상품이 판매되었습니다. 목록을 갱신하세요.</p>}
+            {items.map(item => {
+                const canAfford = playerGold >= (item.cost || 0);
+                return (
+                    <div key={item.id} className="bg-gray-800 p-3 rounded-lg border border-gray-600">
+                         <p className={`font-bold ${RARITY_CONFIG[item.rarity].color}`}>{item.name}</p>
+                        <div className="text-sm text-cyan-300">
+                            {Object.entries(item.stats).map(([stat, value]) => (
+                                <span key={stat}>{`${stat}: +${stat.includes('Bonus') ? `${((value as number) * 100).toFixed(0)}%` : value} `}</span>
+                            ))}
+                        </div>
+                        <div className="flex gap-1 mt-1">
+                            {item.sockets.map((socket, i) => <SocketShape key={i} shape={socket.shape} />)}
+                        </div>
+                        <div className="mt-2 pt-2 border-t border-gray-700 flex justify-end">
+                            <button 
+                                onClick={() => onBuy(item.id)} 
+                                disabled={!canAfford}
+                                className={`font-bold py-1 px-3 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-sm ${canAfford ? 'bg-yellow-500 hover:bg-yellow-600 text-gray-900' : 'bg-gray-600 text-gray-400 cursor-not-allowed'}`}
+                            >
+                                <CoinIcon className="w-4 h-4" />
+                                <span>{item.cost}</span>
+                            </button>
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 const App = () => {
     const [tab, setTab] = useState('upgrades');
@@ -535,7 +694,16 @@ const App = () => {
                 const level = savedUpgrade ? savedUpgrade.level : (config.id === 'CLICK_UPGRADE' ? 1 : 0);
                 return { ...config, level };
             });
-            return { ...data, upgrades: loadedUpgrades };
+            
+             const rehydratedPlayer = { ...INITIAL_PLAYER, ...data.player };
+            if (data.player && !data.monster) {
+                data.monster = MONSTER_GENERATOR(rehydratedPlayer.level);
+            } else if (data.monster) {
+                const template = [...MONSTER_TEMPLATES, BOSS_TEMPLATE].find(t => data.monster.name.includes(t.name));
+                if(template) data.monster.image = template.image;
+            }
+
+            return { ...data, upgrades: loadedUpgrades, player: rehydratedPlayer };
         } catch (error) {
             console.error("Failed to load game data:", error);
             localStorage.removeItem(SAVED_GAME_KEY);
@@ -544,205 +712,41 @@ const App = () => {
     };
     
     const initialUpgrades = useMemo(() => UPGRADES_CONFIG.map(u => ({ ...u, level: u.id === 'CLICK_UPGRADE' ? 1 : 0 })), []);
+    
+    const generateShopStock = useCallback((playerLevel: number): Equipment[] => {
+        return Array.from({ length: 4 }, () => generateEquipment(playerLevel, true));
+    }, []);
 
-    const [player, setPlayer] = useState(() => loadGame()?.player || INITIAL_PLAYER);
-    const [monster, setMonster] = useState(() => MONSTER_GENERATOR(player.level));
-    const [upgrades, setUpgrades] = useState(() => loadGame()?.upgrades || initialUpgrades);
+    const loadedState = useMemo(loadGame, []);
+    
+    const [player, setPlayer] = useState(() => loadedState?.player || INITIAL_PLAYER);
+    const [monster, setMonster] = useState<Monster | null>(() => loadedState?.monster || MONSTER_GENERATOR(player.level));
+    const [upgrades, setUpgrades] = useState(() => loadedState?.upgrades || initialUpgrades);
     const [gameLog, setGameLog] = useState(['게임 시작! 첫 슬라임을 공격하세요.']);
     const [damageNumbers, setDamageNumbers] = useState<DamageNumber[]>([]);
     const [powerShotCooldown, setPowerShotCooldown] = useState(0);
-    // Fix: Explicitly typed state to prevent 'unknown' type errors on properties.
-    const [equippedItems, setEquippedItems] = useState<Record<EquipmentType, Equipment | null>>(() => loadGame()?.equippedItems || { WEAPON: null, ARMOR: null, RING: null });
-    const [inventory, setInventory] = useState<Equipment[]>(() => loadGame()?.inventory || []);
-    const [jewels, setJewels] = useState<Jewel[]>(() => loadGame()?.jewels || []);
+    const [equippedItems, setEquippedItems] = useState<Record<EquipmentType, Equipment | null>>(() => loadedState?.equippedItems || { WEAPON: null, ARMOR: null, RING: null });
+    const [inventory, setInventory] = useState<Equipment[]>(() => loadedState?.inventory || []);
+    const [jewels, setJewels] = useState<Jewel[]>(() => loadedState?.jewels || []);
+    const [shopItems, setShopItems] = useState<Equipment[]>(() => loadedState?.shopItems || generateShopStock(player.level));
     const prevMonsterRef = useRef<Monster>();
     
     useEffect(() => {
-        const gameState = { player, upgrades: upgrades.map(u => ({id: u.id, level: u.level})), equippedItems, inventory, jewels };
+        const gameState = {
+            player,
+            monster,
+            upgrades: upgrades.map(u => ({ id: u.id, level: u.level })),
+            equippedItems,
+            inventory,
+            jewels,
+            shopItems,
+        };
         localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(gameState));
-    }, [player, upgrades, equippedItems, inventory, jewels]);
+    }, [player, monster, upgrades, equippedItems, inventory, jewels, shopItems]);
 
-    const addLog = (message: string) => setGameLog(prev => [message, ...prev.slice(0, 9)]);
-
-    const spawnFloatingNumber = (amount: number | string, type: DamageNumber['type']) => {
-        const newNumber: DamageNumber = { id: Date.now() + Math.random(), amount, x: 50 + Math.random() * 20 - 10, y: 50 + Math.random() * 20 - 10, type };
-        setDamageNumbers(prev => [...prev, newNumber]);
-        setTimeout(() => setDamageNumbers(prev => prev.filter(dn => dn.id !== newNumber.id)), 1000);
-    };
-
-    const playerStats = useMemo(() => {
-        let totalAttack = player.baseAttack;
-        let totalDps = player.dps;
-        let goldBonus = 0;
-        let xpBonus = 0;
-
-        const allItems = Object.values(equippedItems).filter(item => item !== null) as Equipment[];
-        allItems.forEach(item => {
-            totalAttack += item.stats.attack || 0;
-            totalDps += item.stats.dps || 0;
-            goldBonus += item.stats.goldBonus || 0;
-            xpBonus += item.stats.xpBonus || 0;
-
-            item.sockets.forEach(socket => {
-                if(socket.jewelId) {
-                    const jewel = jewels.find(j => j.id === socket.jewelId);
-                    if (jewel) {
-                        totalAttack += jewel.stats.attack || 0;
-                        totalDps += jewel.stats.dps || 0;
-                        goldBonus += jewel.stats.goldBonus || 0;
-                        xpBonus += jewel.stats.xpBonus || 0;
-                    }
-                }
-            })
-        });
-        
-        return { totalAttack, totalDps, goldBonus, xpBonus };
-    }, [player, equippedItems, jewels]);
-
-    const dealDamage = useCallback((damage: number, type: DamageNumber['type']) => {
-        if (monster.hp <= 0) return;
-        let newHp = Math.max(0, monster.hp - damage);
-        if (newHp > 0 && monster.special === 'HEAL' && Math.random() < 0.15) {
-            const healAmount = Math.max(1, Math.floor(monster.maxHp * 0.05));
-            newHp = Math.min(monster.maxHp, newHp + healAmount);
-            addLog(`${monster.name}이(가) 스스로를 치유했습니다! (+${healAmount} HP)`);
-            spawnFloatingNumber(`+${healAmount}`, 'heal');
-        }
-        setMonster(prev => ({ ...prev, hp: newHp }));
-        spawnFloatingNumber(damage, type);
-    }, [monster]);
-
-    useEffect(() => {
-        if (prevMonsterRef.current && prevMonsterRef.current.hp > 0 && monster.hp === 0) {
-            const goldReward = Math.floor(monster.goldReward * (1 + playerStats.goldBonus));
-            const xpReward = Math.floor(monster.xpReward * (1 + playerStats.xpBonus));
-
-            addLog(`${monster.name}을(를) 물리쳤습니다!`);
-            addLog(`+${goldReward} 골드, +${xpReward} 경험치`);
-
-            let newXp = player.xp + xpReward;
-            let newLevel = player.level;
-            let newXpToNextLevel = player.xpToNextLevel;
-            let newBaseAttack = player.baseAttack;
-
-            while (newXp >= newXpToNextLevel) {
-                newXp -= newXpToNextLevel;
-                newLevel++;
-                newXpToNextLevel = Math.floor(newXpToNextLevel * 1.5);
-                newBaseAttack = Math.floor(newBaseAttack * 1.2);
-                addLog(`레벨 업! ${newLevel}레벨이 되었습니다!`);
-            }
-
-            if (Math.random() < 0.15) {
-                const newItem = generateEquipment(newLevel);
-                addLog(`<span class="${RARITY_CONFIG[newItem.rarity].color}">[${newItem.name}]</span> 장비를 획득했습니다!`);
-                setInventory(prev => [newItem, ...prev].slice(0, 20));
-            }
-            if (Math.random() < 0.05) {
-                const newJewel = generateJewel(newLevel);
-                addLog(`<span class="jewel-name-${newJewel.type} ${RARITY_CONFIG[newJewel.rarity].color}">[${newJewel.name}]</span> 보석을 획득했습니다!`);
-                setJewels(prev => [newJewel, ...prev].slice(0, 50));
-            }
-
-            const nextPlayerState = { ...player, level: newLevel, xp: newXp, xpToNextLevel: newXpToNextLevel, gold: player.gold + goldReward, baseAttack: newBaseAttack };
-            setPlayer(nextPlayerState);
-            setMonster(MONSTER_GENERATOR(nextPlayerState.level));
-        }
-        prevMonsterRef.current = monster;
-    }, [monster, player, playerStats]);
-    
-    const handleAttack = () => dealDamage(playerStats.totalAttack, 'click');
-    
-    const powerShotUpgrade = upgrades.find(u => u.id === 'POWER_SHOT_UPGRADE')!;
-    const powerShotCostReduction = Math.min(0.95, powerShotUpgrade.level * 0.05);
-    const powerShotCost = Math.floor((50 + player.level * 10) * (1 - powerShotCostReduction));
-    const powerShotDamage = Math.floor(playerStats.totalAttack * 5 + playerStats.totalDps * 2 + player.level * 3);
-    
-    const handlePowerShot = () => {
-        if (powerShotCooldown > 0 || player.gold < powerShotCost) return;
-        setPlayer(prev => ({...prev, gold: prev.gold - powerShotCost}));
-        dealDamage(powerShotDamage, 'skill');
-        setPowerShotCooldown(15);
-        addLog(`파워 샷! ${powerShotDamage}의 피해를 입혔습니다! (-${powerShotCost} 골드)`);
-    };
-
-    const handleUpgrade = (id: string) => {
-        const upgrade = upgrades.find(u => u.id === id);
-        if (!upgrade) return;
-        const cost = upgrade.cost(upgrade.level);
-        if (player.gold < cost) return;
-
-        setPlayer(p => ({
-            ...p,
-            gold: p.gold - cost,
-            baseAttack: id === 'CLICK_UPGRADE' ? p.baseAttack + upgrade.benefit(upgrade.level) : p.baseAttack,
-            dps: id === 'DPS_UPGRADE' ? p.dps + upgrade.benefit(upgrade.level) : p.dps,
-        }));
-        setUpgrades(upgrades.map(u => u.id === id ? { ...u, level: u.level + 1 } : u));
-        addLog(`${upgrade.name} 강화! (레벨 ${upgrade.level + 1})`);
-    };
-
-    const handleEquipItem = (itemToEquip: Equipment) => {
-        const oldItem = equippedItems[itemToEquip.type];
-        setEquippedItems(prev => ({ ...prev, [itemToEquip.type]: itemToEquip }));
-        setInventory(prev => prev.filter(i => i.id !== itemToEquip.id));
-        if (oldItem) {
-            setInventory(prev => [oldItem, ...prev].slice(0,20));
-            addLog(`[${itemToEquip.name}] 장착, [${oldItem.name}] 해제.`);
-        } else {
-            addLog(`[${itemToEquip.name}] 장착.`);
-        }
-    };
-
-    const handleSocketJewel = (itemType: EquipmentType, socketIndex: number, jewel: Jewel) => {
-        setEquippedItems(prev => {
-            const newEquipped = {...prev};
-            const item = newEquipped[itemType];
-            if (item) {
-                const newSockets = [...item.sockets];
-                newSockets[socketIndex] = {...newSockets[socketIndex], jewelId: jewel.id};
-                newEquipped[itemType] = {...item, sockets: newSockets};
-                addLog(`[${item.name}]에 [${jewel.name}] 보석 장착!`);
-                return newEquipped;
-            }
-            return prev;
-        });
-    }
-
-    const handleUnsocketJewel = (itemType: EquipmentType, socketIndex: number) => {
-        setEquippedItems(prev => {
-            const newEquipped = {...prev};
-            const item = newEquipped[itemType];
-            if (item && item.sockets[socketIndex].jewelId) {
-                const jewelId = item.sockets[socketIndex].jewelId;
-                const jewel = jewels.find(j => j.id === jewelId);
-                const newSockets = [...item.sockets];
-                newSockets[socketIndex] = {...newSockets[socketIndex], jewelId: null};
-                newEquipped[itemType] = {...item, sockets: newSockets};
-                addLog(`[${item.name}]에서 [${jewel?.name}] 보석 제거.`);
-                return newEquipped;
-            }
-            return prev;
-        });
-    }
-
-    useEffect(() => {
-        if (playerStats.totalDps > 0) {
-            const interval = setInterval(() => dealDamage(playerStats.totalDps, 'dps'), 1000);
-            return () => clearInterval(interval);
-        }
-    }, [playerStats.totalDps, dealDamage]);
-
-    useEffect(() => {
-        if (powerShotCooldown > 0) {
-            const timer = setInterval(() => setPowerShotCooldown(p => Math.max(0, p - 1)), 1000);
-            return () => clearInterval(timer);
-        }
-    }, [powerShotCooldown]);
-    
     const socketedJewelIds = useMemo(() => {
         const ids = new Set<string>();
-        Object.values(equippedItems).forEach(item => {
+        Object.values(equippedItems).forEach((item: Equipment | null) => {
             if (item?.sockets) {
                 item.sockets.forEach(socket => {
                     if (socket.jewelId) ids.add(socket.jewelId);
@@ -751,39 +755,334 @@ const App = () => {
         });
         return ids;
     }, [equippedItems]);
-    const availableJewels = jewels.filter(j => !socketedJewelIds.has(j.id));
+
+    const equippedJewels = useMemo(() => {
+        return jewels.filter(j => socketedJewelIds.has(j.id));
+    }, [jewels, socketedJewelIds]);
+
+    const { totalAttack, totalDps, goldBonus, xpBonus, powerShotDamageBonus } = useMemo(() => {
+        let attack = player.baseAttack;
+        let dps = player.dps;
+        let gBonus = 0;
+        let xBonus = 0;
+        let psBonus = 0;
+
+        const clickUpgrade = upgrades.find(u => u.id === 'CLICK_UPGRADE');
+        if (clickUpgrade && clickUpgrade.level > 1) {
+            for (let i = 1; i < clickUpgrade.level; i++) {
+                attack += clickUpgrade.benefit(i);
+            }
+        }
+
+        const dpsUpgrade = upgrades.find(u => u.id === 'DPS_UPGRADE');
+        if (dpsUpgrade && dpsUpgrade.level > 0) {
+            for (let i = 0; i < dpsUpgrade.level; i++) {
+                dps += dpsUpgrade.benefit(i);
+            }
+        }
+        
+        const goldUpgrade = upgrades.find(u => u.id === 'GOLD_BONUS_UPGRADE');
+        if (goldUpgrade) gBonus += goldUpgrade.level * goldUpgrade.benefit(goldUpgrade.level);
+
+        const xpUpgrade = upgrades.find(u => u.id === 'XP_BONUS_UPGRADE');
+        if (xpUpgrade) xBonus += xpUpgrade.level * xpUpgrade.benefit(xpUpgrade.level);
+
+        const powerShotDamageUpgrade = upgrades.find(u => u.id === 'POWER_SHOT_DAMAGE_UPGRADE');
+        if (powerShotDamageUpgrade) {
+            psBonus += powerShotDamageUpgrade.level * powerShotDamageUpgrade.benefit(powerShotDamageUpgrade.level);
+        }
+
+        Object.values(equippedItems).forEach((item: Equipment | null) => {
+            if (!item) return;
+            attack += item.stats.attack || 0;
+            dps += item.stats.dps || 0;
+            gBonus += item.stats.goldBonus || 0;
+            xBonus += item.stats.xpBonus || 0;
+        });
+        
+        equippedJewels.forEach(jewel => {
+            attack += jewel.stats.attack || 0;
+            dps += jewel.stats.dps || 0;
+            gBonus += jewel.stats.goldBonus || 0;
+            xBonus += jewel.stats.xpBonus || 0;
+            psBonus += jewel.stats.powerShotDamageBonus || 0;
+        });
+
+        const blessingUpgrade = upgrades.find(u => u.id === 'BLESSING_UPGRADE');
+        const blessingMultiplier = blessingUpgrade ? Math.pow(blessingUpgrade.benefit(0), blessingUpgrade.level) : 1;
+        
+        attack *= blessingMultiplier;
+        dps *= blessingMultiplier;
+        gBonus *= blessingMultiplier;
+        xBonus *= blessingMultiplier;
+        psBonus *= blessingMultiplier;
+
+        return { totalAttack: Math.floor(attack), totalDps: Math.floor(dps), goldBonus: gBonus, xpBonus: xBonus, powerShotDamageBonus: psBonus };
+    }, [player, upgrades, equippedItems, equippedJewels]);
+    
+    const powerShotBaseCooldown = useMemo(() => {
+        const powerShotUpgrade = upgrades.find(u => u.id === 'POWER_SHOT_UPGRADE');
+        const reduction = powerShotUpgrade ? Math.min(0.9, powerShotUpgrade.level * powerShotUpgrade.benefit(powerShotUpgrade.level)) : 0;
+        return Math.max(3, Math.floor(30 * (1 - reduction)));
+    }, [upgrades]);
+    
+    const shopRefreshCost = useMemo(() => {
+        return Math.floor(50 + player.level * 5);
+    }, [player.level]);
+    
+    const gachaCost = useMemo(() => {
+        return Math.floor(100 + player.level * 20);
+    }, [player.level]);
+
+    const addLog = useCallback((message: string) => {
+        setGameLog(prevLog => [message, ...prevLog.slice(0, 14)]);
+    }, []);
+
+    const addDamageNumber = useCallback((amount: number | string, type: DamageNumber['type'], customX = 50, customY = 50) => {
+        setDamageNumbers(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            amount,
+            x: customX - 10 + Math.random() * 20,
+            y: customY - 10 + Math.random() * 20,
+            type
+        }]);
+    }, []);
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (damageNumbers.length > 20) {
+                setDamageNumbers(d => d.slice(d.length - 20));
+            }
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [damageNumbers]);
+
+    const gainXp = useCallback((xp: number) => {
+        const finalXp = Math.floor(xp * (1 + xpBonus));
+        setPlayer(p => {
+            let newXp = p.xp + finalXp;
+            let newLevel = p.level;
+            let newXpToNext = p.xpToNextLevel;
+            let newBaseAttack = p.baseAttack;
+
+            while (newXp >= newXpToNext) {
+                newXp -= newXpToNext;
+                newLevel++;
+                newXpToNext = Math.floor(10 * Math.pow(1.5, newLevel - 1));
+                newBaseAttack = Math.floor(1 * Math.pow(1.2, newLevel - 1));
+                addLog(`<span class="text-green-400 font-bold">레벨 업! ${newLevel}레벨 달성!</span>`);
+            }
+            return { ...p, level: newLevel, xp: newXp, xpToNextLevel: newXpToNext, baseAttack: newBaseAttack };
+        });
+    }, [xpBonus, addLog]);
+
+    const handleMonsterDefeat = useCallback((defeatedMonster: Monster) => {
+        const goldWon = Math.floor(defeatedMonster.goldReward * (1 + goldBonus));
+        addLog(`<span class="text-yellow-400">+${goldWon} 골드</span>와 <span class="text-blue-400">+${defeatedMonster.xpReward} 경험치</span>를 획득했습니다.`);
+        setPlayer(p => ({ ...p, gold: p.gold + goldWon }));
+        gainXp(defeatedMonster.xpReward);
+
+        if (Math.random() < 0.1) {
+            const newItem = generateEquipment(player.level);
+            setInventory(inv => [...inv, newItem]);
+            addLog(`아이템 획득: <span class="${RARITY_CONFIG[newItem.rarity].color}">${newItem.name}</span>`);
+        }
+        if (Math.random() < 0.05) {
+            const newJewel = generateJewel(player.level);
+            setJewels(j => [...j, newJewel]);
+            addLog(`보석 획득: <span class="${RARITY_CONFIG[newJewel.rarity].color} jewel-name-${newJewel.type}">${newJewel.name}</span>`);
+        }
+
+        setMonster(MONSTER_GENERATOR(player.level));
+    }, [player.level, goldBonus, gainXp, addLog]);
+
+    const dealDamage = useCallback((damage: number) => {
+        setMonster(m => {
+            if (!m) return m;
+            const newHp = Math.max(0, m.hp - damage);
+            if (newHp === 0) {
+                handleMonsterDefeat(m);
+                return null;
+            }
+            if (m.special === 'HEAL' && m.hp / m.maxHp < 0.3 && Math.random() < 0.1) {
+                const healAmount = Math.floor(m.maxHp * 0.15);
+                addDamageNumber(`+${healAmount}`, 'heal', 50, 20);
+                return { ...m, hp: Math.min(m.maxHp, m.hp + healAmount) };
+            }
+            return { ...m, hp: newHp };
+        });
+    }, [handleMonsterDefeat, addDamageNumber]);
+
+    const handleAttack = useCallback((event: React.MouseEvent) => {
+        if (!monster) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = ((event.clientY - rect.top) / rect.height) * 100;
+        
+        addDamageNumber(totalAttack, 'click', x, y);
+        dealDamage(totalAttack);
+    }, [monster, totalAttack, addDamageNumber, dealDamage]);
+
+    const handleDpsAttack = useCallback(() => {
+        if (!monster) return;
+        addDamageNumber(totalDps, 'dps');
+        dealDamage(totalDps);
+    }, [monster, totalDps, addDamageNumber, dealDamage]);
+
+    const handlePowerShot = useCallback(() => {
+        if (!monster || powerShotCooldown > 0) return;
+
+        setPowerShotCooldown(powerShotBaseCooldown);
+        const damage = Math.floor(totalAttack * 5 * (1 + powerShotDamageBonus));
+        addDamageNumber(damage, 'skill');
+        dealDamage(damage);
+        addLog(`<span class="text-cyan-400 font-bold">파워 샷!</span> ${damage}의 피해를 입혔습니다!`);
+    }, [monster, powerShotCooldown, powerShotBaseCooldown, totalAttack, powerShotDamageBonus, addDamageNumber, dealDamage, addLog]);
+
+    const handleUpgrade = useCallback((upgradeId: string) => {
+        const upgrade = upgrades.find(u => u.id === upgradeId);
+        if (!upgrade) return;
+        const cost = upgrade.cost(upgrade.level);
+        if (player.gold >= cost) {
+            setPlayer(p => ({ ...p, gold: p.gold - cost }));
+            setUpgrades(prev => prev.map(u => u.id === upgradeId ? { ...u, level: u.level + 1 } : u));
+            if (upgrade.id === 'BLESSING_UPGRADE') {
+                addLog(`<span class="text-yellow-300 font-bold">여신의 축복을 받아 모든 능력치가 2배가 되었습니다!</span>`);
+            }
+        }
+    }, [player.gold, upgrades, addLog]);
+    
+    const handleEquip = useCallback((itemToEquip: Equipment) => {
+        setEquippedItems(prev => {
+            const currentItem = prev[itemToEquip.type];
+            const newInventory = inventory.filter(i => i.id !== itemToEquip.id);
+            if (currentItem) {
+                newInventory.push(currentItem);
+            }
+            setInventory(newInventory);
+            return { ...prev, [itemToEquip.type]: itemToEquip };
+        });
+        addLog(`[<span class="${RARITY_CONFIG[itemToEquip.rarity].color}">${itemToEquip.name}</span>] 을(를) 장착했습니다.`);
+    }, [inventory, addLog]);
+    
+    const handleSocket = useCallback((itemType: EquipmentType, socketIndex: number, jewel: Jewel) => {
+        setEquippedItems(prev => {
+            const item = prev[itemType];
+            if (!item || !item.sockets[socketIndex] || item.sockets[socketIndex].jewelId) return prev;
+            const newSockets = [...item.sockets];
+            newSockets[socketIndex] = { ...newSockets[socketIndex], jewelId: jewel.id };
+            return { ...prev, [itemType]: { ...item, sockets: newSockets } };
+        });
+        addLog(`[<span class="jewel-name-${jewel.type} ${RARITY_CONFIG[jewel.rarity].color}">${jewel.name}</span>] 을(를) 소켓에 장착했습니다.`);
+    }, [addLog]);
+
+    const handleUnsocket = useCallback((itemType: EquipmentType, socketIndex: number) => {
+        setEquippedItems(prev => {
+            const item = prev[itemType];
+            if (!item || !item.sockets[socketIndex] || !item.sockets[socketIndex].jewelId) return prev;
+            const jewelId = item.sockets[socketIndex].jewelId;
+            const jewel = jewels.find(j => j.id === jewelId);
+            const newSockets = [...item.sockets];
+            newSockets[socketIndex] = { ...newSockets[socketIndex], jewelId: null };
+            if (jewel) {
+                 addLog(`[<span class="jewel-name-${jewel.type} ${RARITY_CONFIG[jewel.rarity].color}">${jewel.name}</span>] 을(를) 소켓에서 제거했습니다.`);
+            }
+            return { ...prev, [itemType]: { ...item, sockets: newSockets } };
+        });
+    }, [addLog, jewels]);
+    
+    const handleBuyItem = useCallback((itemId: string) => {
+        const item = shopItems.find(i => i.id === itemId);
+        if (!item || !item.cost || player.gold < item.cost) return;
+        
+        setPlayer(p => ({ ...p, gold: p.gold - (item.cost || 0) }));
+        setInventory(inv => [...inv, { ...item, cost: undefined }]);
+        setShopItems(si => si.filter(i => i.id !== itemId));
+        addLog(`상점에서 [<span class="${RARITY_CONFIG[item.rarity].color}">${item.name}</span>] 을(를) 구매했습니다.`);
+    }, [player.gold, shopItems, addLog]);
+    
+    const handleRefreshShop = useCallback(() => {
+        if (player.gold < shopRefreshCost) return;
+        setPlayer(p => ({...p, gold: p.gold - shopRefreshCost }));
+        setShopItems(generateShopStock(player.level));
+        addLog('상점 목록을 갱신했습니다.');
+    }, [player.gold, player.level, shopRefreshCost, generateShopStock, addLog]);
+
+    const handleGacha = useCallback(() => {
+        if (player.gold < gachaCost) return;
+        setPlayer(p => ({ ...p, gold: p.gold - gachaCost }));
+        const newItem = generateEquipment(player.level);
+        setInventory(inv => [...inv, newItem]);
+        addLog(`장비 뽑기 성공! [<span class="${RARITY_CONFIG[newItem.rarity].color}">${newItem.name}</span>] 획득!`);
+    }, [player.gold, player.level, gachaCost, addLog]);
+    
+    const handleNicknameChange = useCallback((newName: string) => {
+        setPlayer(p => ({ ...p, nickname: newName }));
+        addLog(`닉네임이 [${newName}](으)로 변경되었습니다.`);
+    }, [addLog]);
+
+    useEffect(() => {
+        if (totalDps > 0) {
+            const interval = setInterval(() => {
+                if (monster) {
+                    handleDpsAttack();
+                }
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [totalDps, monster, handleDpsAttack]);
+
+    useEffect(() => {
+        if (powerShotCooldown > 0) {
+            const timer = setTimeout(() => {
+                setPowerShotCooldown(prev => Math.max(0, prev - 1));
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [powerShotCooldown]);
+    
+    useEffect(() => {
+        prevMonsterRef.current = monster;
+    }, [monster]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900 flex flex-col items-center justify-center p-4 font-sans select-none">
-            <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-1 bg-gray-800/50 p-6 rounded-2xl shadow-lg border border-gray-700 flex flex-col gap-6 order-2 lg:order-1">
-                    <PlayerStats player={player} {...playerStats} />
-                    <EquipmentPanel equippedItems={equippedItems} allJewels={jewels} />
-                    <GameLog log={gameLog} />
-                </div>
-                <div className="lg:col-span-1 flex flex-col items-center justify-center order-1 lg:order-2">
-                    <h1 className="text-4xl font-bold text-yellow-400 mb-4 tracking-wider" style={{ textShadow: '0 0 10px rgba(250, 204, 21, 0.7)' }}>슬라임 헌터</h1>
-                    <MonsterDisplay monster={monster} onAttack={handleAttack} damageNumbers={damageNumbers} />
-                    <SkillsPanel player={player} onPowerShot={handlePowerShot} cooldown={powerShotCooldown} powerShotCost={powerShotCost} />
-                </div>
-                <div className="lg:col-span-1 bg-gray-800/50 p-6 rounded-2xl shadow-lg border border-gray-700 order-3 lg:order-3">
-                    <div className="flex mb-4 border-b border-gray-600">
-                        <button onClick={() => setTab('upgrades')} className={`flex-1 py-2 font-bold ${tab === 'upgrades' ? 'text-yellow-300 border-b-2 border-yellow-300' : 'text-gray-400'}`}>업그레이드</button>
-                        <button onClick={() => setTab('inventory')} className={`flex-1 py-2 font-bold ${tab === 'inventory' ? 'text-yellow-300 border-b-2 border-yellow-300' : 'text-gray-400'}`}>장비 ({inventory.length})</button>
-                        <button onClick={() => setTab('socketing')} className={`flex-1 py-2 font-bold ${tab === 'socketing' ? 'text-yellow-300 border-b-2 border-yellow-300' : 'text-gray-400'}`}>소켓 장착 ({availableJewels.length})</button>
-                    </div>
-                    {tab === 'upgrades' && <UpgradePanel upgrades={upgrades} onUpgrade={handleUpgrade} playerGold={player.gold} />}
-                    {tab === 'inventory' && <EquipmentInventoryPanel inventory={inventory} onEquip={handleEquipItem} />}
-                    {tab === 'socketing' && <SocketingPanel equippedItems={equippedItems} allJewels={jewels} onSocket={handleSocketJewel} onUnsocket={handleUnsocketJewel} />}
-                </div>
+        <main className="container mx-auto p-4 flex flex-col md:flex-row gap-4 items-start font-sans relative">
+            <div className="absolute top-4 right-4 text-sm text-gray-500">제작자: 한국인이라면</div>
+            <div className="w-full md:w-1/4 flex flex-col gap-4 order-2 md:order-1">
+                <PlayerStats player={player} onNicknameChange={handleNicknameChange} totalAttack={totalAttack} totalDps={totalDps} goldBonus={goldBonus} xpBonus={xpBonus} powerShotDamageBonus={powerShotDamageBonus} />
+                <EquipmentPanel equippedItems={equippedItems} allJewels={jewels} />
+                <GameLog log={gameLog} />
             </div>
-            <footer className="text-center text-gray-500 mt-8"><p>&copy; 2024 Slime Hunter. A simple RPG.</p></footer>
-        </div>
+
+            <div className="w-full md:w-1/2 flex flex-col items-center gap-4 order-1 md:order-2">
+                <div className="bg-gray-900/50 rounded-lg border border-gray-700 p-4">
+                    {monster ?
+                        <MonsterDisplay monster={monster} onAttack={handleAttack} damageNumbers={damageNumbers} />
+                        : <div className="w-80 h-80 flex items-center justify-center">Loading...</div>
+                    }
+                </div>
+                <SkillsPanel onPowerShot={handlePowerShot} cooldown={powerShotCooldown} powerShotBaseCooldown={powerShotBaseCooldown} />
+            </div>
+
+            <div className="w-full md:w-1/4 flex flex-col gap-4 order-3 md:order-3 bg-gray-900/50 rounded-lg border border-gray-700 p-4">
+                <div className="flex justify-around border-b border-gray-600 mb-2">
+                    {['upgrades', 'inventory', 'socketing', 'shop'].map(t => (
+                        <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-sm font-bold transition-colors ${tab === t ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-gray-400 hover:text-white'}`}>
+                            {t === 'upgrades' && '강화'}
+                            {t === 'inventory' && '가방'}
+                            {t === 'socketing' && '보석'}
+                            {t === 'shop' && '상점'}
+                        </button>
+                    ))}
+                </div>
+                {tab === 'upgrades' && <UpgradePanel upgrades={upgrades} onUpgrade={handleUpgrade} playerGold={player.gold} />}
+                {tab === 'inventory' && <EquipmentInventoryPanel inventory={inventory} onEquip={handleEquip} />}
+                {tab === 'socketing' && <SocketingPanel equippedItems={equippedItems} allJewels={jewels} onSocket={handleSocket} onUnsocket={handleUnsocket} />}
+                {tab === 'shop' && <ShopPanel items={shopItems} playerGold={player.gold} onBuy={handleBuyItem} onRefresh={handleRefreshShop} refreshCost={shopRefreshCost} onGacha={handleGacha} gachaCost={gachaCost} />}
+            </div>
+        </main>
     );
 };
 
-// --- RENDER APP ---
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error("Could not find root element");
-const root = ReactDOM.createRoot(rootElement);
-root.render(<React.StrictMode><App /></React.StrictMode>);
+const root = ReactDOM.createRoot(document.getElementById('root')!);
+root.render(<App />);
