@@ -5,17 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>슬라임 헌터 (Slime Hunter)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
-  }
-}
-</script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         @keyframes damage-popup {
             0% { transform: translateY(0) scale(1); opacity: 1; }
@@ -30,6 +19,17 @@
         }
         .animate-damage-popup-skill {
             animation: damage-popup-skill 1s ease-out forwards;
+        }
+
+        @keyframes screen-shake {
+            0% { transform: translate(0, 0) rotate(0); }
+            25% { transform: translate(0.5px, -0.5px) rotate(-0.1deg); }
+            50% { transform: translate(-0.5px, 0.5px) rotate(0.1deg); }
+            75% { transform: translate(0.5px, 0.5px) rotate(-0.1deg); }
+            100% { transform: translate(0, 0) rotate(0); }
+        }
+        .animate-screen-shake {
+            animation: screen-shake 0.1s linear;
         }
 
         /* Rarity Colors */
@@ -52,9 +52,17 @@
         .socket-jewel-TOPAZ { background-color: #eab308; box-shadow: 0 0 3px #eab308; }
         .socket-jewel-AMETHYST { background-color: #c026d3; box-shadow: 0 0 3px #c026d3; }
     </style>
-  </head>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+</head>
   <body class="bg-gray-900 text-white antialiased">
     <div id="root"></div>
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="index.tsx"></script>
   </body>
 </html>

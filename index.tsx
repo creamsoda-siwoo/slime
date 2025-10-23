@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -425,7 +424,7 @@ const MonsterDisplay = ({ monster, onAttack, damageNumbers }) => {
                     case 'click': colorClass = 'text-yellow-300 text-2xl'; break;
                     case 'dps': colorClass = 'text-purple-400 text-xl'; break;
                     case 'heal': colorClass = 'text-green-400 text-xl'; break;
-                    case 'skill': colorClass = 'text-cyan-400 text-4xl'; animationClass = 'animate-damage-popup-skill'; style = { textShadow: '0 0 8px rgba(0, 255, 255, 0.9)' }; break;
+                    case 'skill': colorClass = 'text-cyan-400 text-4xl'; animationClass = 'animate-damage-popup'; style = { textShadow: '0 0 8px rgba(0, 255, 255, 0.9)' }; break;
                 }
                 return <div key={dn.id} className={`absolute font-bold pointer-events-none ${animationClass} ${colorClass}`} style={{ left: `${dn.x}%`, top: `${dn.y}%`, textShadow: '0px 0px 5px rgba(0,0,0,0.8)', ...style }}>{dn.amount}</div>;
             })}
@@ -729,6 +728,8 @@ const App = () => {
     const [inventory, setInventory] = useState<Equipment[]>(() => loadedState?.inventory || []);
     const [jewels, setJewels] = useState<Jewel[]>(() => loadedState?.jewels || []);
     const [shopItems, setShopItems] = useState<Equipment[]>(() => loadedState?.shopItems || generateShopStock(player.level));
+    const [isScreenShaking, setIsScreenShaking] = useState(false);
+    const prevLevelRef = useRef(player.level);
     const prevMonsterRef = useRef<Monster>();
     
     useEffect(() => {
@@ -838,6 +839,26 @@ const App = () => {
         setGameLog(prevLog => [message, ...prevLog.slice(0, 14)]);
     }, []);
 
+    useEffect(() => {
+        if (player.level > prevLevelRef.current) {
+            const previousLevel = prevLevelRef.current;
+            const levelsGained = player.level - previousLevel;
+            for (let i = 0; i < levelsGained; i++) {
+                const newLevel = previousLevel + 1 + i;
+                const goldReward = newLevel * 50;
+                setPlayer(p => ({ ...p, gold: p.gold + goldReward }));
+                addLog(`<span class="text-green-400 font-bold">레벨 업! ${newLevel}레벨 달성!</span> 보상으로 <span class="text-yellow-400">${goldReward} 골드</span>를 획득했습니다.`);
+
+                if (Math.random() < 0.2) { // 20% chance
+                    const newJewel = generateJewel(newLevel);
+                    setJewels(j => [...j, newJewel]);
+                    addLog(`레벨업 보너스! 보석 획득: <span class="${RARITY_CONFIG[newJewel.rarity].color} jewel-name-${newJewel.type}">${newJewel.name}</span>`);
+                }
+            }
+        }
+        prevLevelRef.current = player.level;
+    }, [player.level, addLog]);
+
     const addDamageNumber = useCallback((amount: number | string, type: DamageNumber['type'], customX = 50, customY = 50) => {
         setDamageNumbers(prev => [...prev, {
             id: Date.now() + Math.random(),
@@ -870,11 +891,10 @@ const App = () => {
                 newLevel++;
                 newXpToNext = Math.floor(10 * Math.pow(1.5, newLevel - 1));
                 newBaseAttack = Math.floor(1 * Math.pow(1.2, newLevel - 1));
-                addLog(`<span class="text-green-400 font-bold">레벨 업! ${newLevel}레벨 달성!</span>`);
             }
             return { ...p, level: newLevel, xp: newXp, xpToNextLevel: newXpToNext, baseAttack: newBaseAttack };
         });
-    }, [xpBonus, addLog]);
+    }, [xpBonus]);
 
     const handleMonsterDefeat = useCallback((defeatedMonster: Monster) => {
         const goldWon = Math.floor(defeatedMonster.goldReward * (1 + goldBonus));
@@ -915,6 +935,10 @@ const App = () => {
 
     const handleAttack = useCallback((event: React.MouseEvent) => {
         if (!monster) return;
+        
+        setIsScreenShaking(true);
+        setTimeout(() => setIsScreenShaking(false), 100);
+
         const rect = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - rect.left) / rect.width) * 100;
         const y = ((event.clientY - rect.top) / rect.height) * 100;
@@ -1046,7 +1070,7 @@ const App = () => {
     }, [monster]);
 
     return (
-        <main className="container mx-auto p-4 flex flex-col md:flex-row gap-4 items-start font-sans relative">
+        <main className={`container mx-auto p-4 flex flex-col md:flex-row gap-4 items-start font-sans relative ${isScreenShaking ? 'animate-screen-shake' : ''}`}>
             <div className="absolute top-4 right-4 text-sm text-gray-500">제작자: 한국인이라면</div>
             <div className="w-full md:w-1/4 flex flex-col gap-4 order-2 md:order-1">
                 <PlayerStats player={player} onNicknameChange={handleNicknameChange} totalAttack={totalAttack} totalDps={totalDps} goldBonus={goldBonus} xpBonus={xpBonus} powerShotDamageBonus={powerShotDamageBonus} />
