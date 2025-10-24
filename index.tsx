@@ -1,5 +1,5 @@
 // FIX: Import React and ReactDOM to resolve 'not defined' errors.
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo, forwardRef, useImperativeHandle } from 'react';
 import * as ReactDOM from 'react-dom/client';
 
 // --- ICONS ---
@@ -166,8 +166,8 @@ const MONSTER_GENERATOR = (level) => {
     const hp = Math.floor(template.baseHp * Math.pow(1.25, level - 1));
     const goldReward = Math.floor(template.baseGold * Math.pow(1.15, level - 1));
     const xpReward = Math.floor(template.baseXp * Math.pow(1.12, level - 1));
-    // FIX: Cast template to 'any' to safely access the optional 'special' property.
-    return { id: Date.now() + Math.random(), name: `${template.name} (Lv.${level})`, hp, maxHp: hp, goldReward, xpReward, level, color: template.color, special: (template as any).special, image: template.image };
+    // FIX: Removed TypeScript 'as any' cast which causes syntax errors with in-browser Babel.
+    return { id: Date.now() + Math.random(), name: `${template.name} (Lv.${level})`, hp, maxHp: hp, goldReward, xpReward, level, color: template.color, special: template.special, image: template.image };
 };
 
 const generateEquipment = (playerLevel, isShopItem = false) => {
@@ -181,15 +181,18 @@ const generateEquipment = (playerLevel, isShopItem = false) => {
     const type = Object.keys(EQUIPMENT_BASES)[Math.floor(Math.random() * 3)];
     const baseName = EQUIPMENT_BASES[type][Math.floor(Math.random() * EQUIPMENT_BASES[type].length)];
     
-    // FIX: Type 'stats' as 'any' to allow dynamic property assignment.
-    const stats: any = {};
+    // FIX: Removed TypeScript type annotation.
+    const stats = {};
     const multiplier = RARITY_CONFIG[rarity].multiplier;
     const statPower = Math.max(1, Math.floor(playerLevel * multiplier * (1 + Math.random() * 0.2)));
 
     switch (type) {
-        case 'WEAPON': stats.attack = statPower; if (rarity !== 'COMMON') stats.dps = Math.floor(statPower / 2); break;
-        case 'ARMOR': stats.goldBonus = Math.round(statPower * 1.5) / 100; break;
-        case 'RING': stats.xpBonus = Math.round(statPower * 1.5) / 100; break;
+        // FIX: Use bracket notation to prevent 'property does not exist' errors from linters on dynamically assigned properties.
+        case 'WEAPON': stats['attack'] = statPower; if (rarity !== 'COMMON') stats['dps'] = Math.floor(statPower / 2); break;
+        // FIX: Use bracket notation to prevent 'property does not exist' errors from linters on dynamically assigned properties.
+        case 'ARMOR': stats['goldBonus'] = Math.round(statPower * 1.5) / 100; break;
+        // FIX: Use bracket notation to prevent 'property does not exist' errors from linters on dynamically assigned properties.
+        case 'RING': stats['xpBonus'] = Math.round(statPower * 1.5) / 100; break;
     }
 
     const sockets = [];
@@ -236,7 +239,7 @@ const generateJewel = (playerLevel) => {
 };
 
 // --- COMPONENTS ---
-const StatBar = ({ value, maxValue, color, icon, label }) => {
+const StatBar = React.memo(({ value, maxValue, color, icon, label }) => {
     const percentage = Math.min((value / maxValue) * 100, 100);
     return (
         <div>
@@ -249,9 +252,9 @@ const StatBar = ({ value, maxValue, color, icon, label }) => {
             </div>
         </div>
     );
-};
+});
 
-const PlayerStats = ({ player, onNicknameChange, totalAttack, totalDps, goldBonus, xpBonus, powerShotDamageBonus }) => {
+const PlayerStats = React.memo(({ player, onNicknameChange, totalAttack, totalDps, goldBonus, xpBonus, powerShotDamageBonus }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [nickname, setNickname] = useState(player.nickname);
     const inputRef = useRef(null);
@@ -308,24 +311,52 @@ const PlayerStats = ({ player, onNicknameChange, totalAttack, totalDps, goldBonu
             </div>
         </div>
     );
-};
+});
 
-const MonsterDisplay = ({ monster, onAttack, damageNumbers }) => {
+const MonsterDisplay = React.memo(forwardRef(({ monster, onAttack }, ref) => {
     const [isHit, setIsHit] = useState(false);
     const hpPercentage = (monster.hp / monster.maxHp) * 100;
+    const damageNumbersContainerRef = useRef(null);
 
-    useEffect(() => {
-        if (damageNumbers.length > 0) {
+    useImperativeHandle(ref, () => ({
+        showDamageNumber(amount, type) {
             setIsHit(true);
-            const timer = setTimeout(() => setIsHit(false), 100);
-            return () => clearTimeout(timer);
+            setTimeout(() => setIsHit(false), 100);
+
+            if (!damageNumbersContainerRef.current) return;
+
+            const dnElement = document.createElement('div');
+            let colorClass = '', animationClass = 'animate-damage-popup', styleText = 'position: absolute; font-weight: bold; pointer-events: none; text-shadow: 0px 0px 5px rgba(0,0,0,0.8);';
+            
+            switch (type) {
+                case 'click': colorClass = 'text-yellow-300 text-2xl'; break;
+                case 'dps': colorClass = 'text-purple-400 text-xl'; break;
+                case 'heal': colorClass = 'text-green-400 text-xl'; break;
+                case 'skill':
+                    colorClass = 'text-cyan-400 text-4xl';
+                    animationClass = 'animate-damage-popup-skill';
+                    styleText += ' text-shadow: 0 0 8px rgba(0, 255, 255, 0.9);';
+                    break;
+            }
+
+            dnElement.textContent = type === 'heal' ? `+${amount}` : String(amount);
+            dnElement.className = `${animationClass} ${colorClass}`;
+            dnElement.style.cssText = styleText;
+            dnElement.style.left = `${40 + Math.random() * 20}%`;
+            dnElement.style.top = `${40 + Math.random() * 20}%`;
+
+            damageNumbersContainerRef.current.appendChild(dnElement);
+
+            setTimeout(() => {
+                dnElement.remove();
+            }, 1000);
         }
-    }, [damageNumbers]);
+    }));
     
     const MonsterImage = monster.image;
 
     return (
-        <div className="relative w-80 h-80 flex flex-col items-center justify-center cursor-pointer group" onClick={onAttack}>
+        <div ref={damageNumbersContainerRef} className="relative w-80 h-80 flex flex-col items-center justify-center cursor-pointer group" onClick={onAttack}>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="mb-2 text-center"><h3 className="text-lg font-bold text-gray-200">{monster.name}</h3><p className="text-sm text-red-400 font-semibold">{monster.hp} / {monster.maxHp}</p></div>
                 <div className={`relative w-56 h-56 transition-transform duration-100 ${isHit ? 'transform scale-95' : 'group-hover:scale-110'}`}>
@@ -333,21 +364,11 @@ const MonsterDisplay = ({ monster, onAttack, damageNumbers }) => {
                 </div>
                 <div className="w-64 bg-gray-700 rounded-full h-4 mt-4 border-2 border-gray-600"><div className="bg-red-500 h-full rounded-full transition-all duration-200 ease-linear" style={{ width: `${hpPercentage}%` }}></div></div>
             </div>
-            {damageNumbers.map(dn => {
-                let colorClass = '', animationClass = 'animate-damage-popup', style = {};
-                switch (dn.type) {
-                    case 'click': colorClass = 'text-yellow-300 text-2xl'; break;
-                    case 'dps': colorClass = 'text-purple-400 text-xl'; break;
-                    case 'heal': colorClass = 'text-green-400 text-xl'; break;
-                    case 'skill': colorClass = 'text-cyan-400 text-4xl'; animationClass = 'animate-damage-popup-skill'; style = { textShadow: '0 0 8px rgba(0, 255, 255, 0.9)' }; break;
-                }
-                return <div key={dn.id} className={`absolute font-bold pointer-events-none ${animationClass} ${colorClass}`} style={{ left: `${dn.x}%`, top: `${dn.y}%`, textShadow: '0px 0px 5px rgba(0,0,0,0.8)', ...style }}>{dn.amount}</div>;
-            })}
         </div>
     );
-};
+}));
 
-const UpgradePanel = ({ upgrades, onUpgrade, playerGold }) => (
+const UpgradePanel = React.memo(({ upgrades, onUpgrade, playerGold }) => (
     <div className="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-2">
         {upgrades.map(upgrade => {
             const cost = upgrade.cost(upgrade.level);
@@ -362,18 +383,18 @@ const UpgradePanel = ({ upgrades, onUpgrade, playerGold }) => (
             );
         })}
     </div>
-);
+));
 
-const GameLog = ({ log }) => (
+const GameLog = React.memo(({ log }) => (
     <div className="flex-grow flex flex-col p-4 bg-gray-900/50 rounded-lg border border-gray-700 min-h-[150px]">
         <h2 className="text-xl font-bold text-center text-yellow-300 mb-2">게임 로그</h2>
         <div className="flex-grow bg-gray-900 p-2 rounded-md overflow-y-auto h-32">
             {log.map((message, index) => <p key={index} dangerouslySetInnerHTML={{ __html: `> ${message}` }} className={`text-sm ${index === 0 ? 'text-yellow-200' : 'text-gray-400'}`} />)}
         </div>
     </div>
-);
+));
 
-const SkillsPanel = ({ onPowerShot, cooldown, powerShotBaseCooldown }) => {
+const SkillsPanel = React.memo(({ onPowerShot, cooldown, powerShotBaseCooldown }) => {
     const isDisabled = cooldown > 0;
     return (
         <div className="w-full max-w-xs mt-4">
@@ -387,10 +408,11 @@ const SkillsPanel = ({ onPowerShot, cooldown, powerShotBaseCooldown }) => {
             </button>
         </div>
     );
-};
+});
 
 // FIX: Change component signature to accept general props to fix issue with 'key' prop.
-const SocketShape = (props: any) => {
+// FIX: Removed TypeScript type annotation.
+const SocketShape = (props) => {
     const { shape, className = "" } = props;
     const baseStyle = "w-3 h-3 border border-gray-500";
     if (shape === 'CIRCLE') return <div className={`${baseStyle} rounded-full ${className}`}></div>
@@ -400,7 +422,7 @@ const SocketShape = (props: any) => {
 }
 
 // FIX: Update default prop for onSocketClick to match expected signature.
-const SocketsDisplay = ({ sockets, allJewels, itemType, onSocketClick = (itemType, socketIndex) => {} }) => (
+const SocketsDisplay = React.memo(({ sockets, allJewels, itemType, onSocketClick = (itemType, socketIndex) => {} }) => (
     <div className="flex gap-1 mt-1">
         {sockets.map((socket, index) => {
             const jewel = socket.jewelId ? allJewels.find(j => j.id === socket.jewelId) : null;
@@ -415,9 +437,9 @@ const SocketsDisplay = ({ sockets, allJewels, itemType, onSocketClick = (itemTyp
             )
         })}
     </div>
-);
+));
 
-const EquipmentPanel = ({ equippedItems, allJewels }) => (
+const EquipmentPanel = React.memo(({ equippedItems, allJewels }) => (
     <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
         <h2 className="text-xl font-bold text-center text-yellow-300 mb-2">장비</h2>
         <div className="space-y-2">
@@ -442,9 +464,9 @@ const EquipmentPanel = ({ equippedItems, allJewels }) => (
             })}
         </div>
     </div>
-);
+));
 
-const EquipmentInventoryPanel = ({ inventory, onEquip }) => (
+const EquipmentInventoryPanel = React.memo(({ inventory, onEquip }) => (
     <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
         {inventory.length === 0 && <p className="text-center text-gray-500">장비가 없습니다.</p>}
         {inventory.map(item => (
@@ -461,16 +483,18 @@ const EquipmentInventoryPanel = ({ inventory, onEquip }) => (
             </button>
         ))}
     </div>
-);
+));
 
-const SocketingPanel = ({ equippedItems, allJewels, onSocket, onUnsocket }) => {
+const SocketingPanel = React.memo(({ equippedItems, allJewels, onSocket, onUnsocket }) => {
     const [selectedJewelId, setSelectedJewelId] = useState(null);
     const socketedJewelIds = useMemo(() => {
         const ids = new Set();
-        // FIX: Cast 'item' to 'any' to resolve 'unknown' type error when accessing 'sockets'.
-        Object.values(equippedItems).forEach((item: any) => {
-            if (item?.sockets) {
-                item.sockets.forEach(socket => {
+        // FIX: Removed TypeScript type annotation to prevent syntax errors.
+        Object.values(equippedItems).forEach((item) => {
+            // FIX: Use bracket notation and an explicit null check to fix 'property does not exist on type unknown' error.
+            if (item && item['sockets']) {
+                // FIX: Use bracket notation to fix 'property does not exist on type unknown' error.
+                item['sockets'].forEach(socket => {
                     if (socket.jewelId) ids.add(socket.jewelId);
                 });
             }
@@ -534,9 +558,9 @@ const SocketingPanel = ({ equippedItems, allJewels, onSocket, onUnsocket }) => {
             </div>
         </div>
     )
-};
+});
 
-const ShopPanel = ({ items, playerGold, onBuy, onRefresh, refreshCost, onGacha, gachaCost }) => {
+const ShopPanel = React.memo(({ items, playerGold, onBuy, onRefresh, refreshCost, onGacha, gachaCost }) => {
     const canAffordRefresh = playerGold >= refreshCost;
     const canAffordGacha = playerGold >= gachaCost;
     return (
@@ -585,7 +609,7 @@ const ShopPanel = ({ items, playerGold, onBuy, onRefresh, refreshCost, onGacha, 
             })}
         </div>
     );
-};
+});
 
 // --- MAIN APP COMPONENT ---
 const App = () => {
@@ -594,20 +618,22 @@ const App = () => {
     const [monster, setMonster] = useState(() => MONSTER_GENERATOR(1));
     const [upgrades, setUpgrades] = useState(() => UPGRADES_CONFIG.map(u => ({ ...u, level: 0 })));
     const [log, setLog] = useState(["슬라임 헌터에 오신 것을 환영합니다!"]);
-    const [damageNumbers, setDamageNumbers] = useState([]);
     const [powerShotCooldown, setPowerShotCooldown] = useState(0);
     const [activeTab, setActiveTab] = useState('upgrades');
-    // FIX: Provide explicit 'any' type to useState to prevent 'unknown' type errors on properties.
-    const [equippedItems, setEquippedItems] = useState<any>({ WEAPON: null, ARMOR: null, RING: null });
-    const [equipmentInventory, setEquipmentInventory] = useState<any[]>([]);
-    const [jewelInventory, setJewelInventory] = useState<any[]>([]);
-    const [shopItems, setShopItems] = useState<any[]>([]);
+    // FIX: Removed TypeScript syntax to prevent errors with in-browser Babel.
+    const [equippedItems, setEquippedItems] = useState({ WEAPON: null, ARMOR: null, RING: null });
+    const [equipmentInventory, setEquipmentInventory] = useState([]);
+    const [allJewels, setAllJewels] = useState([]);
+    const [shopItems, setShopItems] = useState([]);
     const [shopRefreshCost, setShopRefreshCost] = useState(50);
     const [gachaCost, setGachaCost] = useState(500);
     const [isShaking, setIsShaking] = useState(false);
     
-    // Ref to track the current monster's ID to prevent multiple defeat processes
+    // Refs
     const currentMonsterIdRef = useRef(monster.id);
+    const monsterDisplayRef = useRef(null);
+    const saveTimeoutRef = useRef(null);
+
 
     // Memoized Calculations
     const blessingMultiplier = useMemo(() => {
@@ -621,14 +647,17 @@ const App = () => {
         Object.values(equippedItems).forEach(item => {
             if (!item) return;
             // Base stats from item
-            for (const [stat, value] of Object.entries((item as any).stats)) {
+            // FIX: Use bracket notation to fix 'property does not exist on type unknown' error.
+            for (const [stat, value] of Object.entries(item['stats'])) {
                 total[stat] = (total[stat] || 0) + (Number(value) || 0);
             }
             // Stats from jewels
-            if ((item as any).sockets) {
-                (item as any).sockets.forEach(socket => {
+            // FIX: Use bracket notation to fix 'property does not exist on type unknown' error.
+            if (item['sockets']) {
+                // FIX: Use bracket notation to fix 'property does not exist on type unknown' error.
+                item['sockets'].forEach(socket => {
                     if (socket.jewelId) {
-                        const jewel = jewelInventory.find(j => j.id === socket.jewelId);
+                        const jewel = allJewels.find(j => j.id === socket.jewelId);
                         if (jewel) {
                              for (const [stat, value] of Object.entries(jewel.stats)) {
                                 total[stat] = (total[stat] || 0) + (Number(value) || 0);
@@ -639,7 +668,7 @@ const App = () => {
             }
         });
         return total;
-    }, [equippedItems, jewelInventory]);
+    }, [equippedItems, allJewels]);
     
     const totalAttack = useMemo(() => {
         const clickUpgrade = upgrades.find(u => u.id === 'CLICK_UPGRADE');
@@ -686,97 +715,74 @@ const App = () => {
         setLog(prevLog => [message, ...prevLog.slice(0, 49)]);
     }, []);
 
-    const showDamageNumber = useCallback((amount, type) => {
-        const newDamageNumber = {
-            id: Math.random(),
-            amount: type === 'heal' ? `+${amount}` : amount,
-            type,
-            x: 40 + Math.random() * 20,
-            y: 40 + Math.random() * 20,
-        };
-        setDamageNumbers(current => [...current, newDamageNumber]);
-        setTimeout(() => {
-            setDamageNumbers(current => current.filter(dn => dn.id !== newDamageNumber.id));
-        }, 1000);
-    }, []);
-
     const spawnNewMonster = useCallback((level) => {
         setMonster(MONSTER_GENERATOR(level));
     }, []);
-
-    const gainGold = useCallback((amount) => {
-        const finalAmount = Math.floor(amount * (1 + goldBonus));
-        setPlayer(p => ({ ...p, gold: p.gold + finalAmount }));
-        return finalAmount;
-    }, [goldBonus]);
-
-    const gainXp = useCallback((amount) => {
-        const finalAmount = Math.floor(amount * (1 + xpBonus));
-        setPlayer(p => {
-            let newXp = p.xp + finalAmount;
-            let newLevel = p.level;
-            let newXpToNext = p.xpToNextLevel;
-            let newBaseAttack = p.baseAttack;
-            let newGold = p.gold;
-
-            while (newXp >= newXpToNext) {
-                newXp -= newXpToNext;
-                newLevel++;
-                newXpToNext = Math.floor(newXpToNext * 1.5);
-                newBaseAttack = Math.floor(newBaseAttack * 1.1) + 1;
-                const goldReward = newLevel * 10;
-                newGold += goldReward;
-                addLog(`<span class="text-green-400 font-bold">레벨 업! ${newLevel}레벨 달성!</span> <span class="text-yellow-400">(${goldReward} 골드 획득)</span>`);
-            }
-            return { ...p, xp: newXp, level: newLevel, xpToNextLevel: newXpToNext, baseAttack: newBaseAttack, gold: newGold };
-        });
-    }, [xpBonus, addLog]);
     
     const refreshShop = useCallback(() => {
         const newItems = Array.from({ length: 3 }, () => generateEquipment(player.level, true));
         setShopItems(newItems);
     }, [player.level]);
 
+    // FIX: Combine reward and level-up logic into a single atomic function to prevent race conditions.
+    const handleRewardsAndLevelUp = useCallback((monster, onComplete) => {
+        const goldFromMonster = Math.floor(monster.goldReward * (1 + goldBonus));
+        const xpFromMonster = Math.floor(monster.xpReward * (1 + xpBonus));
+
+        const levelUpLogs = [];
+
+        setPlayer(p => {
+            let newPlayerState = { ...p, gold: p.gold + goldFromMonster, xp: p.xp + xpFromMonster };
+
+            while (newPlayerState.xp >= newPlayerState.xpToNextLevel) {
+                newPlayerState.xp -= newPlayerState.xpToNextLevel;
+                newPlayerState.level++;
+                newPlayerState.xpToNextLevel = Math.floor(newPlayerState.xpToNextLevel * 1.5);
+                newPlayerState.baseAttack = Math.floor(newPlayerState.baseAttack * 1.1) + 1;
+                const goldReward = newPlayerState.level * 10;
+                newPlayerState.gold += goldReward;
+                levelUpLogs.push(`<span class="text-green-400 font-bold">레벨 업! ${newPlayerState.level}레벨 달성!</span> <span class="text-yellow-400">(${goldReward} 골드 획득)</span>`);
+            }
+            
+            if (onComplete) {
+                onComplete(newPlayerState);
+            }
+            
+            return newPlayerState;
+        });
+
+        addLog(`<span class="text-yellow-400">${goldFromMonster} 골드</span>와 <span class="text-blue-400">${xpFromMonster} 경험치</span>를 획득했습니다.`);
+        levelUpLogs.forEach(logMsg => addLog(logMsg));
+    }, [goldBonus, xpBonus, addLog]);
+
     const handleMonsterDefeated = useCallback((defeatedMonster) => {
-        const goldGained = gainGold(defeatedMonster.goldReward);
-        gainXp(defeatedMonster.xpReward);
-        addLog(`<span class="text-yellow-400">${goldGained} 골드</span>와 <span class="text-blue-400">${Math.floor(defeatedMonster.xpReward * (1 + xpBonus))} 경험치</span>를 획득했습니다.`);
-        
-        // Item Drop Logic
-        if (Math.random() < 0.1) {
-            const newItem = generateEquipment(player.level);
-            setEquipmentInventory(inv => [...inv, newItem]);
-            addLog(`아이템 획득: <span class="${RARITY_CONFIG[newItem.rarity].color}">${newItem.name}</span>`);
-        }
-        if (Math.random() < 0.05) {
-            const newJewel = generateJewel(player.level);
-            setJewelInventory(inv => [...inv, newJewel]);
-            addLog(`보석 획득: <span class="${RARITY_CONFIG[newJewel.rarity].color}">${newJewel.name}</span>`);
-        }
-        
-        spawnNewMonster(player.level);
-    }, [gainGold, gainXp, addLog, spawnNewMonster, player.level, xpBonus]);
+        handleRewardsAndLevelUp(defeatedMonster, (newPlayerState) => {
+            // Item Drop Logic - now uses the correct, updated player level
+            if (Math.random() < 0.1) {
+                const newItem = generateEquipment(newPlayerState.level);
+                setEquipmentInventory(inv => [...inv, newItem]);
+                addLog(`아이템 획득: <span class="${RARITY_CONFIG[newItem.rarity].color}">${newItem.name}</span>`);
+            }
+            if (Math.random() < 0.05) {
+                const newJewel = generateJewel(newPlayerState.level);
+                setAllJewels(inv => [...inv, newJewel]);
+                addLog(`보석 획득: <span class="${RARITY_CONFIG[newJewel.rarity].color}">${newJewel.name}</span>`);
+            }
+            
+            spawnNewMonster(newPlayerState.level);
+        });
+    }, [handleRewardsAndLevelUp, addLog, spawnNewMonster]);
 
     const dealDamage = useCallback((damage, type) => {
+        monsterDisplayRef.current?.showDamageNumber(damage, type);
         setMonster(currentMonster => {
             if (!currentMonster || currentMonster.hp <= 0) {
                 return currentMonster;
             }
-
             const newHp = Math.max(0, currentMonster.hp - damage);
-            showDamageNumber(damage, type);
-
-            if (newHp === 0) {
-                // Atomically check and "claim" the defeat of the current monster to prevent race conditions
-                if (currentMonsterIdRef.current === currentMonster.id) {
-                    currentMonsterIdRef.current = null; // Prevent other processes from defeating it again
-                    handleMonsterDefeated(currentMonster);
-                }
-            }
-            
             return { ...currentMonster, hp: newHp };
         });
-    }, [handleMonsterDefeated, showDamageNumber]);
+    }, []);
     
     const handleAttack = useCallback(() => {
         dealDamage(totalAttack, 'click');
@@ -829,7 +835,6 @@ const App = () => {
             }
             return newEquipped;
         });
-        setJewelInventory(inv => inv.filter(j => j.id !== jewel.id));
         addLog(`보석 장착: <span class="${RARITY_CONFIG[jewel.rarity].color}">${jewel.name}</span> -> ${itemType}`);
     };
 
@@ -840,14 +845,12 @@ const App = () => {
             const item = newEquipped[itemType];
             if(item && item.sockets && item.sockets[socketIndex]){
                 const jewelId = item.sockets[socketIndex].jewelId;
-                // FIX: Cast 'it' to 'any' to resolve 'unknown' type error when accessing 'sockets'.
-                jewelToReturn = jewelInventory.concat(Object.values(prev).flatMap((it: any) => it?.sockets?.filter(s => s.jewelId).map(s => jewelInventory.find(j => j.id === s.jewelId)) || [])).find(j => j.id === jewelId);
+                jewelToReturn = allJewels.find(j => j.id === jewelId);
                 item.sockets[socketIndex].jewelId = null;
             }
             return newEquipped;
         });
         if (jewelToReturn) {
-            setJewelInventory(inv => [...inv, jewelToReturn]);
             addLog(`보석 해제: <span class="${RARITY_CONFIG[jewelToReturn.rarity].color}">${jewelToReturn.name}</span>`);
         }
     };
@@ -899,7 +902,7 @@ const App = () => {
 
                 setEquipmentInventory(data.equipmentInventory || []);
                 setEquippedItems(data.equippedItems || { WEAPON: null, ARMOR: null, RING: null });
-                setJewelInventory(data.jewelInventory || []);
+                setAllJewels(data.jewelInventory || []);
                 setShopRefreshCost(data.shopRefreshCost || 50);
                 setGachaCost(data.gachaCost || 500);
             }
@@ -910,19 +913,44 @@ const App = () => {
         refreshShop();
     }, [refreshShop]);
 
-    useEffect(() => { // Save game
-        const saveData = {
-            player,
-            upgrades,
-            equipmentInventory,
-            equippedItems,
-            jewelInventory,
-            shopRefreshCost,
-            gachaCost
-        };
-        localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(saveData));
-    }, [player, upgrades, equipmentInventory, equippedItems, jewelInventory, shopRefreshCost, gachaCost]);
+    useEffect(() => { // Debounced Save game
+        if (saveTimeoutRef.current) {
+            clearTimeout(saveTimeoutRef.current);
+        }
+        saveTimeoutRef.current = setTimeout(() => {
+            const saveData = {
+                player,
+                upgrades: upgrades.map(u => ({id: u.id, level: u.level})),
+                equipmentInventory,
+                equippedItems,
+                jewelInventory: allJewels,
+                shopRefreshCost,
+                gachaCost
+            };
+            localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(saveData));
+        }, 1500);
+
+        return () => {
+            if(saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
+            }
+        }
+    }, [player, upgrades, equipmentInventory, equippedItems, allJewels, shopRefreshCost, gachaCost]);
     
+    // BUGFIX: Monster defeat logic is separated into a useEffect to prevent state update race conditions.
+    useEffect(() => {
+        if (monster && monster.hp <= 0 && currentMonsterIdRef.current === monster.id) {
+            currentMonsterIdRef.current = null; // Mark as processed to prevent re-triggering
+            
+            // A small delay allows the UI to show the monster at 0 HP before it's replaced.
+            const timer = setTimeout(() => {
+                handleMonsterDefeated(monster);
+            }, 100);
+
+            return () => clearTimeout(timer); // Cleanup timer on component unmount or re-render
+        }
+    }, [monster, handleMonsterDefeated]);
+
     useEffect(() => { // DPS loop
         if (totalDps <= 0) return;
         const interval = setInterval(() => {
@@ -930,11 +958,11 @@ const App = () => {
             if (monster?.special === 'HEAL' && Math.random() < 0.1) {
                 const healAmount = Math.floor(monster.maxHp * 0.05);
                 setMonster(m => ({ ...m, hp: Math.min(m.maxHp, m.hp + healAmount) }));
-                showDamageNumber(healAmount, 'heal');
+                monsterDisplayRef.current?.showDamageNumber(healAmount, 'heal');
             }
         }, 1000);
         return () => clearInterval(interval);
-    }, [totalDps, monster, dealDamage, showDamageNumber]);
+    }, [totalDps, monster, dealDamage]);
 
     useEffect(() => { // Cooldown loop
         if (powerShotCooldown > 0) {
@@ -964,11 +992,11 @@ const App = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-7xl">
                 <div className="md:col-span-1 flex flex-col gap-4">
                     <PlayerStats player={player} onNicknameChange={(name) => setPlayer(p=>({...p, nickname: name}))} totalAttack={totalAttack} totalDps={totalDps} goldBonus={goldBonus} xpBonus={xpBonus} powerShotDamageBonus={powerShotDamageBonus} />
-                    <EquipmentPanel equippedItems={equippedItems} allJewels={jewelInventory} />
+                    <EquipmentPanel equippedItems={equippedItems} allJewels={allJewels} />
                     <GameLog log={log} />
                 </div>
                 <div className="md:col-span-1 flex flex-col items-center justify-start">
-                    {monster && <MonsterDisplay monster={monster} onAttack={handleAttack} damageNumbers={damageNumbers} />}
+                    {monster && <MonsterDisplay ref={monsterDisplayRef} monster={monster} onAttack={handleAttack} />}
                     <SkillsPanel onPowerShot={handlePowerShot} cooldown={powerShotCooldown} powerShotBaseCooldown={powerShotBaseCooldown} />
                 </div>
                 <div className="md:col-span-1 bg-gray-900/50 rounded-lg border border-gray-700 p-4 flex flex-col">
@@ -982,7 +1010,7 @@ const App = () => {
                     <div className="flex-grow overflow-y-auto">
                         {activeTab === 'upgrades' && <UpgradePanel upgrades={upgrades} onUpgrade={handleUpgrade} playerGold={player.gold} />}
                         {activeTab === 'inventory' && <EquipmentInventoryPanel inventory={equipmentInventory} onEquip={handleEquip} />}
-                        {activeTab === 'socketing' && <SocketingPanel equippedItems={equippedItems} allJewels={jewelInventory} onSocket={handleSocket} onUnsocket={handleUnsocket} />}
+                        {activeTab === 'socketing' && <SocketingPanel equippedItems={equippedItems} allJewels={allJewels} onSocket={handleSocket} onUnsocket={handleUnsocket} />}
                         {activeTab === 'shop' && <ShopPanel items={shopItems} playerGold={player.gold} onBuy={handleShopBuy} onRefresh={handleShopRefresh} refreshCost={shopRefreshCost} onGacha={handleGacha} gachaCost={gachaCost} />}
                     </div>
                 </div>
