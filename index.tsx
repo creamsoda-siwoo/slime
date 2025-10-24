@@ -1,6 +1,6 @@
-// FIX: Import React and ReactDOM to resolve 'not defined' errors.
+// FIX: Import React, ReactDOM, and React hooks using ES module syntax to resolve 'Cannot find name' errors.
 import React, { useState, useEffect, useCallback, useRef, useMemo, forwardRef, useImperativeHandle } from 'react';
-import * as ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
 
 // --- ICONS ---
 const LevelIcon = (props) => (
@@ -630,7 +630,7 @@ const App = () => {
     const [isShaking, setIsShaking] = useState(false);
     
     // Refs
-    const currentMonsterIdRef = useRef(monster.id);
+    const currentMonsterIdRef = useRef(null);
     const monsterDisplayRef = useRef(null);
     const saveTimeoutRef = useRef(null);
 
@@ -724,14 +724,14 @@ const App = () => {
         setShopItems(newItems);
     }, [player.level]);
 
-    // FIX: Combine reward and level-up logic into a single atomic function to prevent race conditions.
     const handleRewardsAndLevelUp = useCallback((monster, onComplete) => {
         const goldFromMonster = Math.floor(monster.goldReward * (1 + goldBonus));
         const xpFromMonster = Math.floor(monster.xpReward * (1 + xpBonus));
 
-        const levelUpLogs = [];
-
         setPlayer(p => {
+            const generatedLogs = [];
+            generatedLogs.push(`<span class="text-yellow-400">${goldFromMonster} 골드</span>와 <span class="text-blue-400">${xpFromMonster} 경험치</span>를 획득했습니다.`);
+
             let newPlayerState = { ...p, gold: p.gold + goldFromMonster, xp: p.xp + xpFromMonster };
 
             while (newPlayerState.xp >= newPlayerState.xpToNextLevel) {
@@ -741,23 +741,22 @@ const App = () => {
                 newPlayerState.baseAttack = Math.floor(newPlayerState.baseAttack * 1.1) + 1;
                 const goldReward = newPlayerState.level * 10;
                 newPlayerState.gold += goldReward;
-                levelUpLogs.push(`<span class="text-green-400 font-bold">레벨 업! ${newPlayerState.level}레벨 달성!</span> <span class="text-yellow-400">(${goldReward} 골드 획득)</span>`);
+                generatedLogs.push(`<span class="text-green-400 font-bold">레벨 업! ${newPlayerState.level}레벨 달성!</span> <span class="text-yellow-400">(${goldReward} 골드 획득)</span>`);
             }
             
             if (onComplete) {
-                onComplete(newPlayerState);
+                onComplete(newPlayerState, generatedLogs);
             }
             
             return newPlayerState;
         });
-
-        addLog(`<span class="text-yellow-400">${goldFromMonster} 골드</span>와 <span class="text-blue-400">${xpFromMonster} 경험치</span>를 획득했습니다.`);
-        levelUpLogs.forEach(logMsg => addLog(logMsg));
-    }, [goldBonus, xpBonus, addLog]);
+    }, [goldBonus, xpBonus]);
 
     const handleMonsterDefeated = useCallback((defeatedMonster) => {
-        handleRewardsAndLevelUp(defeatedMonster, (newPlayerState) => {
-            // Item Drop Logic - now uses the correct, updated player level
+        handleRewardsAndLevelUp(defeatedMonster, (newPlayerState, logsToAdd) => {
+            logsToAdd.forEach(logMsg => addLog(logMsg));
+            
+            // Item Drop Logic
             if (Math.random() < 0.1) {
                 const newItem = generateEquipment(newPlayerState.level);
                 setEquipmentInventory(inv => [...inv, newItem]);
@@ -839,20 +838,33 @@ const App = () => {
     };
 
     const handleUnsocket = (itemType, socketIndex) => {
-        let jewelToReturn;
+        // Use functional update to ensure we're working with the latest state
         setEquippedItems(prev => {
-            const newEquipped = { ...prev };
-            const item = newEquipped[itemType];
-            if(item && item.sockets && item.sockets[socketIndex]){
-                const jewelId = item.sockets[socketIndex].jewelId;
-                jewelToReturn = allJewels.find(j => j.id === jewelId);
-                item.sockets[socketIndex].jewelId = null;
+            const item = prev[itemType];
+            if (!item?.sockets?.[socketIndex]?.jewelId) {
+                return prev; // No jewel to unsocket, return current state
             }
-            return newEquipped;
+    
+            const jewelId = item.sockets[socketIndex].jewelId;
+            const jewelToReturn = allJewels.find(j => j.id === jewelId);
+    
+            // Create a new item with the updated sockets array
+            const newSockets = item.sockets.map((socket, index) => {
+                if (index === socketIndex) {
+                    return { ...socket, jewelId: null };
+                }
+                return socket;
+            });
+            const updatedItem = { ...item, sockets: newSockets };
+    
+            // Log the action after the state update
+            if (jewelToReturn) {
+                addLog(`보석 해제: <span class="${RARITY_CONFIG[jewelToReturn.rarity].color}">${jewelToReturn.name}</span>`);
+            }
+    
+            // Return the new state object
+            return { ...prev, [itemType]: updatedItem };
         });
-        if (jewelToReturn) {
-            addLog(`보석 해제: <span class="${RARITY_CONFIG[jewelToReturn.rarity].color}">${jewelToReturn.name}</span>`);
-        }
     };
     
     const handleShopBuy = (item) => {
