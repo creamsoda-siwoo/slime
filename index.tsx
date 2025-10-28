@@ -145,7 +145,7 @@ const RARITY_CONFIG = {
     UNCOMMON: { chance: 0.25, multiplier: 1.8, color: 'text-green-400' },
     RARE: { chance: 0.10, multiplier: 3.0, color: 'text-blue-400' },
     EPIC: { chance: 0.04, multiplier: 5.0, color: 'text-purple-500' },
-    LEGENDARY: { chance: 0.01, multiplier: 8.0, color: 'text-yellow-400' },
+    LEGENDary: { chance: 0.01, multiplier: 8.0, color: 'text-yellow-400' },
 };
 const EQUIPMENT_BASES = {
     WEAPON: ['단검', '장검', '도끼', '망치', '마법 지팡이'],
@@ -424,11 +424,10 @@ const GameLog = React.memo(({ logs }) => {
     );
 });
 
-const PowerShotButton = React.memo(({ onClick, cooldown, maxCooldown }) => {
-    // FIX: Add a check to prevent division by zero, which can cause an arithmetic error.
-    // FIX: Explicitly cast props to Number to prevent type errors in arithmetic operations.
-    const cooldownPercentage = Number(maxCooldown) > 0 ? (Number(cooldown) / Number(maxCooldown)) * 100 : 0;
-    const isDisabled = Number(cooldown) > 0;
+// FIX: Explicitly type component props to resolve arithmetic operation error and remove redundant Number() casts.
+const PowerShotButton = React.memo(({ onClick, cooldown, maxCooldown }: { onClick: () => void; cooldown: number; maxCooldown: number; }) => {
+    const cooldownPercentage = maxCooldown > 0 ? (cooldown / maxCooldown) * 100 : 0;
+    const isDisabled = cooldown > 0;
 
     return (
         <button
@@ -436,7 +435,7 @@ const PowerShotButton = React.memo(({ onClick, cooldown, maxCooldown }) => {
             disabled={isDisabled}
             className="relative w-full flex items-center justify-center gap-2 p-3 text-lg font-bold bg-orange-600 rounded-lg shadow-lg hover:bg-orange-500 disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 overflow-hidden"
         >
-            {isDisabled ? (`쿨타임: ${(Number(cooldown) / 1000).toFixed(1)}초`) : (<><PowerShotIcon /><span>파워 샷!</span></>)}
+            {isDisabled ? (`쿨타임: ${(cooldown / 1000).toFixed(1)}초`) : (<><PowerShotIcon /><span>파워 샷!</span></>)}
             {isDisabled && (<div className="absolute bottom-0 left-0 h-full bg-black/50" style={{ width: `${cooldownPercentage}%` }}></div>)}
         </button>
     );
