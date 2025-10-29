@@ -208,7 +208,7 @@ const GachaIcon = (props) => (
 );
 
 const GreenSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-80 h-80 drop-shadow-lg">
         <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path>
         <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path>
         <circle cx="28" cy="50" r="5" fill="#fecaca"></circle>
@@ -224,7 +224,7 @@ const GreenSlimeIcon = () => (
 );
 
 const RedSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-80 h-80 drop-shadow-lg">
         <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path>
         <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#ef4444" stroke="#991b1b" strokeWidth="3"></path>
         <circle cx="38" cy="45" r="7" fill="white"></circle>
@@ -236,7 +236,7 @@ const RedSlimeIcon = () => (
 );
 
 const BlueSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-80 h-80 drop-shadow-lg">
         <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path>
         <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#3b82f6" stroke="#1e3a8a" strokeWidth="3"></path>
         <path d="M 32 40 C 35 45, 41 45, 44 40" stroke="white" fill="transparent" strokeWidth="3" strokeLinecap="round"></path>
@@ -246,7 +246,7 @@ const BlueSlimeIcon = () => (
 );
 
 const GolemIcon = () => (
-    <svg viewBox="0 0 100 100" className="w-64 h-64 drop-shadow-lg">
+    <svg viewBox="0 0 100 100" className="w-80 h-80 drop-shadow-lg">
         <rect x="20" y="40" width="60" height="50" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect>
         <rect x="30" y="20" width="40" height="30" fill="#7f8c9b" stroke="#4b5563" strokeWidth="3" rx="5"></rect>
         <circle cx="45" cy="35" r="4" fill="#dc2626"></circle>
@@ -257,7 +257,7 @@ const GolemIcon = () => (
 );
 
 const KingSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-80 h-80 drop-shadow-lg">
         {/* Crown */}
         <path d="M 25 20 L 30 5 L 50 15 L 70 5 L 75 20 Z" fill="#facc15" stroke="#ca8a04" strokeWidth="2" strokeLinejoin="round"></path>
         <circle cx="30" cy="7" r="3" fill="#ef4444"></circle>
@@ -423,19 +423,10 @@ const EquipmentPanel = ({ equipment }) => (
 
 
 const MonsterDisplay = ({ monster, onClick, damagePopups }) => {
-    const [shake, setShake] = useState(false);
     const MonsterIcon = monster.Icon;
 
-    useEffect(() => {
-        if (damagePopups.length > 0) {
-            setShake(true);
-            const timer = setTimeout(() => setShake(false), 100);
-            return () => clearTimeout(timer);
-        }
-    }, [damagePopups]);
-
     return (
-        <div className={`transition-transform duration-100 ${shake ? 'animate-screen-shake' : ''}`}>
+        <div className="transition-transform duration-100">
             <h2 className={`text-3xl font-bold text-center mb-2 ${monster.isBoss ? 'text-red-400' : ''}`}>
                 {monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level})
             </h2>
@@ -470,91 +461,145 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
         
         <h3 className="text-lg font-semibold mb-2 text-green-300">기본 능력</h3>
         <div className="space-y-2">
-            <button
-                onClick={handlers.onUpgradeClick}
-                disabled={playerCoins < upgrades.clickUpgradeCost}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>검 강화 (+{upgrades.clickUpgradeLevel})</p>
-                <p><CoinIcon /> {formatNumber(upgrades.clickUpgradeCost)}</p>
-            </button>
-            <button
-                onClick={handlers.onUpgradeDps}
-                disabled={playerCoins < upgrades.dpsUpgradeCost}
-                className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>자동 공격 (+{upgrades.dpsUpgradeLevel})</p>
-                <p><CoinIcon /> {formatNumber(upgrades.dpsUpgradeCost)}</p>
-            </button>
-            <button
-                onClick={handlers.onUpgradeCritChance}
-                disabled={playerCoins < upgrades.critChanceUpgradeCost}
-                className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>크리 확률 (+{CRIT_CHANCE_UPGRADE_INCREASE}%)</p>
-                <p><CoinIcon /> {formatNumber(upgrades.critChanceUpgradeCost)}</p>
-            </button>
-            <button
-                onClick={handlers.onUpgradeCritDamage}
-                disabled={playerCoins < upgrades.critDamageUpgradeCost}
-                className="w-full bg-yellow-800 hover:bg-yellow-900 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>크리 데미지 (+{CRIT_DAMAGE_UPGRADE_INCREASE}%)</p>
-                <p><CoinIcon /> {formatNumber(upgrades.critDamageUpgradeCost)}</p>
-            </button>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradeClick}
+                    disabled={playerCoins < upgrades.clickUpgradeCost}
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>검 강화 (+{upgrades.clickUpgradeLevel})</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.clickUpgradeCost)}</p>
+                </button>
+                 <span className="tooltiptext">
+                    <p className="font-bold">클릭 데미지 증가</p>
+                    <p className="text-sm text-gray-300">클릭당 공격력을 높여 몬스터를 더 빠르게 처치합니다. 직접 플레이할 때 가장 중요한 능력치입니다.</p>
+                </span>
+            </div>
+             <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradeDps}
+                    disabled={playerCoins < upgrades.dpsUpgradeCost}
+                    className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>자동 공격 (+{upgrades.dpsUpgradeLevel})</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.dpsUpgradeCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">자동 공격 (DPS) 증가</p>
+                    <p className="text-sm text-gray-300">초당 자동 공격을 증가시켜 게임을 켜두기만 해도 골드와 경험치를 획득합니다. 방치형 플레이의 핵심입니다.</p>
+                </span>
+            </div>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradeCritChance}
+                    disabled={playerCoins < upgrades.critChanceUpgradeCost}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>크리 확률 (+{CRIT_CHANCE_UPGRADE_INCREASE}%)</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.critChanceUpgradeCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">크리티컬 확률 증가</p>
+                    <p className="text-sm text-gray-300">공격 시 크리티컬이 발생할 확률을 높입니다. 모든 공격에 적용되는 강력한 능력치입니다.</p>
+                </span>
+            </div>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradeCritDamage}
+                    disabled={playerCoins < upgrades.critDamageUpgradeCost}
+                    className="w-full bg-yellow-800 hover:bg-yellow-900 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>크리 데미지 (+{CRIT_DAMAGE_UPGRADE_INCREASE}%)</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.critDamageUpgradeCost)}</p>
+                </button>
+                 <span className="tooltiptext">
+                    <p className="font-bold">크리티컬 데미지 증가</p>
+                    <p className="text-sm text-gray-300">크리티컬 공격 시의 데미지 배율을 증가시킵니다. 크리티컬 확률과 함께 투자하면 데미지가 기하급수적으로 증가합니다.</p>
+                </span>
+            </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">추가 능력</h3>
         <div className="space-y-2">
-            <button
-                onClick={handlers.onUpgradeGoldGain}
-                disabled={playerCoins < upgrades.goldGainUpgradeCost}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>골드 수급량 (+5%)</p>
-                <p className="text-xs">(현재: +{abilityStats.goldGainBonus}%)</p>
-                <p><CoinIcon /> {formatNumber(upgrades.goldGainUpgradeCost)}</p>
-            </button>
-            <button
-                onClick={handlers.onUpgradeXpGain}
-                disabled={playerCoins < upgrades.xpGainUpgradeCost}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>경험치 수급량 (+5%)</p>
-                 <p className="text-xs">(현재: +{abilityStats.xpGainBonus}%)</p>
-                <p><CoinIcon /> {formatNumber(upgrades.xpGainUpgradeCost)}</p>
-            </button>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradeGoldGain}
+                    disabled={playerCoins < upgrades.goldGainUpgradeCost}
+                    className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>골드 수급량 (+5%)</p>
+                    <p className="text-xs">(현재: +{abilityStats.goldGainBonus}%)</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.goldGainUpgradeCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">골드 획득량 증가</p>
+                    <p className="text-sm text-gray-300">몬스터 처치 시 획득하는 골드의 양을 늘립니다. 더 빠른 성장을 위한 필수적인 투자입니다.</p>
+                </span>
+            </div>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradeXpGain}
+                    disabled={playerCoins < upgrades.xpGainUpgradeCost}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>경험치 수급량 (+5%)</p>
+                     <p className="text-xs">(현재: +{abilityStats.xpGainBonus}%)</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.xpGainUpgradeCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">경험치 획득량 증가</p>
+                    <p className="text-sm text-gray-300">빠른 레벨업을 통해 기본 능력치를 올리고 더 강한 몬스터를 만날 수 있습니다.</p>
+                </span>
+            </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">스킬 강화</h3>
         <div className="space-y-2">
-            <button
-                onClick={handlers.onUpgradePowerShotDamage}
-                disabled={playerCoins < upgrades.psDamageUpgradeCost}
-                className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>파워샷 공격력 (+10%)</p>
-                <p className="text-xs">(현재: +{abilityStats.powerShotDamageBonus}%)</p>
-                <p><CoinIcon /> {formatNumber(upgrades.psDamageUpgradeCost)}</p>
-            </button>
-            <button
-                onClick={handlers.onUpgradePowerShotCooldown}
-                disabled={playerCoins < upgrades.psCooldownUpgradeCost}
-                className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p>파워샷 쿨타임 (-5%)</p>
-                <p className="text-xs">(현재: -{abilityStats.powerShotCooldownReduction}%)</p>
-                <p><CoinIcon /> {formatNumber(upgrades.psCooldownUpgradeCost)}</p>
-            </button>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradePowerShotDamage}
+                    disabled={playerCoins < upgrades.psDamageUpgradeCost}
+                    className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>파워샷 공격력 (+10%)</p>
+                    <p className="text-xs">(현재: +{abilityStats.powerShotDamageBonus}%)</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.psDamageUpgradeCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">파워 샷 데미지 강화</p>
+                    <p className="text-sm text-gray-300">파워 샷 스킬의 데미지를 강화합니다. 보스를 처치하거나 위급한 순간을 넘기는 데 큰 도움이 됩니다.</p>
+                </span>
+            </div>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onUpgradePowerShotCooldown}
+                    disabled={playerCoins < upgrades.psCooldownUpgradeCost}
+                    className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p>파워샷 쿨타임 (-5%)</p>
+                    <p className="text-xs">(현재: -{abilityStats.powerShotCooldownReduction}%)</p>
+                    <p><CoinIcon /> {formatNumber(upgrades.psCooldownUpgradeCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">파워 샷 쿨타임 감소</p>
+                    <p className="text-sm text-gray-300">파워 샷 스킬의 재사용 대기시간을 줄여 더 자주 사용할 수 있게 합니다.</p>
+                </span>
+            </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">특별</h3>
          <div className="space-y-2">
-            <button
-                onClick={handlers.onEquipmentGacha}
-                disabled={playerCoins < equipmentGachaCost}
-                className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
-                <p><GachaIcon /> 장비 뽑기</p>
-                <p><CoinIcon /> {formatNumber(equipmentGachaCost)}</p>
-            </button>
+            <div className="tooltip w-full">
+                <button
+                    onClick={handlers.onEquipmentGacha}
+                    disabled={playerCoins < equipmentGachaCost}
+                    className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-md text-sm">
+                    <p><GachaIcon /> 장비 뽑기</p>
+                    <p><CoinIcon /> {formatNumber(equipmentGachaCost)}</p>
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">장비 뽑기</p>
+                    <p className="text-sm text-gray-300">골드를 사용하여 무작위 장비를 획득합니다. 장비는 기본 능력치를 크게 증폭시켜주므로 후반 성장의 핵심입니다.</p>
+                </span>
+            </div>
         </div>
     </div>
 );
 
 const LiberationButton = ({ onLiberate, cost, playerCoins, count }) => (
-    <div className="w-full mt-4">
+    <div className="w-full">
         <button
             onClick={onLiberate}
             disabled={playerCoins < cost}
@@ -574,7 +619,7 @@ const PowerShotButton = ({ onClick, cooldown, maxCooldown }) => {
         <button
             onClick={onClick}
             disabled={isDisabled}
-            className="relative w-full md:w-auto bg-red-700 hover:bg-red-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-lg transition-colors shadow-lg overflow-hidden mt-4">
+            className="relative w-full bg-red-700 hover:bg-red-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-4 rounded-lg transition-colors shadow-lg overflow-hidden">
             {cooldown > 0 && (
                  <div className="absolute top-0 left-0 h-full bg-black opacity-50" style={{ width: `${cooldownPercentage}%` }}></div>
             )}
@@ -591,7 +636,7 @@ const PowerShotButton = ({ onClick, cooldown, maxCooldown }) => {
 };
 
 const GameLog = ({ log }) => (
-     <div className="w-full bg-gray-800 p-4 rounded-lg shadow-lg mt-4 order-4 h-32 overflow-y-auto">
+     <div className="w-full bg-gray-800 p-4 rounded-lg shadow-lg order-4 h-32 overflow-y-auto">
         <h3 className="text-lg font-bold mb-2 text-green-400">게임 로그</h3>
         <div className="text-sm space-y-1">
             {log.map((entry, index) => (
@@ -1131,11 +1176,6 @@ const App = () => {
                 </div>
                 <div className="w-full md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-center order-2 md:order-2 relative overflow-hidden">
                     <MonsterDisplay monster={monsterStats} onClick={handleMonsterClick} damagePopups={damagePopups} />
-                    <PowerShotButton 
-                        onClick={handlePowerShot} 
-                        cooldown={powerShotCooldown} 
-                        maxCooldown={finalAbilityStats.powerShotCooldown}
-                    />
                 </div>
                 <UpgradePanel 
                     upgrades={upgrades}
@@ -1156,14 +1196,21 @@ const App = () => {
                 />
             </main>
 
-            <footer className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center gap-4">
-                 <LiberationButton
-                    onLiberate={handleLiberation}
-                    cost={liberationCost}
-                    playerCoins={playerStats.coins}
-                    count={liberationCount}
-                 />
-                 <GameLog log={gameLog}/>
+            <footer className="w-full max-w-7xl flex flex-col items-center justify-center gap-4">
+                <PowerShotButton 
+                    onClick={handlePowerShot} 
+                    cooldown={powerShotCooldown} 
+                    maxCooldown={finalAbilityStats.powerShotCooldown}
+                />
+                <div className="w-full flex flex-col md:flex-row gap-4">
+                    <LiberationButton
+                        onLiberate={handleLiberation}
+                        cost={liberationCost}
+                        playerCoins={playerStats.coins}
+                        count={liberationCount}
+                    />
+                    <GameLog log={gameLog}/>
+                </div>
             </footer>
 
             <NewItemDropModal 
