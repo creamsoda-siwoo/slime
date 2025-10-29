@@ -20,6 +20,14 @@
         .animate-damage-popup-skill {
             animation: damage-popup-skill 1s ease-out forwards;
         }
+        @keyframes damage-popup-crit {
+            0% { transform: translateY(0) scale(1.5) rotate(-5deg); opacity: 1; text-shadow: 0 0 10px #fff, 0 0 20px #fff; }
+            100% { transform: translateY(-100px) scale(2.8) rotate(10deg); opacity: 0; }
+        }
+        .animate-damage-popup-crit {
+            animation: damage-popup-crit 1s ease-out forwards;
+        }
+
 
         @keyframes screen-shake {
             0% { transform: translate(0, 0) rotate(0); }
@@ -33,24 +41,46 @@
         }
 
         /* Rarity Colors */
-        .rarity-COMMON { color: #ffffff; }
-        .rarity-UNCOMMON { color: #1eff00; }
-        .rarity-RARE { color: #0070dd; }
-        .rarity-EPIC { color: #a335ee; }
-        .rarity-LEGENDARY { color: #ff8000; }
-        
-        /* Jewel Colors */
-        .jewel-name-RUBY { color: #ef4444; }
-        .jewel-name-SAPPHIRE { color: #3b82f6; }
-        .jewel-name-EMERALD { color: #22c55e; }
-        .jewel-name-TOPAZ { color: #eab308; }
-        .jewel-name-AMETHYST { color: #c026d3; }
+        .text-rarity-COMMON { color: #ffffff; }
+        .text-rarity-UNCOMMON { color: #1eff00; }
+        .text-rarity-RARE { color: #0070dd; }
+        .text-rarity-EPIC { color: #a335ee; }
+        .text-rarity-LEGENDARY { color: #ff8000; }
 
-        .socket-jewel-RUBY { background-color: #ef4444; box-shadow: 0 0 3px #ef4444; }
-        .socket-jewel-SAPPHIRE { background-color: #3b82f6; box-shadow: 0 0 3px #3b82f6; }
-        .socket-jewel-EMERALD { background-color: #22c55e; box-shadow: 0 0 3px #22c55e; }
-        .socket-jewel-TOPAZ { background-color: #eab308; box-shadow: 0 0 3px #eab308; }
-        .socket-jewel-AMETHYST { background-color: #c026d3; box-shadow: 0 0 3px #c026d3; }
+        .border-rarity-COMMON { border-color: #6b7280; }
+        .border-rarity-UNCOMMON { border-color: #16a34a; }
+        .border-rarity-RARE { border-color: #2563eb; }
+        .border-rarity-EPIC { border-color: #9333ea; }
+        .border-rarity-LEGENDARY { border-color: #d97706; }
+
+        .crit-icon { color: #facc15; }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid #4b5563;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="importmap">
@@ -66,6 +96,6 @@
 </head>
   <body class="bg-gray-900 text-white antialiased">
     <div id="root"></div>
-    <script type="text/babel" data-type="module" src="index.tsx"></script>
+    <script type="text/babel" data-presets="react,typescript" src="index.tsx"></script>
   </body>
 </html>
