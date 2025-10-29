@@ -96,7 +96,7 @@ const { useState, useEffect, useCallback, useRef, useMemo } = React;
 
 // --- CONFIG ---
 const LEVEL_EXPERIENCE_BASE = 20;
-const LEVEL_EXPERIENCE_MULTIPLIER = 1.2;
+const LEVEL_EXPERIENCE_MULTIPLIER = 1.15; // Adjusted: Lowered level up difficulty
 const MONSTER_HP_BASE = 20;
 const MONSTER_HP_MULTIPLIER = 1.2;
 const MONSTER_REWARD_BASE = 5;
@@ -137,7 +137,7 @@ const LIBERATION_COST_MULTIPLIER = 100; // Increased significantly
 const POWER_SHOT_COOLDOWN = 30000; // 30 seconds
 const POWER_SHOT_DAMAGE_MULTIPLIER = 5; // Base multiplier
 
-const EQUIPMENT_DROP_CHANCE_BASE = 0.1; // 10% base drop chance
+const EQUIPMENT_DROP_CHANCE_BASE = 0.15; // Adjusted: Increased drop chance
 const EQUIPMENT_GACHA_COST_BASE = 100;
 const EQUIPMENT_GACHA_COST_LEVEL_MULTIPLIER = 20;
 
@@ -208,7 +208,7 @@ const GachaIcon = (props) => (
 );
 
 const GreenSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-48 h-48 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
         <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path>
         <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path>
         <circle cx="28" cy="50" r="5" fill="#fecaca"></circle>
@@ -224,7 +224,7 @@ const GreenSlimeIcon = () => (
 );
 
 const RedSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-48 h-48 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
         <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path>
         <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#ef4444" stroke="#991b1b" strokeWidth="3"></path>
         <circle cx="38" cy="45" r="7" fill="white"></circle>
@@ -236,7 +236,7 @@ const RedSlimeIcon = () => (
 );
 
 const BlueSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-48 h-48 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
         <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path>
         <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#3b82f6" stroke="#1e3a8a" strokeWidth="3"></path>
         <path d="M 32 40 C 35 45, 41 45, 44 40" stroke="white" fill="transparent" strokeWidth="3" strokeLinecap="round"></path>
@@ -246,7 +246,7 @@ const BlueSlimeIcon = () => (
 );
 
 const GolemIcon = () => (
-    <svg viewBox="0 0 100 100" className="w-48 h-48 drop-shadow-lg">
+    <svg viewBox="0 0 100 100" className="w-64 h-64 drop-shadow-lg">
         <rect x="20" y="40" width="60" height="50" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect>
         <rect x="30" y="20" width="40" height="30" fill="#7f8c9b" stroke="#4b5563" strokeWidth="3" rx="5"></rect>
         <circle cx="45" cy="35" r="4" fill="#dc2626"></circle>
@@ -257,7 +257,7 @@ const GolemIcon = () => (
 );
 
 const KingSlimeIcon = () => (
-    <svg viewBox="0 0 100 80" className="w-48 h-48 drop-shadow-lg">
+    <svg viewBox="0 0 100 80" className="w-64 h-64 drop-shadow-lg">
         {/* Crown */}
         <path d="M 25 20 L 30 5 L 50 15 L 70 5 L 75 20 Z" fill="#facc15" stroke="#ca8a04" strokeWidth="2" strokeLinejoin="round"></path>
         <circle cx="30" cy="7" r="3" fill="#ef4444"></circle>
@@ -888,15 +888,36 @@ const App = () => {
             let newXp = prev.xp + xpGained;
             let newLevel = prev.level;
             let newMaxXp = prev.maxXp;
+            let newClickDamage = prev.clickDamage;
+            let newDps = prev.dps;
+            let newCritChance = prev.critChance;
+            let newCritDamage = prev.critDamage;
 
             while (newXp >= newMaxXp) {
                 newXp -= newMaxXp;
                 newLevel += 1;
                 newMaxXp = Math.floor(LEVEL_EXPERIENCE_BASE * Math.pow(LEVEL_EXPERIENCE_MULTIPLIER, newLevel - 1));
                 addLog(`레벨업! ${newLevel}레벨 달성!`);
+                
+                // Level up stat bonus
+                newClickDamage *= 1.01;
+                newDps *= 1.01;
+                newCritChance *= 1.01;
+                newCritDamage *= 1.01;
+                addLog(`<span class="text-yellow-300">레벨업 보너스! 모든 능력치가 1% 증가했습니다!</span>`);
             }
 
-            return { ...prev, level: newLevel, xp: newXp, maxXp: newMaxXp, coins: prev.coins + coinsGained };
+            return { 
+                ...prev, 
+                level: newLevel, 
+                xp: newXp, 
+                maxXp: newMaxXp, 
+                coins: prev.coins + coinsGained,
+                clickDamage: newClickDamage,
+                dps: newDps,
+                critChance: newCritChance,
+                critDamage: newCritDamage
+            };
         });
 
         const newMonsterLevel = currentMonsterLevel + 1;
