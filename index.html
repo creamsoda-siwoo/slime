@@ -98,41 +98,41 @@ const { useState, useEffect, useCallback, useRef, useMemo } = React;
 const LEVEL_EXPERIENCE_BASE = 20;
 const LEVEL_EXPERIENCE_MULTIPLIER = 1.15;
 const MONSTER_HP_BASE = 20;
-const MONSTER_HP_MULTIPLIER = 1.2;
+const MONSTER_HP_MULTIPLIER = 1.16; // 난이도 하향
 const MONSTER_REWARD_BASE = 5;
 const MONSTER_REWARD_MULTIPLIER = 1.1;
 const BOSS_LEVEL_INTERVAL = 10;
-const BOSS_HP_MULTIPLIER = 5;
+const BOSS_HP_MULTIPLIER = 4.0; // 난이도 하향
 const BOSS_REWARD_MULTIPLIER = 3;
 const BOSS_DROP_CHANCE_BOOST = 0.2;
 const UPGRADE_COST_LEVEL_FACTOR = 0.02;
 
 const CLICK_UPGRADE_COST_BASE = 4;
-const CLICK_UPGRADE_COST_MULTIPLIER = 1.25;
+const CLICK_UPGRADE_COST_MULTIPLIER = 1.18; // 난이도 하향
 const AUTO_ATTACK_UPGRADE_COST_BASE = 10;
-const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.35;
+const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.25; // 난이도 하향
 const CRIT_CHANCE_UPGRADE_COST_BASE = 30;
-const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.6;
+const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.4; // 난이도 하향
 const CRIT_CHANCE_UPGRADE_INCREASE = 1;
 const CRIT_DAMAGE_UPGRADE_COST_BASE = 50;
-const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.5;
-const CRIT_DAMAGE_UPGRADE_INCREASE = 10;
+const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.38; // 난이도 하향
+const CRIT_DAMAGE_UPGRADE_INCREASE = 5; // 버그 수정
 
 const GOLD_GAIN_UPGRADE_COST_BASE = 50;
-const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.5;
+const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.4; // 난이도 하향
 const XP_GAIN_UPGRADE_COST_BASE = 75;
-const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.6;
+const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.5; // 난이도 하향
 
 // New Upgrade Costs
 const ATTACK_SPEED_UPGRADE_COST_BASE = 100;
-const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.4;
+const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.35; // 난이도 하향
 const HASTE_UPGRADE_COST_BASE = 250;
-const HASTE_UPGRADE_COST_MULTIPLIER = 1.8;
+const HASTE_UPGRADE_COST_MULTIPLIER = 1.6; // 난이도 하향
 const LUCK_UPGRADE_COST_BASE = 200;
-const LUCK_UPGRADE_COST_MULTIPLIER = 1.5;
+const LUCK_UPGRADE_COST_MULTIPLIER = 1.45; // 난이도 하향
 
 const SKILL_DAMAGE_UPGRADE_COST_BASE = 150;
-const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.8;
+const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.6; // 난이도 하향
 
 const LIBERATION_COST_BASE = 10000;
 const LIBERATION_COST_MULTIPLIER = 100;
@@ -989,11 +989,27 @@ const App = () => {
 
     const handleDiscardNewItem = () => { setNewItemDrop(null); };
 
+    const handleResetGame = useCallback(() => {
+        if (window.confirm('정말로 게임을 초기화하시겠습니까? 모든 진행 상황이 사라집니다.')) {
+            localStorage.removeItem(SAVED_GAME_KEY);
+            window.location.reload();
+        }
+    }, []);
+
     const liberationCost = useMemo(() => LIBERATION_COST_BASE * Math.pow(LIBERATION_COST_MULTIPLIER, liberationCount), [liberationCount]);
     const equipmentGachaCost = useMemo(() => EQUIPMENT_GACHA_COST_BASE + playerStats.level * EQUIPMENT_GACHA_COST_LEVEL_MULTIPLIER, [playerStats.level]);
 
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-4 space-y-4">
+            <div className="fixed top-4 left-4 z-10">
+                <button onClick={handleResetGame} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg">
+                    게임 초기화
+                </button>
+            </div>
+            <div className="fixed top-4 right-4 z-10">
+                <p className="text-gray-500 text-sm">제작자: 한국인이라면</p>
+            </div>
+
             {!playerClass && <JobSelectionModal onSelect={handleJobSelect} />}
             <header className="text-center">
                 <h1 className="text-5xl font-bold text-green-400 drop-shadow-lg">슬라임 헌터</h1>
