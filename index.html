@@ -273,6 +273,22 @@ const formatNumber = (num) => {
     return (n / 1000000000000).toFixed(1).replace(/\.0$/, '') + 'T';
 };
 
+const getEnhancedItemStats = (item) => {
+    if (!item || !item.stats) return { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0 };
+    const itemLevel = item.level || 0;
+    const multiplier = Math.pow(1.1, itemLevel);
+    const critMultiplier = Math.pow(1.05, itemLevel);
+    
+    const enhancedStats = {
+        clickDamage: (item.stats.clickDamage || 0) * multiplier,
+        autoAttackDamage: (item.stats.autoAttackDamage || 0) * multiplier,
+        critChance: (item.stats.critChance || 0) * critMultiplier,
+        critDamage: (item.stats.critDamage || 0) * critMultiplier,
+    };
+    
+    return enhancedStats;
+};
+
 const calculateItemStats = (baseLevel, rarityKey, typeKey) => {
     const rarity = RARITIES[rarityKey];
     const stats = { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0 };
@@ -340,6 +356,7 @@ const EquipmentTooltip = ({ item }) => {
     if (!item) return null;
     const rarityInfo = RARITIES[item.rarity];
     const typeInfo = EQUIPMENT_TYPES[item.type];
+    const enhancedStats = getEnhancedItemStats(item);
 
     return (
         <div className="tooltiptext">
@@ -347,10 +364,10 @@ const EquipmentTooltip = ({ item }) => {
             <p className="text-sm text-gray-400 mb-2"> <span className={rarityInfo.textClass}>[{rarityInfo.name}]</span> <span> {typeInfo.name}</span> </p>
             <hr className="border-gray-600 my-2" />
             <div className="space-y-1 text-sm">
-                {item.stats.clickDamage > 0 && <p className="flex items-center"><SwordIcon className="h-4 w-4 mr-1.5" /> <span>클릭 데미지 +{formatNumber(item.stats.clickDamage)}</span></p>}
-                {item.stats.autoAttackDamage > 0 && <p className="flex items-center"><DpsIcon className="h-4 w-4 mr-1.5" /> <span>자동 공격 +{formatNumber(item.stats.autoAttackDamage)}</span></p>}
-                {item.stats.critChance > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 확률 +{item.stats.critChance.toFixed(1)}%</span></p>}
-                {item.stats.critDamage > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 데미지 +{item.stats.critDamage}%</span></p>}
+                {enhancedStats.clickDamage > 0 && <p className="flex items-center"><SwordIcon className="h-4 w-4 mr-1.5" /> <span>클릭 데미지 +{formatNumber(enhancedStats.clickDamage)}</span></p>}
+                {enhancedStats.autoAttackDamage > 0 && <p className="flex items-center"><DpsIcon className="h-4 w-4 mr-1.5" /> <span>자동 공격 +{formatNumber(enhancedStats.autoAttackDamage)}</span></p>}
+                {enhancedStats.critChance > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 확률 +{enhancedStats.critChance.toFixed(1)}%</span></p>}
+                {enhancedStats.critDamage > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 데미지 +{formatNumber(enhancedStats.critDamage)}%</span></p>}
             </div>
         </div>
     );
@@ -504,7 +521,7 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
     </div>
 );
 
-const InventoryPanel = ({ inventory, onSelectItem }) => {
+const InventoryPanel = ({ inventory, onSelectItem, isSalvageMode, onToggleSalvageMode, salvageList, onToggleSalvageItem, onBulkSalvage }) => {
     const [filter, setFilter] = useState('ALL');
 
     const filteredInventory = useMemo(() => {
@@ -528,7 +545,10 @@ const InventoryPanel = ({ inventory, onSelectItem }) => {
         <div>
             <div className="flex justify-between items-center mb-2">
                  <h3 className="text-lg font-semibold text-green-300">인벤토리</h3>
-                 <span>{filteredInventory.length} / {inventory.length}개</span>
+                 <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-400">{filteredInventory.length} / {inventory.length}개</span>
+                    <button onClick={onToggleSalvageMode} className={`text-sm py-1 px-2 rounded ${isSalvageMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-600 hover:bg-gray-500 text-gray-200'}`}>분해 모드</button>
+                 </div>
             </div>
             <div className="flex gap-2 mb-2">
                 <FilterButton type="ALL">전체</FilterButton>
@@ -536,21 +556,35 @@ const InventoryPanel = ({ inventory, onSelectItem }) => {
                 <FilterButton type="ARMOR"><ArmorIcon className="w-5 h-5 mx-auto"/></FilterButton>
                 <FilterButton type="AMULET"><AmuletIcon className="w-5 h-5 mx-auto"/></FilterButton>
             </div>
-            <div className="grid grid-cols-4 gap-2 h-[410px] overflow-y-auto bg-gray-900/50 p-2 rounded">
+            <div className="grid grid-cols-4 gap-2 h-[380px] overflow-y-auto bg-gray-900/50 p-2 rounded">
                 {filteredInventory.map(item => {
                     const rarityInfo = RARITIES[item.rarity];
                     const IconComponent = EQUIPMENT_TYPES[item.type].icon;
+                    const isSelected = salvageList.has(item.id);
                     return (
-                        <div key={item.id} className="tooltip" onClick={() => onSelectItem(item)}>
-                            <div className={`relative aspect-square flex items-center justify-center p-1 border-2 ${rarityInfo.borderClass} bg-gray-800 rounded-md cursor-pointer hover:bg-gray-700 transition-colors`}>
+                        <div key={item.id} className="tooltip" onClick={() => isSalvageMode ? onToggleSalvageItem(item) : onSelectItem(item)}>
+                            <div className={`relative aspect-square flex items-center justify-center p-1 border-2 ${rarityInfo.borderClass} bg-gray-800 rounded-md cursor-pointer hover:bg-gray-700 transition-colors ${isSelected ? 'ring-2 ring-red-500 ring-offset-2 ring-offset-gray-800' : ''}`}>
                                  <IconComponent className={`h-8 w-8 ${rarityInfo.textClass}`} />
                                  {item.level > 0 && <span className="absolute bottom-0 right-0 text-xs bg-gray-900 px-1 rounded-sm">+{item.level}</span>}
+                                 {isSelected && <div className="absolute inset-0 bg-red-500/50 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></div>}
                             </div>
                             <EquipmentTooltip item={item} />
                         </div>
                     );
                 })}
             </div>
+            {isSalvageMode && (
+                <div className="mt-2 p-2 bg-gray-900/50 rounded">
+                    <p className="text-center mb-2 text-sm text-gray-300">{salvageList.size}개 아이템 선택됨</p>
+                    <button
+                        onClick={onBulkSalvage}
+                        disabled={salvageList.size === 0}
+                        className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded transition-colors"
+                    >
+                        선택 아이템 분해
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
@@ -574,20 +608,15 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
     const rarityInfo = RARITIES[selectedItem.rarity];
     const itemLevel = selectedItem.level || 0;
 
-    const renderStats = (item, isNextLevel = false) => {
-        const stats = isNextLevel ? {
-             clickDamage: Math.ceil(item.stats.clickDamage * 1.1),
-             autoAttackDamage: Math.ceil(item.stats.autoAttackDamage * 1.1),
-             critChance: parseFloat((item.stats.critChance * 1.05).toFixed(1)),
-             critDamage: Math.ceil(item.stats.critDamage * 1.05),
-        } : item.stats;
+    const renderStats = (item) => {
+        const stats = getEnhancedItemStats(item);
         
         return (
              <div className="space-y-1 text-sm p-2 bg-gray-900/50 rounded">
                 {stats.clickDamage > 0 && <p>클릭 데미지 +{formatNumber(stats.clickDamage)}</p>}
                 {stats.autoAttackDamage > 0 && <p>자동 공격 +{formatNumber(stats.autoAttackDamage)}</p>}
                 {stats.critChance > 0 && <p>크리 확률 +{stats.critChance.toFixed(1)}%</p>}
-                {stats.critDamage > 0 && <p>크리 데미지 +{stats.critDamage}%</p>}
+                {stats.critDamage > 0 && <p>크리 데미지 +{formatNumber(stats.critDamage)}%</p>}
             </div>
         );
     };
@@ -596,8 +625,8 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
         const upgradeCost = Math.ceil(rarityInfo.statMultiplier * 50 * Math.pow(1.5, itemLevel) * (1 + itemLevel * 0.2));
         return (
             <div className="space-y-3">
-                 <div> <p className="font-semibold mb-1">현재 능력치</p> {renderStats(selectedItem, false)} </div>
-                 <div> <p className="font-semibold mb-1">다음 레벨 (+{itemLevel + 1})</p> {renderStats(selectedItem, true)} </div>
+                 <div> <p className="font-semibold mb-1">현재 능력치 (+{itemLevel})</p> {renderStats(selectedItem)} </div>
+                 <div> <p className="font-semibold mb-1">다음 레벨 (+{itemLevel + 1})</p> {renderStats({ ...selectedItem, level: itemLevel + 1 })} </div>
                 <div className="text-center">
                     <p className="mb-2 flex items-center justify-center">비용: <CoinIcon/> {formatNumber(upgradeCost)}</p>
                     <button onClick={() => onForge(selectedItem)} disabled={playerCoins < upgradeCost} className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded">
@@ -639,7 +668,7 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
         const canReforge = playerCoins >= cost;
          return (
              <div className="space-y-3">
-                 <div> <p className="font-semibold mb-1">현재 능력치</p> {renderStats(selectedItem, false)} </div>
+                 <div> <p className="font-semibold mb-1">현재 능력치</p> {renderStats(selectedItem)} </div>
                  <p className="text-sm text-gray-400 text-center">아이템의 기본 능력치를 무작위로 재설정합니다. (등급과 아이템 종류는 유지됩니다)</p>
                  <div className="text-center mt-4">
                     <p className="mb-2 flex items-center justify-center">비용: <CoinIcon/> {formatNumber(cost)}</p>
@@ -671,7 +700,7 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
 };
 
 
-const RightPanel = ({ activeTab, setActiveTab, selectedForgeItem, onSelectForgeItem, ...props }) => {
+const RightPanel = ({ activeTab, setActiveTab, selectedForgeItem, ...props }) => {
     const forgeHandlers = {
         onForge: props.handlers.onForgeItem,
         onUpgradeRarity: props.handlers.onUpgradeRarity,
@@ -687,7 +716,15 @@ const RightPanel = ({ activeTab, setActiveTab, selectedForgeItem, onSelectForgeI
             </div>
             
             {activeTab === 'upgrade' && <UpgradePanel {...props}/>}
-            {activeTab === 'inventory' && <InventoryPanel inventory={props.inventory} onSelectItem={props.handlers.onSelectItem} />}
+            {activeTab === 'inventory' && <InventoryPanel 
+                inventory={props.inventory} 
+                onSelectItem={props.handlers.onSelectItem}
+                isSalvageMode={props.isSalvageMode}
+                onToggleSalvageMode={props.handlers.onToggleSalvageMode}
+                salvageList={props.salvageList}
+                onToggleSalvageItem={props.handlers.onToggleSalvageItem}
+                onBulkSalvage={props.handlers.onBulkSalvage}
+                 />}
             {activeTab === 'forge' && <ForgePanel selectedItem={selectedForgeItem} handlers={forgeHandlers} playerCoins={props.playerCoins} />}
         </div>
     );
@@ -764,15 +801,16 @@ const NewItemDropModal = ({ newItem, currentItem, onEquip, onStore }) => {
     const renderItemStats = (item) => {
         if (!item) return <p className="text-gray-400">없음</p>;
         const rarityInfo = RARITIES[item.rarity];
+        const enhancedStats = getEnhancedItemStats(item);
         return (
             <div className={`p-4 rounded-lg border-2 ${rarityInfo.borderClass} bg-gray-800`}>
-                <p className={`font-bold text-xl ${rarityInfo.textClass}`}>{item.name}</p>
+                <p className={`font-bold text-xl ${rarityInfo.textClass}`}>{item.name} {item.level > 0 ? `+${item.level}` : ''}</p>
                 <p className={`text-sm mb-2 ${rarityInfo.textClass}`}>[{rarityInfo.name}]</p>
                 <div className="space-y-1">
-                    {item.stats.clickDamage > 0 && <p><SwordIcon /> 클릭 데미지 +{formatNumber(item.stats.clickDamage)}</p>}
-                    {item.stats.autoAttackDamage > 0 && <p><DpsIcon /> 자동 공격 +{formatNumber(item.stats.autoAttackDamage)}</p>}
-                    {item.stats.critChance > 0 && <p><CritIcon /> 크리 확률 +{item.stats.critChance.toFixed(1)}%</p>}
-                    {item.stats.critDamage > 0 && <p><CritIcon /> 크리 데미지 +{item.stats.critDamage}%</p>}
+                    {enhancedStats.clickDamage > 0 && <p><SwordIcon /> 클릭 데미지 +{formatNumber(enhancedStats.clickDamage)}</p>}
+                    {enhancedStats.autoAttackDamage > 0 && <p><DpsIcon /> 자동 공격 +{formatNumber(enhancedStats.autoAttackDamage)}</p>}
+                    {enhancedStats.critChance > 0 && <p><CritIcon /> 크리 확률 +{enhancedStats.critChance.toFixed(1)}%</p>}
+                    {enhancedStats.critDamage > 0 && <p><CritIcon /> 크리 데미지 +{formatNumber(enhancedStats.critDamage)}%</p>}
                 </div>
             </div>
         );
@@ -831,6 +869,7 @@ const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSalvage, o
     const renderItemStats = (itemToRender, title) => {
         if (!itemToRender) return <div><h3 className="text-lg font-semibold mb-2 text-center text-gray-400">{title}</h3><div className="p-4 rounded-lg border-2 border-gray-600 bg-gray-800 flex items-center justify-center min-h-[160px]"><p className="text-gray-500">없음</p></div></div>;
         const rarityInfo = RARITIES[itemToRender.rarity];
+        const enhancedStats = getEnhancedItemStats(itemToRender);
         return (
             <div>
                  <h3 className="text-lg font-semibold mb-2 text-center text-gray-400">{title}</h3>
@@ -839,10 +878,10 @@ const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSalvage, o
                     <p className={`text-sm mb-2 ${rarityInfo.textClass}`}>[{rarityInfo.name}]</p>
                     <hr className="border-gray-600 my-1"/>
                     <div className="space-y-1 mt-2">
-                        {itemToRender.stats.clickDamage > 0 && <p><SwordIcon /> 클릭 데미지 +{formatNumber(itemToRender.stats.clickDamage)}</p>}
-                        {itemToRender.stats.autoAttackDamage > 0 && <p><DpsIcon /> 자동 공격 +{formatNumber(itemToRender.stats.autoAttackDamage)}</p>}
-                        {itemToRender.stats.critChance > 0 && <p><CritIcon /> 크리 확률 +{itemToRender.stats.critChance.toFixed(1)}%</p>}
-                        {itemToRender.stats.critDamage > 0 && <p><CritIcon /> 크리 데미지 +{itemToRender.stats.critDamage}%</p>}
+                        {enhancedStats.clickDamage > 0 && <p><SwordIcon /> 클릭 데미지 +{formatNumber(enhancedStats.clickDamage)}</p>}
+                        {enhancedStats.autoAttackDamage > 0 && <p><DpsIcon /> 자동 공격 +{formatNumber(enhancedStats.autoAttackDamage)}</p>}
+                        {enhancedStats.critChance > 0 && <p><CritIcon /> 크리 확률 +{enhancedStats.critChance.toFixed(1)}%</p>}
+                        {enhancedStats.critDamage > 0 && <p><CritIcon /> 크리 데미지 +{formatNumber(enhancedStats.critDamage)}%</p>}
                     </div>
                 </div>
             </div>
@@ -1072,6 +1111,9 @@ const App = () => {
     const [isJobSelectionOpen, setIsJobSelectionOpen] = useState(false);
     const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
     const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
+    const [isSalvageMode, setIsSalvageMode] = useState(false);
+    const [salvageList, setSalvageList] = useState(new Set());
+
 
     const [activeSkillCooldown, setActiveSkillCooldown] = useState(0);
     const [damagePopups, setDamagePopups] = useState([]);
@@ -1088,14 +1130,12 @@ const App = () => {
         let combined = { ...playerStats };
         Object.values(equipment).forEach(item => {
             if (!item) return;
-            const itemLevel = item.level || 0;
-            const multiplier = Math.pow(1.1, itemLevel);
-            const critMultiplier = Math.pow(1.05, itemLevel);
-
-            if (item.stats.clickDamage) combined.clickDamage += item.stats.clickDamage * multiplier;
-            if (item.stats.autoAttackDamage) combined.autoAttackDamage += item.stats.autoAttackDamage * multiplier;
-            if (item.stats.critChance) combined.critChance += item.stats.critChance * critMultiplier;
-            if (item.stats.critDamage) combined.critDamage += item.stats.critDamage * critMultiplier;
+            const enhancedStats = getEnhancedItemStats(item);
+            
+            if (enhancedStats.clickDamage) combined.clickDamage += enhancedStats.clickDamage;
+            if (enhancedStats.autoAttackDamage) combined.autoAttackDamage += enhancedStats.autoAttackDamage;
+            if (enhancedStats.critChance) combined.critChance += enhancedStats.critChance;
+            if (enhancedStats.critDamage) combined.critDamage += enhancedStats.critDamage;
         });
 
         if (playerClass && JOBS[playerClass]) {
@@ -1624,6 +1664,50 @@ const App = () => {
         }
     }, []);
 
+    const handleToggleSalvageMode = () => {
+        setIsSalvageMode(prev => {
+            if (prev) { // if turning off
+                setSalvageList(new Set());
+            }
+            return !prev;
+        });
+    };
+
+    const handleToggleSalvageItem = (item) => {
+        setSalvageList(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(item.id)) {
+                newSet.delete(item.id);
+            } else {
+                newSet.add(item.id);
+            }
+            return newSet;
+        });
+    };
+
+    const handleBulkSalvage = () => {
+        if (salvageList.size === 0) return;
+
+        let totalGoldGained = 0;
+        const itemsToSalvage = inventory.filter(item => salvageList.has(item.id));
+
+        itemsToSalvage.forEach(itemToSalvage => {
+            const rarityInfo = RARITIES[itemToSalvage.rarity];
+            const itemLevel = itemToSalvage.level || 0;
+            const goldGained = Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (itemToSalvage.baseLevel || 1));
+            totalGoldGained += goldGained;
+        });
+
+        if (window.confirm(`${salvageList.size}개의 아이템을 분해하여 ${formatNumber(totalGoldGained)} 골드를 얻습니다. 계속하시겠습니까?`)) {
+            setPlayerStats(prev => ({ ...prev, coins: prev.coins + totalGoldGained }));
+            setInventory(prev => prev.filter(item => !salvageList.has(item.id)));
+            addLog(`아이템 ${salvageList.size}개를 분해하여 <strong class="text-yellow-400">${formatNumber(totalGoldGained)} 골드</strong>를 획득했습니다.`);
+            setSalvageList(new Set());
+            setIsSalvageMode(false);
+            needsSave.current = true;
+        }
+    };
+
     const liberationCost = useMemo(() => LIBERATION_COST_BASE * Math.pow(LIBERATION_COST_MULTIPLIER, liberationCount), [liberationCount]);
     const equipmentGachaCost = useMemo(() => EQUIPMENT_GACHA_COST_BASE + playerStats.level * EQUIPMENT_GACHA_COST_LEVEL_MULTIPLIER, [playerStats.level]);
     
@@ -1682,12 +1766,13 @@ const App = () => {
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                     selectedForgeItem={selectedForgeItem}
-                    onSelectForgeItem={handleSelectForgeItem}
                     upgrades={upgrades}
                     playerCoins={playerStats.coins}
                     abilityStats={finalAbilityStats}
                     equipmentGachaCost={equipmentGachaCost}
                     inventory={inventory}
+                    isSalvageMode={isSalvageMode}
+                    salvageList={salvageList}
                     handlers={{
                         onUpgradeClick: handleUpgradeClick,
                         onUpgradeAutoAttack: handleUpgradeAutoAttack,
@@ -1705,6 +1790,9 @@ const App = () => {
                         onForgeItem: handleForgeItem,
                         onUpgradeRarity: handleUpgradeRarity,
                         onReforgeItem: handleReforgeItem,
+                        onToggleSalvageMode: handleToggleSalvageMode,
+                        onToggleSalvageItem: handleToggleSalvageItem,
+                        onBulkSalvage: handleBulkSalvage,
                     }}
                 />
             </main>
