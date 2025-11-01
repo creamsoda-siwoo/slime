@@ -65,7 +65,7 @@
         }
         .tooltip .tooltiptext {
             visibility: hidden;
-            width: 220px;
+            width: 240px;
             background-color: #1f2937;
             color: #fff;
             text-align: left;
@@ -75,7 +75,7 @@
             z-index: 50;
             bottom: 125%;
             left: 50%;
-            margin-left: -110px;
+            margin-left: -120px;
             opacity: 0;
             transition: opacity 0.3s;
             border: 1px solid #4b5563;
@@ -84,6 +84,15 @@
         .tooltip:hover .tooltiptext {
             visibility: visible;
             opacity: 1;
+        }
+        
+        /* Slot Machine Animation */
+        @keyframes spinReel {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        .reel-spinning {
+            animation: spinReel 0.1s linear infinite;
         }
     </style>
     <!-- Load React and ReactDOM from CDN -->
@@ -112,33 +121,36 @@ const BOSS_DROP_CHANCE_BOOST = 0.2;
 const UPGRADE_COST_LEVEL_FACTOR = 0.02;
 
 const CLICK_UPGRADE_COST_BASE = 4;
-const CLICK_UPGRADE_COST_MULTIPLIER = 1.07; // 완화
+const CLICK_UPGRADE_COST_MULTIPLIER = 1.12;
 const AUTO_ATTACK_UPGRADE_COST_BASE = 10;
-const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.12; // 완화
+const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.18;
 const CRIT_CHANCE_UPGRADE_COST_BASE = 30;
-const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.25; // 완화
+const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.32;
 const CRIT_CHANCE_UPGRADE_INCREASE = 1;
 const CRIT_DAMAGE_UPGRADE_COST_BASE = 50;
-const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.23; // 완화
+const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.30;
 const CRIT_DAMAGE_UPGRADE_INCREASE = 5;
 
 const GOLD_GAIN_UPGRADE_COST_BASE = 50;
-const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.25; // 완화
+const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.33;
 const XP_GAIN_UPGRADE_COST_BASE = 75;
-const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.35; // 완화
+const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.42;
 
 const ATTACK_SPEED_UPGRADE_COST_BASE = 100;
-const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.20; // 완화
+const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.28;
 const HASTE_UPGRADE_COST_BASE = 250;
-const HASTE_UPGRADE_COST_MULTIPLIER = 1.4; // 완화
+const HASTE_UPGRADE_COST_MULTIPLIER = 1.48;
 const LUCK_UPGRADE_COST_BASE = 200;
-const LUCK_UPGRADE_COST_MULTIPLIER = 1.30; // 완화
+const LUCK_UPGRADE_COST_MULTIPLIER = 1.36;
 
 const SKILL_DAMAGE_UPGRADE_COST_BASE = 150;
-const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.4; // 완화
+const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.45;
 
 const BOSS_DAMAGE_UPGRADE_COST_BASE = 200;
-const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.35; // 완화
+const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.41;
+
+const ARTIFACT_POWER_UPGRADE_COST_BASE = 5000;
+const ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER = 1.5;
 
 const LIBERATION_COST_BASE = 10000;
 const LIBERATION_COST_MULTIPLIER = 100;
@@ -152,6 +164,9 @@ const EQUIPMENT_GACHA_COST_LEVEL_MULTIPLIER = 20;
 
 const REBIRTH_LEVEL_REQUIREMENT = 30;
 const REBIRTH_ALL_STAT_BONUS = 10; // All stats +10%
+
+const TREASURE_GOLEM_SPAWN_CHANCE = 0.02; // 2% chance
+const TREASURE_GOLEM_TIMER = 30; // 30 seconds
 
 const SAVED_GAME_KEY = 'slimeHunterSaveData';
 
@@ -213,7 +228,10 @@ const MISSION_TYPES = {
 const EQUIPMENT_TYPES = {
     WEAPON: { name: '무기', icon: (props) => <SwordIcon {...props}/> },
     ARMOR: { name: '방어구', icon: (props) => <ArmorIcon {...props}/> },
-    AMULET: { name: '장신구', icon: (props) => <AmuletIcon {...props}/> }
+    AMULET: { name: '장신구', icon: (props) => <AmuletIcon {...props}/> },
+    HELMET: { name: '투구', icon: (props) => <HelmetIcon {...props}/> },
+    GLOVES: { name: '장갑', icon: (props) => <GlovesIcon {...props}/> },
+    BOOTS: { name: '신발', icon: (props) => <BootsIcon {...props}/> }
 };
 
 const RARITY_ORDER = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY', 'MYTHIC'];
@@ -239,6 +257,11 @@ const GachaIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className
 const AttackSpeedIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> );
 const LuckIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> );
 const BossIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 1.052A10.952 10.952 0 003.848 5.766L2 12l1.848 6.234A10.952 10.952 0 0012 22.948a10.952 10.952 0 008.152-4.714L22 12l-1.848-6.234A10.952 10.952 0 0012 1.052z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14s1.5-2 4-2 4 2 4 2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h.01M15 9h.01" /></svg> );
+const HelmetIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> );
+const GlovesIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.264-2.55-.724-3.682z" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /></svg> );
+const BootsIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg> );
+const ArtifactIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H7.5A2.25 2.25 0 005.25 6.75v9.75a2.25 2.25 0 002.25 2.25z" /> </svg> );
+const SlotMachineIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /> </svg> );
 
 // Monster Icons
 const GreenSlimeIcon = () => ( <svg viewBox="0 0 100 80" className="w-96 h-96 drop-shadow-lg"> <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path> <circle cx="28" cy="50" r="5" fill="#fecaca"></circle> <circle cx="72" cy="50" r="5" fill="#fecaca"></circle> <circle cx="38" cy="45" r="8" fill="white"></circle> <circle cx="62" cy="45" r="8" fill="white"></circle> <circle cx="40" cy="46" r="4" fill="black"></circle> <circle cx="64" cy="46" r="4" fill="black"></circle> <circle cx="37" cy="42" r="2" fill="white"></circle> <circle cx="61" cy="42" r="2" fill="white"></circle> <path d="M 45 60 Q 50 68, 55 60" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
@@ -247,7 +270,7 @@ const BlueSlimeIcon = () => ( <svg viewBox="0 0 100 80" className="w-96 h-96 dro
 const GolemIcon = () => ( <svg viewBox="0 0 100 100" className="w-96 h-96 drop-shadow-lg"> <rect x="20" y="40" width="60" height="50" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect> <rect x="30" y="20" width="40" height="30" fill="#7f8c9b" stroke="#4b5563" strokeWidth="3" rx="5"></rect> <circle cx="45" cy="35" r="4" fill="#dc2626"></circle> <circle cx="55" cy="35" r="4" fill="#dc2626"></circle> <rect x="10" y="50" width="20" height="30" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect> <rect x="70" y="50" width="20" height="30" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect> </svg> );
 const KingSlimeIcon = () => ( <svg viewBox="0 0 100 80" className="w-96 h-96 drop-shadow-lg"> <path d="M 25 20 L 30 5 L 50 15 L 70 5 L 75 20 Z" fill="#facc15" stroke="#ca8a04" strokeWidth="2" strokeLinejoin="round"></path> <circle cx="30" cy="7" r="3" fill="#ef4444"></circle> <circle cx="50" cy="17" r="3" fill="#3b82f6"></circle> <circle cx="70" cy="7" r="3" fill="#22c55e"></circle> <path d="M 35 35 C 40 30, 50 30, 55 35" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 20, 40 20, 50 20 C 60 20, 90 20, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path> <circle cx="28" cy="55" r="5" fill="#fecaca"></circle> <circle cx="72" cy="55" r="5" fill="#fecaca"></circle> <circle cx="38" cy="50" r="8" fill="white"></circle> <circle cx="62" cy="50" r="8" fill="white"></circle> <circle cx="40" cy="51" r="4" fill="black"></circle> <circle cx="64" cy="51" r="4" fill="black"></circle> <circle cx="37" cy="47" r="2" fill="white"></circle> <circle cx="61" cy="47" r="2" fill="white"></circle> <path d="M 45 65 Q 50 73, 55 65" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
 const DragonIcon = () => ( <svg viewBox="0 0 100 100" className="w-96 h-96 drop-shadow-lg"> <path d="M 50 10 C 20 40, 20 80, 50 90 C 80 80, 80 40, 50 10" fill="#b91c1c" stroke="#4a0404" strokeWidth="3"></path> <path d="M 40 20 C 30 30, 30 40, 40 50" fill="none" stroke="#fef2f2" strokeWidth="2"></path> <path d="M 60 20 C 70 30, 70 40, 60 50" fill="none" stroke="#fef2f2" strokeWidth="2"></path> <circle cx="45" cy="35" r="5" fill="#fef08a"></circle> <circle cx="55" cy="35" r="5" fill="#fef08a"></circle> <path d="M 45 70 Q 50 80, 55 70" stroke="white" strokeWidth="2" fill="none"></path> <path d="M 20 50 C 10 60, 10 70, 20 80" fill="#991b1b" stroke="#4a0404" strokeWidth="2"></path> <path d="M 80 50 C 90 60, 90 70, 80 80" fill="#991b1b" stroke="#4a0404" strokeWidth="2"></path> </svg> );
-
+const TreasureGolemIcon = () => ( <svg viewBox="0 0 100 100" className="w-96 h-96 drop-shadow-lg"> <rect x="20" y="40" width="60" height="50" fill="#facc15" stroke="#ca8a04" strokeWidth="3" rx="5"></rect> <rect x="30" y="20" width="40" height="30" fill="#fde047" stroke="#ca8a04" strokeWidth="3" rx="5"></rect> <circle cx="45" cy="35" r="4" fill="#3b82f6"></circle> <circle cx="55" cy="35" r="4" fill="#3b82f6"></circle> <rect x="10" y="50" width="20" height="30" fill="#facc15" stroke="#ca8a04" strokeWidth="3" rx="5"></rect> <rect x="70" y="50" width="20" height="30" fill="#facc15" stroke="#ca8a04" strokeWidth="3" rx="5"></rect> <circle cx="50" cy="65" r="8" fill="#22c55e" stroke="#166534" strokeWidth="2"></circle> </svg> );
 
 // --- MONSTER DATA ---
 const MONSTER_TYPES = [
@@ -255,21 +278,35 @@ const MONSTER_TYPES = [
     { name: '빨간 슬라임', Icon: RedSlimeIcon, minLevel: 1 },
     { name: '파란 슬라임', Icon: BlueSlimeIcon, minLevel: 1 },
 ];
-
 const BOSS_TYPES = [
     { name: '골렘', Icon: GolemIcon },
     { name: '킹 슬라임', Icon: KingSlimeIcon },
     { name: '드래곤', Icon: DragonIcon },
+];
+const SPECIAL_MONSTERS = {
+    TREASURE_GOLEM: { name: '보물 골렘', Icon: TreasureGolemIcon, isSpecial: true }
+};
+
+// --- ARTIFACT DATA ---
+const ARTIFACTS = [
+    { id: 'berserkers_blood', name: '광전사의 피', description: '보스에게 주는 모든 피해 +25%', icon: BossIcon, effect: { type: 'BOSS_DAMAGE', value: 25 } },
+    { id: 'swift_quiver', name: '신속의 화살통', description: '공격 속도 +10%', icon: AttackSpeedIcon, effect: { type: 'ATTACK_SPEED_MULT', value: 0.1 } },
+    { id: 'mana_crystal', name: '마나 수정', description: '스킬 쿨타임 -15%', icon: DpsIcon, effect: { type: 'HASTE', value: 15 } },
+    { id: 'lucky_clover', name: '행운의 클로버', description: '크리티컬 확률 +5%p', icon: LuckIcon, effect: { type: 'CRIT_CHANCE', value: 5 } },
+    { id: 'executioners_edge', name: '처형인의 칼날', description: '크리티컬 데미지 +50%p', icon: CritIcon, effect: { type: 'CRIT_DAMAGE', value: 50 } },
+    { id: 'golden_goblet', name: '황금 술잔', description: '골드 획득량 +20%', icon: CoinIcon, effect: { type: 'GOLD_GAIN', value: 20 } },
+    { id: 'sages_stone', name: '현자의 돌', description: '경험치 획득량 +20%', icon: XPIcon, effect: { type: 'XP_GAIN', value: 20 } },
+    { id: 'ancient_scope', name: '고대의 조준경', description: '클릭 데미지 +25%', icon: SwordIcon, effect: { type: 'CLICK_DAMAGE_MULT', value: 0.25 } },
 ];
 
 // --- UTILS ---
 const formatNumber = (num) => {
     const n = Math.floor(num);
     if (n < 1000) return n.toString();
-    if (n < 1000000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-    if (n < 1000000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (n < 1000000000000) return (n / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
-    return (n / 1000000000000).toFixed(1).replace(/\.0$/, '') + 'T';
+    if (n < 1000000) return (n / 1000).toFixed(0) + 'K';
+    if (n < 1000000000) return (n / 1000000).toFixed(0) + 'M';
+    if (n < 1000000000000) return (n / 1000000000).toFixed(0) + 'B';
+    return (n / 1000000000000).toFixed(0) + 'T';
 };
 
 const formatTime = (seconds) => {
@@ -284,32 +321,37 @@ const formatTime = (seconds) => {
 };
 
 const getEnhancedItemStats = (item) => {
-    if (!item || !item.stats) return { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0 };
+    if (!item || !item.stats) return { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0, attackSpeedBonus: 0, hasteBonus: 0, goldGainBonus: 0, xpGainBonus: 0 };
     const itemLevel = item.level || 0;
     const multiplier = Math.pow(1.1, itemLevel);
-    const critMultiplier = Math.pow(1.05, itemLevel);
+    const bonusStatMultiplier = 1 + (itemLevel * 0.1);
     
-    const enhancedStats = {
+    return {
         clickDamage: (item.stats.clickDamage || 0) * multiplier,
         autoAttackDamage: (item.stats.autoAttackDamage || 0) * multiplier,
-        critChance: (item.stats.critChance || 0) * critMultiplier,
-        critDamage: (item.stats.critDamage || 0) * critMultiplier,
+        critChance: (item.stats.critChance || 0) + (itemLevel * 0.2),
+        critDamage: (item.stats.critDamage || 0) + (itemLevel * 2),
+        attackSpeedBonus: (item.stats.attackSpeedBonus || 0) * bonusStatMultiplier,
+        hasteBonus: (item.stats.hasteBonus || 0) * bonusStatMultiplier,
+        goldGainBonus: (item.stats.goldGainBonus || 0) * bonusStatMultiplier,
+        xpGainBonus: (item.stats.xpGainBonus || 0) * bonusStatMultiplier,
     };
-    
-    return enhancedStats;
 };
 
 const calculateItemStats = (baseLevel, rarityKey, typeKey) => {
     const rarity = RARITIES[rarityKey];
-    const stats = { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0 };
+    const stats = { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0, attackSpeedBonus: 0, hasteBonus: 0, goldGainBonus: 0, xpGainBonus: 0 };
     const statBudget = baseLevel * rarity.statMultiplier;
     switch (typeKey) {
         case 'WEAPON': stats.clickDamage = Math.ceil(statBudget * (1 + Math.random() * 0.2)); break;
-        case 'ARMOR': stats.autoAttackDamage = Math.ceil(statBudget * 0.5 * (1 + Math.random() * 0.2)); break;
+        case 'ARMOR': stats.autoAttackDamage = Math.ceil(statBudget * 0.6 * (1 + Math.random() * 0.2)); break;
         case 'AMULET':
             stats.critChance = parseFloat((statBudget * 0.1 * (1 + Math.random() * 0.1)).toFixed(1));
             stats.critDamage = Math.ceil(statBudget * 2 * (1 + Math.random() * 0.1));
             break;
+        case 'HELMET': stats.xpGainBonus = Math.ceil(statBudget * 0.5); break;
+        case 'GLOVES': stats.attackSpeedBonus = Math.ceil(statBudget * 0.15); break;
+        case 'BOOTS': stats.hasteBonus = Math.ceil(statBudget * 0.15); break;
     }
     return stats;
 }
@@ -320,10 +362,10 @@ const PlayerStats = ({ stats, playerClass, onNameChange, abilityStats, liberatio
     <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-green-400">플레이어 정보</h2>
         <div className="flex justify-around mb-3 text-center">
-             {liberationCount > 0 && ( <div className="font-bold text-yellow-300 text-lg border-2 border-yellow-400 bg-gray-700 p-2 rounded w-1/2 mr-1"> 해방 {liberationCount}단계 </div> )}
-             {rebirthCount > 0 && ( <div className="font-bold text-purple-400 text-lg border-2 border-purple-500 bg-gray-700 p-2 rounded w-1/2 ml-1"> 환생 {rebirthCount}회차 </div> )}
+             {liberationCount > 0 && ( <div className="font-bold text-yellow-300 text-lg border-2 border-yellow-400 bg-gray-700 p-2 rounded w-1/2 mr-1">해방 {liberationCount}</div> )}
+             {rebirthCount > 0 && ( <div className="font-bold text-purple-400 text-lg border-2 border-purple-500 bg-gray-700 p-2 rounded w-1/2 ml-1">환생 {rebirthCount}</div> )}
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2">
              <div className="flex justify-between items-center bg-gray-700 p-2 rounded">
                 <span className="font-semibold">이름:</span>
                 <input type="text" value={stats.playerName} onChange={(e) => onNameChange(e.target.value)} className="bg-gray-600 text-right font-bold text-lg rounded px-2 w-32" />
@@ -343,26 +385,26 @@ const PlayerStats = ({ stats, playerClass, onNameChange, abilityStats, liberatio
                 </button>
             </div>
             <div className="flex justify-between items-center bg-gray-700 p-2 rounded">
-                <span className="font-semibold">장비 자동 드랍:</span>
+                <span className="font-semibold">장비 자동 판매:</span>
                 <button onClick={onToggleAutoDrop} className={`font-bold text-sm px-3 py-1 rounded-md transition-colors ${isAutoDropEnabled ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'}`}>
                     {isAutoDropEnabled ? 'ON' : 'OFF'}
                 </button>
             </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><LevelIcon />레벨:</span> <span className="font-bold text-lg">{stats.level}</span> </div>
-            <div className="bg-gray-700 p-2 rounded">
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><LevelIcon />레벨:</span> <span className="font-bold text-lg">{stats.level}</span> </div>
+            <div className="bg-gray-700 p-2 rounded text-sm">
                 <div className="flex justify-between items-center mb-1"> <span className="font-semibold"><XPIcon />경험치:</span> <span>{formatNumber(stats.xp)} / {formatNumber(stats.maxXp)}</span> </div>
-                <div className="w-full bg-gray-600 rounded-full h-4"> <div className="bg-purple-500 h-4 rounded-full" style={{ width: `${(stats.xp / stats.maxXp) * 100}%` }}></div> </div>
+                <div className="w-full bg-gray-600 rounded-full h-3"> <div className="bg-purple-500 h-3 rounded-full" style={{ width: `${(stats.xp / stats.maxXp) * 100}%` }}></div> </div>
             </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><CoinIcon />골드:</span> <span className="font-bold text-lg text-yellow-400">{formatNumber(stats.coins)}</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><SwordIcon />클릭 데미지:</span> <span>{formatNumber(stats.clickDamage)}</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><DpsIcon />자동 공격 데미지:</span> <span>{formatNumber(stats.autoAttackDamage)}</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><AttackSpeedIcon />공격 속도:</span> <span>{stats.attackSpeed.toFixed(2)} / s</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><CritIcon />크리 확률:</span> <span>{stats.critChance.toFixed(1)}%</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><CritIcon />크리 데미지:</span> <span>{stats.critDamage}%</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded"> <span className="font-semibold"><LuckIcon />행운:</span> <span>{stats.luck}</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold text-cyan-400"><CoinIcon />골드 보너스:</span> <span className="text-cyan-400">+{abilityStats.goldGainBonus.toFixed(0)}%</span> </div>
-            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold text-purple-400"><XPIcon />경험치 보너스:</span> <span className="text-purple-400">+{abilityStats.xpGainBonus.toFixed(0)}%</span> </div>
-             <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold text-red-400"><BossIcon />보스 데미지:</span> <span className="text-red-400">+{abilityStats.bossDamageBonus.toFixed(0)}%</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><CoinIcon />골드:</span> <span className="font-bold text-lg text-yellow-400">{formatNumber(stats.coins)}</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><SwordIcon />클릭 데미지:</span> <span>{formatNumber(stats.clickDamage)}</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><DpsIcon />자동 공격 데미지:</span> <span>{formatNumber(stats.autoAttackDamage)}</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><AttackSpeedIcon />공격 속도:</span> <span>{stats.attackSpeed.toFixed(1)} / s</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><CritIcon />크리 확률:</span> <span>{Math.round(stats.critChance)}%</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><CritIcon />크리 데미지:</span> <span>{Math.round(stats.critDamage)}%</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-sm"> <span className="font-semibold"><LuckIcon />행운:</span> <span>{stats.luck}</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-xs"> <span className="font-semibold text-cyan-400"><CoinIcon />골드 보너스:</span> <span className="text-cyan-400">+{Math.round(abilityStats.goldGainBonus)}%</span> </div>
+            <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-xs"> <span className="font-semibold text-purple-400"><XPIcon />경험치 보너스:</span> <span className="text-purple-400">+{Math.round(abilityStats.xpGainBonus)}%</span> </div>
+             <div className="flex justify-between items-center bg-gray-700 p-2 rounded text-xs"> <span className="font-semibold text-red-400"><BossIcon />보스 데미지:</span> <span className="text-red-400">+{Math.round(abilityStats.bossDamageBonus)}%</span> </div>
         </div>
     </div>
 );
@@ -382,8 +424,12 @@ const EquipmentTooltip = ({ item }) => {
             <div className="space-y-1 text-sm">
                 {enhancedStats.clickDamage > 0 && <p className="flex items-center"><SwordIcon className="h-4 w-4 mr-1.5" /> <span>클릭 데미지 +{formatNumber(enhancedStats.clickDamage)}</span></p>}
                 {enhancedStats.autoAttackDamage > 0 && <p className="flex items-center"><DpsIcon className="h-4 w-4 mr-1.5" /> <span>자동 공격 +{formatNumber(enhancedStats.autoAttackDamage)}</span></p>}
-                {enhancedStats.critChance > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 확률 +{enhancedStats.critChance.toFixed(1)}%</span></p>}
+                {enhancedStats.critChance > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 확률 +{Math.round(enhancedStats.critChance)}%</span></p>}
                 {enhancedStats.critDamage > 0 && <p className="flex items-center"><CritIcon className="h-4 w-4 mr-1.5" /> <span>크리 데미지 +{formatNumber(enhancedStats.critDamage)}%</span></p>}
+                {enhancedStats.attackSpeedBonus > 0 && <p className="flex items-center"><AttackSpeedIcon className="h-4 w-4 mr-1.5" /> <span>공격 속도 +{Math.round(enhancedStats.attackSpeedBonus)}%</span></p>}
+                {enhancedStats.hasteBonus > 0 && <p className="flex items-center"><DpsIcon className="h-4 w-4 mr-1.5" /> <span>가속 +{Math.round(enhancedStats.hasteBonus)}%</span></p>}
+                {enhancedStats.goldGainBonus > 0 && <p className="flex items-center"><CoinIcon className="h-4 w-4 mr-1.5" /> <span>골드 획득 +{Math.round(enhancedStats.goldGainBonus)}%</span></p>}
+                {enhancedStats.xpGainBonus > 0 && <p className="flex items-center"><XPIcon className="h-4 w-4 mr-1.5" /> <span>경험치 획득 +{Math.round(enhancedStats.xpGainBonus)}%</span></p>}
             </div>
         </div>
     );
@@ -397,7 +443,7 @@ const EquipmentSlot = ({ item, type, onClick }) => {
         <div className="tooltip" onClick={onClick}>
              <div className={`bg-gray-700 p-2 rounded h-16 flex items-center border-2 ${item ? `${rarityInfo.borderClass} cursor-pointer hover:bg-gray-600` : 'border-gray-600'}`}>
                 <IconComponent className="h-8 w-8 text-gray-400 mr-2" />
-                {item ? ( <div> <p className={`font-semibold ${rarityInfo.textClass}`}>{item.name} {item.level > 0 ? `+${item.level}` : ''}</p> <p className="text-xs text-gray-400">{rarityInfo.name}</p> </div> ) : ( <p className="text-gray-500">비어있음</p> )}
+                {item ? ( <div> <p className={`font-semibold text-sm ${rarityInfo.textClass}`}>{item.name} {item.level > 0 ? `+${item.level}` : ''}</p> <p className="text-xs text-gray-400">{rarityInfo.name}</p> </div> ) : ( <p className="text-gray-500">비어있음</p> )}
             </div>
             <EquipmentTooltip item={item} />
         </div>
@@ -408,21 +454,28 @@ const EquipmentSlot = ({ item, type, onClick }) => {
 const EquipmentPanel = ({ equipment, onSelectItem }) => (
     <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-green-400">장비</h2>
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-2">
             <EquipmentSlot item={equipment.weapon} type="WEAPON" onClick={() => onSelectItem(equipment.weapon)} />
+            <EquipmentSlot item={equipment.helmet} type="HELMET" onClick={() => onSelectItem(equipment.helmet)} />
             <EquipmentSlot item={equipment.armor} type="ARMOR" onClick={() => onSelectItem(equipment.armor)} />
+            <EquipmentSlot item={equipment.gloves} type="GLOVES" onClick={() => onSelectItem(equipment.gloves)} />
             <EquipmentSlot item={equipment.amulet} type="AMULET" onClick={() => onSelectItem(equipment.amulet)} />
+            <EquipmentSlot item={equipment.boots} type="BOOTS" onClick={() => onSelectItem(equipment.boots)} />
         </div>
     </div>
 );
 
 
-const MonsterDisplay = ({ monster, onClick, damagePopups }) => {
+const MonsterDisplay = ({ monster, onClick, damagePopups, treasureGolem }) => {
     const MonsterIcon = monster.Icon;
+    const isTreasureGolem = treasureGolem.isActive;
 
     return (
         <div className="transition-transform duration-100">
-            <h2 className={`text-3xl font-bold text-center mb-2 ${monster.isBoss ? 'text-red-400' : ''}`}> {monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level}) </h2>
+            <h2 className={`text-3xl font-bold text-center mb-2 ${monster.isBoss ? 'text-red-400' : ''} ${isTreasureGolem ? 'text-yellow-400' : ''}`}>
+                {monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level})
+            </h2>
+            {isTreasureGolem && <p className="text-center text-2xl font-bold text-yellow-300 mb-2">남은 시간: {treasureGolem.timer}초</p>}
             <div className={`w-full bg-gray-700 rounded-full h-6 mb-2 border-2 ${monster.isBoss ? 'border-red-400' : 'border-gray-600'}`}>
                 <div className="bg-red-500 h-full rounded-full transition-width duration-300" style={{ width: `${(monster.hp / monster.maxHp) * 100}%` }}> </div>
             </div>
@@ -450,94 +503,104 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
         <h3 className="text-lg font-semibold mb-2 text-green-300">전투 능력</h3>
         <div className="space-y-2">
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeClick} disabled={playerCoins < upgrades.clickUpgradeCost} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>검 강화 (+{upgrades.clickUpgradeLevel})</p> <p><CoinIcon /> {formatNumber(upgrades.clickUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeClick} disabled={playerCoins < upgrades.clickUpgradeCost} className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    검 강화 (+{upgrades.clickUpgradeLevel}) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.clickUpgradeCost)}
                 </button>
                  <span className="tooltiptext"> <p className="font-bold">클릭 데미지 증가</p> <p className="text-sm text-gray-300">클릭당 공격력을 높여 몬스터를 더 빠르게 처치합니다.</p> </span>
             </div>
              <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeAutoAttack} disabled={playerCoins < upgrades.autoAttackUpgradeCost} className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>자동 공격 강화 (+{upgrades.autoAttackUpgradeLevel})</p> <p><CoinIcon /> {formatNumber(upgrades.autoAttackUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeAutoAttack} disabled={playerCoins < upgrades.autoAttackUpgradeCost} className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    자동 공격 강화 (+{upgrades.autoAttackUpgradeLevel}) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.autoAttackUpgradeCost)}
                 </button>
-                <span className="tooltiptext"> <p className="font-bold">자동 공격 데미지 증가</p> <p className="text-sm text-gray-300">자동 공격의 기본 데미지를 증가시킵니다. 공격 속도와 시너지를 냅니다.</p> </span>
+                <span className="tooltiptext"> <p className="font-bold">자동 공격 데미지 증가</p> <p className="text-sm text-gray-300">자동 공격의 기본 데미지를 증가시킵니다.</p> </span>
             </div>
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeAttackSpeed} disabled={playerCoins < upgrades.attackSpeedUpgradeCost} className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>공격 속도 증가 (+0.05)</p> <p><CoinIcon /> {formatNumber(upgrades.attackSpeedUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeAttackSpeed} disabled={playerCoins < upgrades.attackSpeedUpgradeCost} className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    공격 속도 증가 (+0.1) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.attackSpeedUpgradeCost)}
                 </button>
                 <span className="tooltiptext"> <p className="font-bold">공격 속도 증가</p> <p className="text-sm text-gray-300">초당 자동 공격 횟수를 늘려 DPS를 극대화합니다.</p> </span>
             </div>
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeCritChance} disabled={playerCoins < upgrades.critChanceUpgradeCost} className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>크리 확률 (+{CRIT_CHANCE_UPGRADE_INCREASE}%)</p> <p><CoinIcon /> {formatNumber(upgrades.critChanceUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeCritChance} disabled={playerCoins < upgrades.critChanceUpgradeCost} className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    크리 확률 (+{CRIT_CHANCE_UPGRADE_INCREASE}%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.critChanceUpgradeCost)}
                 </button>
                 <span className="tooltiptext"> <p className="font-bold">크리티컬 확률 증가</p> <p className="text-sm text-gray-300">모든 공격에 적용되는 강력한 능력치입니다.</p> </span>
             </div>
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeCritDamage} disabled={playerCoins < upgrades.critDamageUpgradeCost} className="w-full bg-yellow-800 hover:bg-yellow-900 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>크리 데미지 (+{CRIT_DAMAGE_UPGRADE_INCREASE}%)</p> <p><CoinIcon /> {formatNumber(upgrades.critDamageUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeCritDamage} disabled={playerCoins < upgrades.critDamageUpgradeCost} className="w-full bg-yellow-800 hover:bg-yellow-900 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    크리 데미지 (+{CRIT_DAMAGE_UPGRADE_INCREASE}%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.critDamageUpgradeCost)}
                 </button>
                  <span className="tooltiptext"> <p className="font-bold">크리티컬 데미지 증가</p> <p className="text-sm text-gray-300">크리티컬 데미지 배율을 증가시킵니다.</p> </span>
             </div>
              <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeBossDamage} disabled={playerCoins < upgrades.bossDamageUpgradeCost} className="w-full bg-red-800 hover:bg-red-900 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>보스 슬레이어 (+2%)</p> <p className="text-xs">(현재: +{abilityStats.bossDamageBonus.toFixed(0)}%)</p> <p><CoinIcon /> {formatNumber(upgrades.bossDamageUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeBossDamage} disabled={playerCoins < upgrades.bossDamageUpgradeCost} className="w-full bg-red-800 hover:bg-red-900 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    보스 데미지 (+2%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.bossDamageUpgradeCost)}
                 </button>
-                 <span className="tooltiptext"> <p className="font-bold">보스 데미지 증가</p> <p className="text-sm text-gray-300">보스 몬스터에게 주는 모든 피해량이 증가합니다.</p> </span>
+                 <span className="tooltiptext"> <p className="font-bold">보스 데미지 증가</p> <p className="text-sm text-gray-300">보스 몬스터에게 주는 모든 피해량이 증가합니다.</p> <p className="text-sm text-red-300 mt-2">현재: +{Math.round(abilityStats.bossDamageBonus)}%</p> </span>
             </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">보조 능력</h3>
         <div className="space-y-2">
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeGoldGain} disabled={playerCoins < upgrades.goldGainUpgradeCost} className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>골드 수급량 (+5%)</p> <p className="text-xs">(현재: +{abilityStats.goldGainBonus.toFixed(0)}%)</p> <p><CoinIcon /> {formatNumber(upgrades.goldGainUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeGoldGain} disabled={playerCoins < upgrades.goldGainUpgradeCost} className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    골드 획득 (+5%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.goldGainUpgradeCost)}
                 </button>
-                <span className="tooltiptext"> <p className="font-bold">골드 획득량 증가</p> <p className="text-sm text-gray-300">더 빠른 성장을 위한 필수 투자입니다.</p> </span>
+                <span className="tooltiptext"> <p className="font-bold">골드 획득량 증가</p> <p className="text-sm text-gray-300">더 빠른 성장을 위한 필수 투자입니다.</p> <p className="text-sm text-cyan-300 mt-2">현재: +{Math.round(abilityStats.goldGainBonus)}%</p> </span>
             </div>
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeXpGain} disabled={playerCoins < upgrades.xpGainUpgradeCost} className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>경험치 수급량 (+5%)</p> <p className="text-xs">(현재: +{abilityStats.xpGainBonus.toFixed(0)}%)</p> <p><CoinIcon /> {formatNumber(upgrades.xpGainUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeXpGain} disabled={playerCoins < upgrades.xpGainUpgradeCost} className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    경험치 획득 (+5%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.xpGainUpgradeCost)}
                 </button>
-                <span className="tooltiptext"> <p className="font-bold">경험치 획득량 증가</p> <p className="text-sm text-gray-300">빠른 레벨업을 돕습니다.</p> </span>
+                <span className="tooltiptext"> <p className="font-bold">경험치 획득량 증가</p> <p className="text-sm text-gray-300">빠른 레벨업을 돕습니다.</p> <p className="text-sm text-purple-300 mt-2">현재: +{Math.round(abilityStats.xpGainBonus)}%</p> </span>
             </div>
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeLuck} disabled={playerCoins < upgrades.luckUpgradeCost} className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>행운 증가 (+1)</p> <p className="text-xs">(현재: +{abilityStats.luck} 행운)</p> <p><CoinIcon /> {formatNumber(upgrades.luckUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeLuck} disabled={playerCoins < upgrades.luckUpgradeCost} className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    행운 증가 (+1) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.luckUpgradeCost)}
                 </button>
-                <span className="tooltiptext"> <p className="font-bold">행운 증가</p> <p className="text-sm text-gray-300">장비 획득 확률과 더 높은 등급의 장비가 나올 확률을 높여줍니다.</p> </span>
+                <span className="tooltiptext"> <p className="font-bold">행운 증가</p> <p className="text-sm text-gray-300">장비 획득 확률과 등급을 높여줍니다.</p> <p className="text-sm text-pink-300 mt-2">현재: {abilityStats.luck} 행운</p> </span>
             </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">스킬 강화</h3>
         <div className="space-y-2">
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeSkillDamage} disabled={playerCoins < upgrades.skillDamageUpgradeCost} className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>스킬 공격력 (+10%)</p> <p className="text-xs">(현재: +{abilityStats.skillDamageBonus.toFixed(0)}%)</p> <p><CoinIcon /> {formatNumber(upgrades.skillDamageUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeSkillDamage} disabled={playerCoins < upgrades.skillDamageUpgradeCost} className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    스킬 공격력 (+10%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.skillDamageUpgradeCost)}
                 </button>
-                <span className="tooltiptext"> <p className="font-bold">스킬 데미지 강화</p> <p className="text-sm text-gray-300">액티브 스킬의 데미지나 효과를 강화합니다.</p> </span>
+                <span className="tooltiptext"> <p className="font-bold">스킬 데미지 강화</p> <p className="text-sm text-gray-300">액티브 스킬의 효과를 강화합니다.</p> <p className="text-sm text-orange-300 mt-2">현재: +{Math.round(abilityStats.skillDamageBonus)}%</p> </span>
             </div>
             <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeHaste} disabled={playerCoins < upgrades.hasteUpgradeCost} className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p>가속 (+1%)</p> <p className="text-xs">(현재: 쿨타임 -{abilityStats.haste}%)</p> <p><CoinIcon /> {formatNumber(upgrades.hasteUpgradeCost)}</p>
+                <button onClick={handlers.onUpgradeHaste} disabled={playerCoins < upgrades.hasteUpgradeCost} className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    가속 (+1%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.hasteUpgradeCost)}
                 </button>
-                <span className="tooltiptext"> <p className="font-bold">가속 (쿨타임 감소)</p> <p className="text-sm text-gray-300">스킬의 재사용 대기시간을 줄여 더 자주 사용할 수 있게 합니다.</p> </span>
+                <span className="tooltiptext"> <p className="font-bold">가속 (쿨타임 감소)</p> <p className="text-sm text-gray-300">스킬 재사용 대기시간을 줄입니다.</p> <p className="text-sm text-teal-300 mt-2">현재: 쿨타임 -{Math.round(abilityStats.haste)}%</p> </span>
             </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">특별</h3>
          <div className="space-y-2">
             <div className="tooltip w-full">
-                <button onClick={handlers.onEquipmentGacha} disabled={playerCoins < equipmentGachaCost} className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200 ease-in-out hover:-translate-y-0.5">
-                    <p><GachaIcon /> 장비 뽑기</p> <p><CoinIcon /> {formatNumber(equipmentGachaCost)}</p>
+                <button onClick={handlers.onEquipmentGacha} disabled={playerCoins < equipmentGachaCost} className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    <GachaIcon className="inline-block h-4 w-4 -mt-1" /> 장비 뽑기 | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(equipmentGachaCost)}
                 </button>
                 <span className="tooltiptext"> <p className="font-bold">장비 뽑기</p> <p className="text-sm text-gray-300">골드를 사용하여 무작위 장비를 획득합니다.</p> </span>
+            </div>
+            <div className="tooltip w-full">
+                <button onClick={handlers.onUpgradeArtifactPower} disabled={playerCoins < upgrades.artifactPowerUpgradeCost} className="w-full bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    <ArtifactIcon className="inline-block h-4 w-4 -mt-1" /> 유물력 강화 (+1%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.artifactPowerUpgradeCost)}
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">유물력 강화</p>
+                    <p className="text-sm text-gray-300">장착한 모든 유물의 효과를 증폭시킵니다.</p>
+                    <p className="text-sm text-yellow-300 mt-2">현재: +{Math.round(abilityStats.artifactPowerBonus)}%</p>
+                </span>
             </div>
         </div>
     </div>
 );
 
-const InventoryPanel = ({ inventory, onSelectItem, isSalvageMode, onToggleSalvageMode, salvageList, onToggleSalvageItem, onBulkSalvage }) => {
+const InventoryPanel = ({ inventory, onSelectItem, isSellMode, onToggleSellMode, sellList, onToggleSellItem, onBulkSell }) => {
     const [filter, setFilter] = useState('ALL');
 
     const filteredInventory = useMemo(() => {
@@ -562,42 +625,45 @@ const InventoryPanel = ({ inventory, onSelectItem, isSalvageMode, onToggleSalvag
             <div className="flex justify-between items-center mb-2">
                  <h3 className="text-lg font-semibold text-green-300">인벤토리</h3>
                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">{filteredInventory.length} / {inventory.length}개</span>
-                    <button onClick={onToggleSalvageMode} className={`text-sm py-1 px-2 rounded ${isSalvageMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-600 hover:bg-gray-500 text-gray-200'}`}>분해 모드</button>
+                    <span className="text-sm text-gray-400">{inventory.length}개</span>
+                    <button onClick={onToggleSellMode} className={`text-sm py-1 px-2 rounded ${isSellMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-gray-600 hover:bg-gray-500 text-gray-200'}`}>판매 모드</button>
                  </div>
             </div>
-            <div className="flex gap-2 mb-2">
+            <div className="grid grid-cols-4 gap-1 mb-2">
                 <FilterButton type="ALL">전체</FilterButton>
                 <FilterButton type="WEAPON"><SwordIcon className="w-5 h-5 mx-auto"/></FilterButton>
                 <FilterButton type="ARMOR"><ArmorIcon className="w-5 h-5 mx-auto"/></FilterButton>
                 <FilterButton type="AMULET"><AmuletIcon className="w-5 h-5 mx-auto"/></FilterButton>
+                <FilterButton type="HELMET"><HelmetIcon className="w-5 h-5 mx-auto"/></FilterButton>
+                <FilterButton type="GLOVES"><GlovesIcon className="w-5 h-5 mx-auto"/></FilterButton>
+                <FilterButton type="BOOTS"><BootsIcon className="w-5 h-5 mx-auto"/></FilterButton>
             </div>
             <div className="grid grid-cols-4 gap-2 h-[380px] overflow-y-auto bg-gray-900/50 p-2 rounded">
                 {filteredInventory.map(item => {
                     const rarityInfo = RARITIES[item.rarity];
                     const IconComponent = EQUIPMENT_TYPES[item.type].icon;
-                    const isSelected = salvageList.has(item.id);
+                    const isSelected = sellList.has(item.id);
                     return (
-                        <div key={item.id} className="tooltip" onClick={() => isSalvageMode ? onToggleSalvageItem(item) : onSelectItem(item)}>
+                        <div key={item.id} className="tooltip" onClick={() => isSellMode ? onToggleSellItem(item) : onSelectItem(item)}>
                             <div className={`relative aspect-square flex items-center justify-center p-1 border-2 ${rarityInfo.borderClass} bg-gray-800 rounded-md cursor-pointer hover:bg-gray-700 transition-colors ${isSelected ? 'ring-2 ring-red-500 ring-offset-2 ring-offset-gray-800' : ''}`}>
                                  <IconComponent className={`h-8 w-8 ${rarityInfo.textClass}`} />
                                  {item.level > 0 && <span className="absolute bottom-0 right-0 text-xs bg-gray-900 px-1 rounded-sm">+{item.level}</span>}
-                                 {isSelected && <div className="absolute inset-0 bg-red-500/50 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></div>}
+                                 {isSelected && <div className="absolute inset-0 bg-red-500/50 flex items-center justify-center"><CoinIcon className="w-6 h-6 text-white"/></div>}
                             </div>
                             <EquipmentTooltip item={item} />
                         </div>
                     );
                 })}
             </div>
-            {isSalvageMode && (
+            {isSellMode && (
                 <div className="mt-2 p-2 bg-gray-900/50 rounded">
-                    <p className="text-center mb-2 text-sm text-gray-300">{salvageList.size}개 아이템 선택됨</p>
+                    <p className="text-center mb-2 text-sm text-gray-300">{sellList.size}개 아이템 선택됨</p>
                     <button
-                        onClick={onBulkSalvage}
-                        disabled={salvageList.size === 0}
+                        onClick={onBulkSell}
+                        disabled={sellList.size === 0}
                         className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded transition-colors"
                     >
-                        선택 아이템 분해
+                        선택 아이템 판매
                     </button>
                 </div>
             )}
@@ -631,18 +697,22 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
              <div className="space-y-1 text-sm p-2 bg-gray-900/50 rounded">
                 {stats.clickDamage > 0 && <p>클릭 데미지 +{formatNumber(stats.clickDamage)}</p>}
                 {stats.autoAttackDamage > 0 && <p>자동 공격 +{formatNumber(stats.autoAttackDamage)}</p>}
-                {stats.critChance > 0 && <p>크리 확률 +{stats.critChance.toFixed(1)}%</p>}
+                {stats.critChance > 0 && <p>크리 확률 +{Math.round(stats.critChance)}%</p>}
                 {stats.critDamage > 0 && <p>크리 데미지 +{formatNumber(stats.critDamage)}%</p>}
+                {stats.attackSpeedBonus > 0 && <p>공격 속도 +{Math.round(stats.attackSpeedBonus)}%</p>}
+                {stats.hasteBonus > 0 && <p>가속 +{Math.round(stats.hasteBonus)}%</p>}
+                {stats.goldGainBonus > 0 && <p>골드 획득 +{Math.round(stats.goldGainBonus)}%</p>}
+                {stats.xpGainBonus > 0 && <p>경험치 획득 +{Math.round(stats.xpGainBonus)}%</p>}
             </div>
         );
     };
     
     const renderEnhanceTab = () => {
-        const upgradeCost = Math.ceil(rarityInfo.statMultiplier * 50 * Math.pow(1.5, itemLevel) * (1 + itemLevel * 0.2));
+        const upgradeCost = Math.ceil(rarityInfo.statMultiplier * 30 * Math.pow(1.35, itemLevel) * (1 + itemLevel * 0.1));
         return (
             <div className="space-y-3">
-                 <div> <p className="font-semibold mb-1">현재 능력치 (+{itemLevel})</p> {renderStats(selectedItem)} </div>
-                 <div> <p className="font-semibold mb-1">다음 레벨 (+{itemLevel + 1})</p> {renderStats({ ...selectedItem, level: itemLevel + 1 })} </div>
+                 <div> <p className="font-semibold mb-1">현재 (+{itemLevel})</p> {renderStats(selectedItem)} </div>
+                 <div> <p className="font-semibold mb-1">다음 (+{itemLevel + 1})</p> {renderStats({ ...selectedItem, level: itemLevel + 1 })} </div>
                 <div className="text-center">
                     <p className="mb-2 flex items-center justify-center">비용: <CoinIcon/> {formatNumber(upgradeCost)}</p>
                     <button onClick={() => onForge(selectedItem)} disabled={playerCoins < upgradeCost} className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded">
@@ -660,7 +730,6 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
         }
         const nextRarityKey = RARITY_ORDER[currentRarityIndex + 1];
         
-        // Dynamic gold cost for rarity upgrade
         const upgradeCost = Math.ceil(Math.pow(10, currentRarityIndex + 2) * (selectedItem.baseLevel || 1) * rarityInfo.statMultiplier);
         const canUpgrade = playerCoins >= upgradeCost;
 
@@ -685,7 +754,7 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
          return (
              <div className="space-y-3">
                  <div> <p className="font-semibold mb-1">현재 능력치</p> {renderStats(selectedItem)} </div>
-                 <p className="text-sm text-gray-400 text-center">아이템의 기본 능력치를 무작위로 재설정합니다. (등급과 아이템 종류는 유지됩니다)</p>
+                 <p className="text-sm text-gray-400 text-center">아이템의 기본 능력치를 무작위로 재설정합니다.</p>
                  <div className="text-center mt-4">
                     <p className="mb-2 flex items-center justify-center">비용: <CoinIcon/> {formatNumber(cost)}</p>
                      <button onClick={() => onReforge(selectedItem)} disabled={!canReforge} className="w-full bg-pink-600 hover:bg-pink-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded">
@@ -743,6 +812,121 @@ const MissionsPanel = ({ missions, onClaim }) => (
     </div>
 );
 
+const ArtifactPanel = ({ owned, equipped, onEquip, onUnequip, onGacha, playerCoins }) => {
+    const gachaCost = 1000;
+    const allArtifactsOwned = owned.length >= ARTIFACTS.length;
+
+    return (
+        <div>
+            <h3 className="text-lg font-semibold mb-2 text-green-300">유물</h3>
+            <div className="bg-gray-900/50 p-2 rounded mb-3">
+                <h4 className="text-md font-semibold mb-2 text-center text-yellow-300">장착된 유물</h4>
+                <div className="grid grid-cols-3 gap-2">
+                    {[0, 1, 2].map(index => {
+                        const artifactId = equipped[index];
+                        const artifact = artifactId ? ARTIFACTS.find(a => a.id === artifactId) : null;
+                        return (
+                            <div key={index} onClick={() => artifact && onUnequip(artifact.id)} className={`tooltip aspect-square flex items-center justify-center p-1 border-2 ${artifact ? 'border-yellow-400 bg-gray-800 cursor-pointer' : 'border-gray-600 bg-gray-700'}`}>
+                                {artifact ? <artifact.icon className="h-8 w-8 text-yellow-400" /> : <span className="text-gray-500 text-xs">비어있음</span>}
+                                {artifact && <span className="tooltiptext">{artifact.name}: {artifact.description}</span>}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+            <div className="space-y-2 h-[260px] overflow-y-auto pr-2">
+                <h4 className="text-md font-semibold text-center text-gray-300">보유한 유물</h4>
+                {owned.length > 0 ? owned.map(id => {
+                    const artifact = ARTIFACTS.find(a => a.id === id);
+                    if (!artifact) return null;
+                    const isEquipped = equipped.includes(id);
+                    return (
+                        <div key={id} onClick={() => !isEquipped && onEquip(id)} className={`bg-gray-800 p-3 rounded-lg border border-gray-600 flex items-center gap-3 ${isEquipped ? 'opacity-50' : 'cursor-pointer hover:bg-gray-700'}`}>
+                            <artifact.icon className="w-8 h-8 text-yellow-400 flex-shrink-0" />
+                            <div>
+                                <p className="font-semibold text-yellow-400">{artifact.name}</p>
+                                <p className="text-xs text-gray-300">{artifact.description}</p>
+                            </div>
+                        </div>
+                    );
+                }) : <p className="text-center text-gray-500 mt-8">보유한 유물이 없습니다.</p>}
+            </div>
+            <div className="mt-2 pt-2 border-t border-gray-700">
+                <h4 className="text-md font-semibold text-center text-green-300 mb-2">유물 뽑기</h4>
+                <button 
+                    onClick={onGacha}
+                    disabled={allArtifactsOwned || playerCoins < gachaCost}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                >
+                    {allArtifactsOwned ? '모든 유물 획득' : (
+                        `뽑기 | ${formatNumber(gachaCost)}`
+                    )}
+                </button>
+            </div>
+        </div>
+    );
+};
+
+const SlotMachinePanel = ({ playerCoins, onSpin, playerLevel }) => {
+    const [reels, setReels] = useState(['🍀', '🍀', '🍀']);
+    const [spinning, setSpinning] = useState(false);
+    const [result, setResult] = useState(null);
+    const symbols = ['💰', '⚔️', '💧', '💎', '🍀']; // Coin, Sword, Slime, Gem, Clover
+    const cost = 100 + playerLevel * 50;
+    
+    const handleSpin = () => {
+        if (playerCoins < cost || spinning) return;
+        setSpinning(true);
+        setResult(null);
+        onSpin(cost, (newReels, reward) => {
+            let reelIndex = 0;
+            const interval = setInterval(() => {
+                setReels(prev => {
+                    const next = [...prev];
+                    next[reelIndex] = newReels[reelIndex];
+                    return next;
+                });
+                reelIndex++;
+                if(reelIndex >= 3) {
+                    clearInterval(interval);
+                    setSpinning(false);
+                    setResult(reward);
+                }
+            }, 500);
+        });
+        
+        // Visual spin
+        const spinInterval = setInterval(() => {
+            setReels(prev => prev.map((_, i) => i < reelIndex ? newReels[i] : symbols[Math.floor(Math.random() * symbols.length)]));
+        }, 100);
+        
+        setTimeout(() => clearInterval(spinInterval), 1500);
+    };
+
+    return (
+        <div>
+            <h3 className="text-lg font-semibold mb-2 text-green-300">행운의 슬롯머신</h3>
+            <div className="bg-gray-900/50 p-4 rounded-lg">
+                <div className="flex justify-center gap-4 mb-4 bg-gray-700 p-4 rounded">
+                    {reels.map((symbol, i) => (
+                        <div key={i} className="w-16 h-16 bg-gray-900 rounded-md flex items-center justify-center text-4xl">
+                            {symbol}
+                        </div>
+                    ))}
+                </div>
+                <div className="text-center mb-4 h-12">
+                    {result && (
+                        <p className="text-lg font-bold text-yellow-300">{result.message}</p>
+                    )}
+                </div>
+                <button onClick={handleSpin} disabled={playerCoins < cost || spinning} className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded">
+                    {spinning ? '돌아가는 중...' : `돌리기 (${formatNumber(cost)} 골드)`}
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const RightPanel = ({ activeTab, setActiveTab, selectedForgeItem, ...props }) => {
     const forgeHandlers = {
         onForge: props.handlers.onForgeItem,
@@ -751,26 +935,31 @@ const RightPanel = ({ activeTab, setActiveTab, selectedForgeItem, ...props }) =>
     };
 
     return (
-        <div className="w-full md:w-1/4 bg-gray-800 p-4 rounded-lg shadow-lg order-3 md:order-3">
-            <div className="flex border-b border-gray-700 mb-4 text-sm">
-                 <button onClick={() => setActiveTab('upgrade')} className={`flex-1 py-2 text-center font-semibold ${activeTab === 'upgrade' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>강화</button>
-                 <button onClick={() => setActiveTab('inventory')} className={`flex-1 py-2 text-center font-semibold ${activeTab === 'inventory' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>인벤토리</button>
-                 <button onClick={() => setActiveTab('forge')} className={`flex-1 py-2 text-center font-semibold ${activeTab === 'forge' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>대장간</button>
-                 <button onClick={() => setActiveTab('missions')} className={`flex-1 py-2 text-center font-semibold ${activeTab === 'missions' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>임무</button>
+        <div className="w-full md:w-1/4 bg-gray-800 p-2 rounded-lg shadow-lg order-3 md:order-3">
+            <div className="grid grid-cols-3 text-sm">
+                 <button onClick={() => setActiveTab('upgrade')} className={`py-2 text-center font-semibold ${activeTab === 'upgrade' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>강화</button>
+                 <button onClick={() => setActiveTab('inventory')} className={`py-2 text-center font-semibold ${activeTab === 'inventory' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>인벤토리</button>
+                 <button onClick={() => setActiveTab('forge')} className={`py-2 text-center font-semibold ${activeTab === 'forge' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>대장간</button>
+                 <button onClick={() => setActiveTab('missions')} className={`py-2 text-center font-semibold ${activeTab === 'missions' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>임무</button>
+                 <button onClick={() => setActiveTab('artifacts')} className={`py-2 text-center font-semibold ${activeTab === 'artifacts' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>유물</button>
+                 <button onClick={() => setActiveTab('slots')} className={`py-2 text-center font-semibold ${activeTab === 'slots' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>슬롯</button>
             </div>
-            
+            <div className="p-2">
             {activeTab === 'upgrade' && <UpgradePanel {...props}/>}
             {activeTab === 'inventory' && <InventoryPanel 
                 inventory={props.inventory} 
                 onSelectItem={props.handlers.onSelectItem}
-                isSalvageMode={props.isSalvageMode}
-                onToggleSalvageMode={props.handlers.onToggleSalvageMode}
-                salvageList={props.salvageList}
-                onToggleSalvageItem={props.handlers.onToggleSalvageItem}
-                onBulkSalvage={props.handlers.onBulkSalvage}
+                isSellMode={props.isSellMode}
+                onToggleSellMode={props.handlers.onToggleSellMode}
+                sellList={props.sellList}
+                onToggleSellItem={props.handlers.onToggleSellItem}
+                onBulkSell={props.handlers.onBulkSell}
                  />}
             {activeTab === 'forge' && <ForgePanel selectedItem={selectedForgeItem} handlers={forgeHandlers} playerCoins={props.playerCoins} />}
             {activeTab === 'missions' && <MissionsPanel missions={props.missions} onClaim={props.handlers.onClaimMission} />}
+            {activeTab === 'artifacts' && <ArtifactPanel owned={props.ownedArtifacts} equipped={props.equippedArtifacts} onEquip={props.handlers.onEquipArtifact} onUnequip={props.handlers.onUnequipArtifact} onGacha={props.handlers.onArtifactGacha} playerCoins={props.playerCoins} />}
+            {activeTab === 'slots' && <SlotMachinePanel playerCoins={props.playerCoins} onSpin={props.handlers.onSpinSlots} playerLevel={props.playerStats.level} />}
+            </div>
         </div>
     );
 };
@@ -782,9 +971,7 @@ const LiberationButton = ({ onLiberate, cost, playerCoins, count }) => (
             onClick={onLiberate}
             disabled={playerCoins < cost}
             className="w-full bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 hover:from-yellow-500 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg transform hover:scale-105">
-            <p className="text-xl drop-shadow-md">해방 (단계: {count})</p>
-            <p className="text-lg">모든 기본 능력치 2배!</p>
-            <p><CoinIcon /> {formatNumber(cost)}</p>
+            <span className="text-lg drop-shadow-md">해방 ({count}) - 모든 스탯 x2 | <CoinIcon className="inline-block h-5 w-5 -mt-1"/> {formatNumber(cost)}</span>
         </button>
     </div>
 );
@@ -798,14 +985,10 @@ const RebirthButton = ({ onRebirth, level, count }) => {
                 disabled={!canRebirth}
                 className="w-full bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-bold py-4 px-4 rounded-lg transition-all shadow-lg transform hover:scale-105"
             >
-                <p className="text-xl drop-shadow-md">환생 (요구 레벨: {REBIRTH_LEVEL_REQUIREMENT})</p>
-                {!canRebirth ? (
-                     <p className="text-sm">현재 레벨: {level}</p>
+                {canRebirth ? (
+                    <span className="text-lg drop-shadow-md">환생 | 영구 스탯 +{REBIRTH_ALL_STAT_BONUS}% (현재 {count}회)</span>
                 ) : (
-                    <>
-                        <p className="text-lg">영구 모든 능력치 +{REBIRTH_ALL_STAT_BONUS}%!</p>
-                        <p className="text-sm">(현재 {count}회, 총 +{count * REBIRTH_ALL_STAT_BONUS}%)</p>
-                    </>
+                    <span className="text-lg drop-shadow-md">환생 필요: Lv.{REBIRTH_LEVEL_REQUIREMENT} (현재 {level})</span>
                 )}
             </button>
         </div>
@@ -826,8 +1009,11 @@ const ActiveSkillButton = ({ skill, onClick, cooldown, maxCooldown }) => {
                  <div className="absolute top-0 left-0 h-full bg-black opacity-50" style={{ width: `${100 - cooldownPercentage}%` }}></div>
             )}
             <div className="relative z-10">
-                <p className="text-xl">{skill.name}</p>
-                {cooldown > 0 ? ( <p>{(cooldown / 1000).toFixed(1)}초</p> ) : ( <p>사용 가능</p> )}
+                {cooldown > 0 ? (
+                    <span className="text-xl">{skill.name} ({Math.ceil(cooldown / 1000)}초)</span>
+                ) : (
+                    <span className="text-xl">{skill.name} (사용 가능)</span>
+                )}
             </div>
         </button>
     );
@@ -854,8 +1040,12 @@ const NewItemDropModal = ({ newItem, currentItem, onEquip, onStore }) => {
                 <div className="space-y-1">
                     {enhancedStats.clickDamage > 0 && <p><SwordIcon /> 클릭 데미지 +{formatNumber(enhancedStats.clickDamage)}</p>}
                     {enhancedStats.autoAttackDamage > 0 && <p><DpsIcon /> 자동 공격 +{formatNumber(enhancedStats.autoAttackDamage)}</p>}
-                    {enhancedStats.critChance > 0 && <p><CritIcon /> 크리 확률 +{enhancedStats.critChance.toFixed(1)}%</p>}
+                    {enhancedStats.critChance > 0 && <p><CritIcon /> 크리 확률 +{Math.round(enhancedStats.critChance)}%</p>}
                     {enhancedStats.critDamage > 0 && <p><CritIcon /> 크리 데미지 +{formatNumber(enhancedStats.critDamage)}%</p>}
+                    {enhancedStats.attackSpeedBonus > 0 && <p><AttackSpeedIcon /> 공격 속도 +{Math.round(enhancedStats.attackSpeedBonus)}%</p>}
+                    {enhancedStats.hasteBonus > 0 && <p><DpsIcon /> 가속 +{Math.round(enhancedStats.hasteBonus)}%</p>}
+                    {enhancedStats.goldGainBonus > 0 && <p><CoinIcon /> 골드 획득 +{Math.round(enhancedStats.goldGainBonus)}%</p>}
+                    {enhancedStats.xpGainBonus > 0 && <p><XPIcon /> 경험치 획득 +{Math.round(enhancedStats.xpGainBonus)}%</p>}
                 </div>
             </div>
         );
@@ -908,7 +1098,7 @@ const JobSelectionModal = ({ onSelect, onClose }) => {
     );
 };
 
-const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSalvage, onSelectForge, onClose }) => {
+const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSell, onSelectForge, onClose }) => {
     if (!item) return null;
 
     const renderItemStats = (itemToRender, title) => {
@@ -925,8 +1115,12 @@ const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSalvage, o
                     <div className="space-y-1 mt-2">
                         {enhancedStats.clickDamage > 0 && <p><SwordIcon /> 클릭 데미지 +{formatNumber(enhancedStats.clickDamage)}</p>}
                         {enhancedStats.autoAttackDamage > 0 && <p><DpsIcon /> 자동 공격 +{formatNumber(enhancedStats.autoAttackDamage)}</p>}
-                        {enhancedStats.critChance > 0 && <p><CritIcon /> 크리 확률 +{enhancedStats.critChance.toFixed(1)}%</p>}
+                        {enhancedStats.critChance > 0 && <p><CritIcon /> 크리 확률 +{Math.round(enhancedStats.critChance)}%</p>}
                         {enhancedStats.critDamage > 0 && <p><CritIcon /> 크리 데미지 +{formatNumber(enhancedStats.critDamage)}%</p>}
+                        {enhancedStats.attackSpeedBonus > 0 && <p><AttackSpeedIcon /> 공격 속도 +{Math.round(enhancedStats.attackSpeedBonus)}%</p>}
+                        {enhancedStats.hasteBonus > 0 && <p><DpsIcon /> 가속 +{Math.round(enhancedStats.hasteBonus)}%</p>}
+                        {enhancedStats.goldGainBonus > 0 && <p><CoinIcon /> 골드 획득 +{Math.round(enhancedStats.goldGainBonus)}%</p>}
+                        {enhancedStats.xpGainBonus > 0 && <p><XPIcon /> 경험치 획득 +{Math.round(enhancedStats.xpGainBonus)}%</p>}
                     </div>
                 </div>
             </div>
@@ -944,7 +1138,7 @@ const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSalvage, o
                 </div>
                 <div className="flex justify-center gap-4">
                     <button onClick={() => { onEquip(item); onClose(); }} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg">장착</button>
-                    <button onClick={() => { onSalvage(item); onClose(); }} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg">분해</button>
+                    <button onClick={() => { onSell(item); onClose(); }} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg">판매</button>
                     <button onClick={() => { onSelectForge(item); onClose(); }} className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg text-lg">대장간</button>
                 </div>
             </div>
@@ -1062,11 +1256,10 @@ const getDefaultState = () => ({
         hasteUpgradeCost: HASTE_UPGRADE_COST_BASE,
         luckUpgradeCost: LUCK_UPGRADE_COST_BASE,
         bossDamageUpgradeCost: BOSS_DAMAGE_UPGRADE_COST_BASE,
+        artifactPowerUpgradeCost: ARTIFACT_POWER_UPGRADE_COST_BASE,
     },
     equipment: {
-        weapon: null,
-        armor: null,
-        amulet: null,
+        weapon: null, armor: null, amulet: null, helmet: null, gloves: null, boots: null
     },
     gameLog: ["게임 시작! 슬라임을 처치하세요."],
     abilityStats: {
@@ -1075,12 +1268,15 @@ const getDefaultState = () => ({
         haste: 0, // Skill Cooldown Reduction %
         skillDamageBonus: 0,
         bossDamageBonus: 0,
+        artifactPowerBonus: 0,
     },
     liberationCount: 0,
     rebirthCount: 0,
     inventory: [],
     isAutoDropEnabled: true,
     missions: [],
+    ownedArtifacts: [],
+    equippedArtifacts: [],
     lastSaveTimestamp: Date.now(),
 });
 
@@ -1187,14 +1383,29 @@ const App = () => {
         catch(e) { return []; }
     });
 
+    const [ownedArtifacts, setOwnedArtifacts] = useState(() => {
+        const saved = localStorage.getItem(SAVED_GAME_KEY);
+        if (!saved) return [];
+        try { return JSON.parse(saved).ownedArtifacts || []; }
+        catch(e) { return []; }
+    });
+
+    const [equippedArtifacts, setEquippedArtifacts] = useState(() => {
+        const saved = localStorage.getItem(SAVED_GAME_KEY);
+        if (!saved) return [];
+        try { return JSON.parse(saved).equippedArtifacts || []; }
+        catch(e) { return []; }
+    });
+
+
     // UI State
     const [activeTab, setActiveTab] = useState('upgrade');
     const [selectedForgeItem, setSelectedForgeItem] = useState(null);
     const [isJobSelectionOpen, setIsJobSelectionOpen] = useState(false);
     const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
     const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
-    const [isSalvageMode, setIsSalvageMode] = useState(false);
-    const [salvageList, setSalvageList] = useState(new Set());
+    const [isSellMode, setIsSellMode] = useState(false);
+    const [sellList, setSellList] = useState(new Set());
     const [offlineProgress, setOfflineProgress] = useState(null);
 
     const [activeSkillCooldown, setActiveSkillCooldown] = useState(0);
@@ -1203,6 +1414,7 @@ const App = () => {
     const [frenzyActive, setFrenzyActive] = useState(false);
     const [arrowRainActive, setArrowRainActive] = useState(false);
     const [arcaneBlastDebuff, setArcaneBlastDebuff] = useState(false);
+    const [treasureGolem, setTreasureGolem] = useState({ isActive: false, timer: 0 });
     const needsSave = useRef(false);
 
     const difficultyMultipliers = useMemo(() => {
@@ -1236,16 +1448,74 @@ const App = () => {
         });
     }, [addLog]);
 
+    const artifactBonuses = useMemo(() => {
+        const bonuses = { goldGain: 0, xpGain: 0, bossDamage: 0, haste: 0, critChance: 0, critDamage: 0, clickDamageMult: 0, attackSpeedMult: 0 };
+        const powerMultiplier = 1 + (abilityStats.artifactPowerBonus / 100);
+
+        equippedArtifacts.forEach(id => {
+            const artifact = ARTIFACTS.find(a => a.id === id);
+            if (!artifact) return;
+            switch(artifact.effect.type) {
+                case 'GOLD_GAIN': bonuses.goldGain += artifact.effect.value * powerMultiplier; break;
+                case 'XP_GAIN': bonuses.xpGain += artifact.effect.value * powerMultiplier; break;
+                case 'BOSS_DAMAGE': bonuses.bossDamage += artifact.effect.value * powerMultiplier; break;
+                case 'HASTE': bonuses.haste += artifact.effect.value * powerMultiplier; break;
+                case 'CRIT_CHANCE': bonuses.critChance += artifact.effect.value * powerMultiplier; break;
+                case 'CRIT_DAMAGE': bonuses.critDamage += artifact.effect.value * powerMultiplier; break;
+                case 'CLICK_DAMAGE_MULT': bonuses.clickDamageMult += artifact.effect.value * powerMultiplier; break;
+                case 'ATTACK_SPEED_MULT': bonuses.attackSpeedMult += artifact.effect.value * powerMultiplier; break;
+            }
+        });
+        return bonuses;
+    }, [equippedArtifacts, abilityStats.artifactPowerBonus]);
+
+    const finalAbilityStats = useMemo(() => {
+        let haste = abilityStats.haste;
+        let skillDamage = abilityStats.skillDamageBonus;
+        if (playerClass === 'MAGE') {
+            haste *= 1.25;
+            skillDamage *= (1 + JOBS.MAGE.bonuses.skillEffect);
+        }
+        
+        const rebirthBonus = rebirthCount * REBIRTH_ALL_STAT_BONUS;
+        
+        let hasteFromItems = 0;
+        let goldBonusFromItems = 0;
+        let xpBonusFromItems = 0;
+
+        Object.values(equipment).forEach(item => {
+            if (!item) return;
+            const enhancedStats = getEnhancedItemStats(item);
+            hasteFromItems += enhancedStats.hasteBonus || 0;
+            goldBonusFromItems += enhancedStats.goldGainBonus || 0;
+            xpBonusFromItems += enhancedStats.xpGainBonus || 0;
+        });
+
+        return {
+            ...abilityStats,
+            luck: playerStats.luck,
+            goldGainBonus: abilityStats.goldGainBonus + rebirthBonus + artifactBonuses.goldGain + goldBonusFromItems,
+            xpGainBonus: abilityStats.xpGainBonus + rebirthBonus + artifactBonuses.xpGain + xpBonusFromItems,
+            bossDamageBonus: abilityStats.bossDamageBonus + rebirthBonus + artifactBonuses.bossDamage,
+            haste: haste + artifactBonuses.haste + hasteFromItems,
+            skillDamageBonus: skillDamage,
+            activeSkillCooldown: BASE_SKILL_COOLDOWN * (1 - (haste + artifactBonuses.haste + hasteFromItems) / 100),
+        }
+    }, [abilityStats, playerClass, rebirthCount, artifactBonuses, equipment, playerStats.luck]);
+
     const finalStats = useMemo(() => {
         let combined = { ...playerStats };
+        let attackSpeedBonusFromItems = 0;
+
         Object.values(equipment).forEach(item => {
             if (!item) return;
             const enhancedStats = getEnhancedItemStats(item);
             
-            if (enhancedStats.clickDamage) combined.clickDamage += enhancedStats.clickDamage;
-            if (enhancedStats.autoAttackDamage) combined.autoAttackDamage += enhancedStats.autoAttackDamage;
-            if (enhancedStats.critChance) combined.critChance += enhancedStats.critChance;
-            if (enhancedStats.critDamage) combined.critDamage += enhancedStats.critDamage;
+            combined.clickDamage += enhancedStats.clickDamage || 0;
+            combined.autoAttackDamage += enhancedStats.autoAttackDamage || 0;
+            combined.critChance += enhancedStats.critChance || 0;
+            combined.critDamage += enhancedStats.critDamage || 0;
+            attackSpeedBonusFromItems += enhancedStats.attackSpeedBonus || 0;
         });
 
         if (playerClass && JOBS[playerClass]) {
@@ -1260,51 +1530,35 @@ const App = () => {
         combined.clickDamage *= rebirthMultiplier;
         combined.autoAttackDamage *= rebirthMultiplier;
 
+        combined.critChance += artifactBonuses.critChance;
+        combined.critDamage += artifactBonuses.critDamage;
+        combined.clickDamage *= (1 + artifactBonuses.clickDamageMult);
+        combined.attackSpeed = playerStats.attackSpeed * (1 + artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems / 100);
+
         if (frenzyActive) {
             combined.clickDamage *= 2;
             combined.autoAttackDamage *= 1.5;
         }
-
         if (arrowRainActive) {
             combined.critChance = Math.min(100, combined.critChance + 25);
         }
 
         return combined;
-    }, [playerStats, equipment, playerClass, frenzyActive, arrowRainActive, rebirthCount]);
+    }, [playerStats, equipment, playerClass, frenzyActive, arrowRainActive, rebirthCount, artifactBonuses]);
     
-    const finalAbilityStats = useMemo(() => {
-        let haste = abilityStats.haste;
-        let skillDamage = abilityStats.skillDamageBonus;
-        if (playerClass === 'MAGE') {
-            haste *= 1.25;
-            skillDamage *= (1 + JOBS.MAGE.bonuses.skillEffect);
-        }
-        
-        const rebirthBonus = rebirthCount * REBIRTH_ALL_STAT_BONUS;
-        
-        return {
-            ...abilityStats,
-            goldGainBonus: abilityStats.goldGainBonus + rebirthBonus,
-            xpGainBonus: abilityStats.xpGainBonus + rebirthBonus,
-            bossDamageBonus: abilityStats.bossDamageBonus + rebirthBonus,
-            haste,
-            skillDamageBonus: skillDamage,
-            activeSkillCooldown: BASE_SKILL_COOLDOWN * (1 - haste / 100),
-        }
-    }, [abilityStats, playerClass, rebirthCount]);
-
     const saveGame = useCallback(() => {
         try {
             const serializableMonsterStats = { ...monsterStats, Icon: undefined };
             const gameStateToSave = {
                 difficulty, playerClass, playerStats, monsterStats: serializableMonsterStats,
                 upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount,
-                inventory, isAutoDropEnabled, missions, lastSaveTimestamp: Date.now()
+                inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts,
+                lastSaveTimestamp: Date.now()
             };
             localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(gameStateToSave));
             needsSave.current = false;
         } catch (error) { console.error("Could not save game state", error); }
-    }, [difficulty, playerClass, playerStats, monsterStats, upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount, inventory, isAutoDropEnabled, missions]);
+    }, [difficulty, playerClass, playerStats, monsterStats, upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount, inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts]);
 
     useEffect(() => { if (needsSave.current) { saveGame(); } });
 
@@ -1469,59 +1723,80 @@ const App = () => {
     }, [finalStats.luck]);
 
     const handleMonsterDefeat = useCallback(() => {
-        const isBossDefeated = monsterStats.isBoss;
-        const currentMonsterLevel = monsterStats.level;
-        const rewardMultiplier = (isBossDefeated ? BOSS_REWARD_MULTIPLIER : 1) * difficultyMultipliers.monsterReward;
-        const xpGained = Math.ceil(currentMonsterLevel * 2.5 * rewardMultiplier * (1 + finalAbilityStats.xpGainBonus / 100));
-        const coinsGained = Math.ceil(MONSTER_REWARD_BASE * Math.pow(MONSTER_REWARD_MULTIPLIER, currentMonsterLevel - 1) * rewardMultiplier * (1 + finalAbilityStats.goldGainBonus / 100));
-        
-        addLog(`${isBossDefeated ? `<strong>[BOSS]</strong> ` : ''}${monsterStats.name}(Lv.${currentMonsterLevel}) 처치! +${formatNumber(coinsGained)} 골드, +${formatNumber(xpGained)} 경험치.`);
-        updateMissionProgress('EARN_GOLD', coinsGained);
-        updateMissionProgress(isBossDefeated ? 'DEFEAT_BOSSES' : 'DEFEAT_MONSTERS', 1);
-
-        const dropChance = EQUIPMENT_DROP_CHANCE_BASE + (currentMonsterLevel * 0.005) + (isBossDefeated ? BOSS_DROP_CHANCE_BOOST : 0) + (finalStats.luck / 100);
-        if (isAutoDropEnabled && Math.random() < dropChance && !newItemDrop) {
-            const droppedItem = generateRandomItem(currentMonsterLevel);
-            const rarityInfo = RARITIES[droppedItem.rarity];
-            addLog(`<span class="${rarityInfo.textClass}">[${rarityInfo.name}] ${droppedItem.name}</span> 획득!`);
-            setNewItemDrop(droppedItem);
-        }
-
-        setPlayerStats(prev => {
-            let newXp = prev.xp + xpGained; let newLevel = prev.level; let newMaxXp = prev.maxXp;
-            let newClickDamage = prev.clickDamage; let newAutoAttackDamage = prev.autoAttackDamage;
-
-            while (newXp >= newMaxXp) {
-                newXp -= newMaxXp; newLevel += 1;
-                newMaxXp = Math.floor(LEVEL_EXPERIENCE_BASE * Math.pow(LEVEL_EXPERIENCE_MULTIPLIER, newLevel - 1));
-                addLog(`레벨업! ${newLevel}레벨 달성!`);
-                newClickDamage *= 1.01; newAutoAttackDamage *= 1.01;
-                addLog(`<span class="text-yellow-300">레벨업 보너스! 기본 공격력이 1% 증가했습니다!</span>`);
-            }
-            return { ...prev, level: newLevel, xp: newXp, maxXp: newMaxXp, coins: prev.coins + coinsGained, clickDamage: newClickDamage, autoAttackDamage: newAutoAttackDamage };
-        });
-
-        const newMonsterLevel = currentMonsterLevel + 1;
-        let nextMonster;
-        if (newMonsterLevel > 0 && newMonsterLevel % BOSS_LEVEL_INTERVAL === 0) {
-            const bossIndex = Math.floor((newMonsterLevel / BOSS_LEVEL_INTERVAL - 1)) % BOSS_TYPES.length;
-            const bossData = BOSS_TYPES[bossIndex];
-            const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultipliers.monsterHp);
-            nextMonster = { name: bossData.name, Icon: bossData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: true };
+        if (treasureGolem.isActive) {
+            const goldReward = Math.floor(monsterStats.maxHp * 5 * (1 + finalAbilityStats.goldGainBonus / 100));
+            addLog(`<strong class="text-yellow-400">보물 골렘 처치! +${formatNumber(goldReward)} 골드!</strong>`);
+            setPlayerStats(prev => ({ ...prev, coins: prev.coins + goldReward }));
+            setTreasureGolem({ isActive: false, timer: 0 });
         } else {
-            const availableMonsters = MONSTER_TYPES.filter(m => newMonsterLevel >= m.minLevel);
-            const monsterData = availableMonsters.length > 0 ? availableMonsters[Math.floor(Math.random() * availableMonsters.length)] : MONSTER_TYPES[0];
-            const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * difficultyMultipliers.monsterHp);
-            nextMonster = { name: monsterData.name, Icon: monsterData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: false };
+            const isBossDefeated = monsterStats.isBoss;
+            const currentMonsterLevel = monsterStats.level;
+            const rewardMultiplier = (isBossDefeated ? BOSS_REWARD_MULTIPLIER : 1) * difficultyMultipliers.monsterReward;
+            const xpGained = Math.ceil(currentMonsterLevel * 2.5 * rewardMultiplier * (1 + finalAbilityStats.xpGainBonus / 100));
+            const coinsGained = Math.ceil(MONSTER_REWARD_BASE * Math.pow(MONSTER_REWARD_MULTIPLIER, currentMonsterLevel - 1) * rewardMultiplier * (1 + finalAbilityStats.goldGainBonus / 100));
+            
+            addLog(`${isBossDefeated ? `<strong>[BOSS]</strong> ` : ''}${monsterStats.name}(Lv.${currentMonsterLevel}) 처치! +${formatNumber(coinsGained)} 골드, +${formatNumber(xpGained)} 경험치.`);
+            updateMissionProgress('EARN_GOLD', coinsGained);
+            updateMissionProgress(isBossDefeated ? 'DEFEAT_BOSSES' : 'DEFEAT_MONSTERS', 1);
+
+            const dropChance = EQUIPMENT_DROP_CHANCE_BASE + (currentMonsterLevel * 0.005) + (isBossDefeated ? BOSS_DROP_CHANCE_BOOST : 0) + (finalStats.luck / 100);
+            if (Math.random() < dropChance && !newItemDrop) {
+                const droppedItem = generateRandomItem(currentMonsterLevel);
+                if (isAutoDropEnabled) {
+                    const rarityInfo = RARITIES[droppedItem.rarity];
+                    const itemLevel = droppedItem.level || 0;
+                    const goldGained = Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (droppedItem.baseLevel || 1));
+                    setPlayerStats(prev => ({...prev, coins: prev.coins + goldGained}));
+                    addLog(`<span class="${rarityInfo.textClass}">[${rarityInfo.name}] ${droppedItem.name}</span> 획득 후 자동 판매! +<strong class="text-yellow-400">${formatNumber(goldGained)}</strong> 골드`);
+                } else {
+                    const rarityInfo = RARITIES[droppedItem.rarity];
+                    addLog(`<span class="${rarityInfo.textClass}">[${rarityInfo.name}] ${droppedItem.name}</span> 획득!`);
+                    setNewItemDrop(droppedItem);
+                }
+            }
+
+            setPlayerStats(prev => {
+                let newXp = prev.xp + xpGained; let newLevel = prev.level; let newMaxXp = prev.maxXp;
+                let newClickDamage = prev.clickDamage; let newAutoAttackDamage = prev.autoAttackDamage;
+
+                while (newXp >= newMaxXp) {
+                    newXp -= newMaxXp; newLevel += 1;
+                    newMaxXp = Math.floor(LEVEL_EXPERIENCE_BASE * Math.pow(LEVEL_EXPERIENCE_MULTIPLIER, newLevel - 1));
+                    addLog(`레벨업! ${newLevel}레벨 달성!`);
+                    newClickDamage *= 1.01; newAutoAttackDamage *= 1.01;
+                    addLog(`<span class="text-yellow-300">레벨업 보너스! 기본 공격력이 1% 증가했습니다!</span>`);
+                }
+                return { ...prev, level: newLevel, xp: newXp, maxXp: newMaxXp, coins: prev.coins + coinsGained, clickDamage: newClickDamage, autoAttackDamage: newAutoAttackDamage };
+            });
         }
-        setMonsterStats(nextMonster);
+        
+        const newMonsterLevel = monsterStats.level + (treasureGolem.isActive ? 0 : 1);
+        if (Math.random() < TREASURE_GOLEM_SPAWN_CHANCE) {
+            const hp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * 10 * difficultyMultipliers.monsterHp);
+            setMonsterStats({ ...SPECIAL_MONSTERS.TREASURE_GOLEM, level: newMonsterLevel, hp, maxHp: hp, isBoss: false });
+            setTreasureGolem({ isActive: true, timer: TREASURE_GOLEM_TIMER });
+        } else {
+            let nextMonster;
+            if (newMonsterLevel > 0 && newMonsterLevel % BOSS_LEVEL_INTERVAL === 0) {
+                const bossIndex = Math.floor((newMonsterLevel / BOSS_LEVEL_INTERVAL - 1)) % BOSS_TYPES.length;
+                const bossData = BOSS_TYPES[bossIndex];
+                const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultipliers.monsterHp);
+                nextMonster = { name: bossData.name, Icon: bossData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: true };
+            } else {
+                const availableMonsters = MONSTER_TYPES.filter(m => newMonsterLevel >= m.minLevel);
+                const monsterData = availableMonsters.length > 0 ? availableMonsters[Math.floor(Math.random() * availableMonsters.length)] : MONSTER_TYPES[0];
+                const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * difficultyMultipliers.monsterHp);
+                nextMonster = { name: monsterData.name, Icon: monsterData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: false };
+            }
+            setMonsterStats(nextMonster);
+        }
         needsSave.current = true;
-    }, [monsterStats, addLog, generateRandomItem, newItemDrop, finalAbilityStats, finalStats.luck, difficultyMultipliers, isAutoDropEnabled, updateMissionProgress]);
+    }, [monsterStats, addLog, generateRandomItem, newItemDrop, finalAbilityStats, finalStats.luck, difficultyMultipliers, isAutoDropEnabled, updateMissionProgress, ownedArtifacts, treasureGolem.isActive]);
     
     useEffect(() => {
         if (finalStats.autoAttackDamage <= 0) return;
         const interval = setInterval(() => {
-            if (newItemDrop || isJobSelectionOpen || selectedInventoryItem || !difficulty || offlineProgress) return;
+            if (newItemDrop || isJobSelectionOpen || selectedInventoryItem || !difficulty || offlineProgress || treasureGolem.isActive) return;
             const debuffMultiplier = arcaneBlastDebuff ? 1.2 : 1;
             const isCrit = Math.random() * 100 < finalStats.critChance;
             const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
@@ -1535,7 +1810,7 @@ const App = () => {
             });
         }, 1000 / finalStats.attackSpeed);
         return () => clearInterval(interval);
-    }, [finalStats.autoAttackDamage, finalStats.attackSpeed, finalStats.critChance, finalStats.critDamage, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats.bossDamageBonus, difficulty, arcaneBlastDebuff, offlineProgress]);
+    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats, difficulty, arcaneBlastDebuff, offlineProgress, treasureGolem.isActive]);
     
     useEffect(() => {
         if (activeSkillCooldown > 0) {
@@ -1543,6 +1818,21 @@ const App = () => {
             return () => clearTimeout(timer);
         }
     }, [activeSkillCooldown]);
+
+    useEffect(() => {
+        if (treasureGolem.isActive && treasureGolem.timer > 0) {
+            const timer = setTimeout(() => setTreasureGolem(prev => ({ ...prev, timer: prev.timer - 1 })), 1000);
+            return () => clearTimeout(timer);
+        } else if (treasureGolem.isActive && treasureGolem.timer <= 0) {
+            addLog(`<strong class="text-yellow-600">보물 골렘이 도망쳤습니다!</strong>`);
+            setTreasureGolem({ isActive: false, timer: 0 });
+            // Spawn a normal monster
+            const newMonsterLevel = monsterStats.level;
+            const monsterData = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
+            const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * difficultyMultipliers.monsterHp);
+            setMonsterStats({ name: monsterData.name, Icon: monsterData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: false });
+        }
+    }, [treasureGolem, addLog, monsterStats.level, difficultyMultipliers]);
     
     const createDamagePopup = (damage, type = 'normal') => {
         const newPopup = { id: Date.now() + Math.random(), damage, x: 40 + Math.random() * 20, y: 40 + Math.random() * 20, type };
@@ -1584,7 +1874,7 @@ const App = () => {
         setUpgrades(prev => ({ ...prev, autoAttackUpgradeCost: Math.floor(prev.autoAttackUpgradeCost * AUTO_ATTACK_UPGRADE_COST_MULTIPLIER), autoAttackUpgradeLevel: prev.autoAttackUpgradeLevel + 1 }));
     });
     const handleUpgradeAttackSpeed = () => handleUpgrade(upgrades.attackSpeedUpgradeCost, () => {
-        setPlayerStats(prev => ({ ...prev, attackSpeed: prev.attackSpeed + 0.05 }));
+        setPlayerStats(prev => ({ ...prev, attackSpeed: prev.attackSpeed + 0.1 }));
         setUpgrades(prev => ({ ...prev, attackSpeedUpgradeCost: Math.floor(prev.attackSpeedUpgradeCost * ATTACK_SPEED_UPGRADE_COST_MULTIPLIER)}));
     });
     const handleUpgradeCritChance = () => handleUpgrade(upgrades.critChanceUpgradeCost, () => {
@@ -1618,6 +1908,10 @@ const App = () => {
     const handleUpgradeBossDamage = () => handleUpgrade(upgrades.bossDamageUpgradeCost, () => {
         setAbilityStats(prev => ({ ...prev, bossDamageBonus: prev.bossDamageBonus + 2 }));
         setUpgrades(prev => ({ ...prev, bossDamageUpgradeCost: Math.floor(prev.bossDamageUpgradeCost * BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER) }));
+    });
+     const handleUpgradeArtifactPower = () => handleUpgrade(upgrades.artifactPowerUpgradeCost, () => {
+        setAbilityStats(prev => ({ ...prev, artifactPowerBonus: prev.artifactPowerBonus + 1 }));
+        setUpgrades(prev => ({ ...prev, artifactPowerUpgradeCost: Math.floor(prev.artifactPowerUpgradeCost * ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER) }));
     });
 
     const handleActiveSkill = () => {
@@ -1680,7 +1974,7 @@ const App = () => {
     
     const handleRebirth = useCallback(() => {
         if (playerStats.level < REBIRTH_LEVEL_REQUIREMENT) return;
-        if (window.confirm(`환생하시겠습니까?\n\n- 레벨, 골드, 업그레이드가 초기화됩니다.\n- 장비, 인벤토리, 해방 단계는 유지됩니다.\n- 영구적으로 모든 능력치가 ${REBIRTH_ALL_STAT_BONUS}% 증가합니다.\n\n이 작업은 되돌릴 수 없습니다!`)) {
+        if (window.confirm(`환생하시겠습니까?\n\n- 레벨, 골드, 업그레이드가 초기화됩니다.\n- 장비, 인벤토리, 유물, 해방 단계는 유지됩니다.\n- 영구적으로 모든 능력치가 ${REBIRTH_ALL_STAT_BONUS}% 증가합니다.\n\n이 작업은 되돌릴 수 없습니다!`)) {
             const newRebirthCount = rebirthCount + 1;
             setRebirthCount(newRebirthCount);
             
@@ -1747,24 +2041,24 @@ const App = () => {
         needsSave.current = true;
     };
     
-    const handleSalvageItem = useCallback((itemToSalvage) => {
-        if (!itemToSalvage || !window.confirm(`[${itemToSalvage.name}] 아이템을 정말로 분해하시겠습니까?`)) return;
+    const handleSellItem = useCallback((itemToSell) => {
+        if (!itemToSell || !window.confirm(`[${itemToSell.name}] 아이템을 정말로 판매하시겠습니까?`)) return;
 
-        const rarityKey = itemToSalvage.rarity;
+        const rarityKey = itemToSell.rarity;
         const rarityInfo = RARITIES[rarityKey];
-        const itemLevel = itemToSalvage.level || 0;
+        const itemLevel = itemToSell.level || 0;
         
-        const goldGained = Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (itemToSalvage.baseLevel || 1));
+        const goldGained = Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (itemToSell.baseLevel || 1));
         
         setPlayerStats(prev => ({ ...prev, coins: prev.coins + goldGained }));
         updateMissionProgress('EARN_GOLD', goldGained);
         
-        setInventory(prev => prev.filter(i => i.id !== itemToSalvage.id));
-        if (selectedForgeItem && selectedForgeItem.id === itemToSalvage.id) {
+        setInventory(prev => prev.filter(i => i.id !== itemToSell.id));
+        if (selectedForgeItem && selectedForgeItem.id === itemToSell.id) {
             setSelectedForgeItem(null);
         }
         
-        addLog(`[${itemToSalvage.name}] 분해 완료! <strong class="text-yellow-400">${formatNumber(goldGained)} 골드</strong>를 획득했습니다.`);
+        addLog(`[${itemToSell.name}] 판매 완료! <strong class="text-yellow-400">${formatNumber(goldGained)} 골드</strong>를 획득했습니다.`);
         
         needsSave.current = true;
     }, [selectedForgeItem, addLog, updateMissionProgress]);
@@ -1782,7 +2076,7 @@ const App = () => {
         if (!itemToForge) return;
         const rarityInfo = RARITIES[itemToForge.rarity];
         const itemLevel = itemToForge.level || 0;
-        const cost = Math.ceil(rarityInfo.statMultiplier * 50 * Math.pow(1.5, itemLevel) * (1 + itemLevel * 0.2));
+        const cost = Math.ceil(rarityInfo.statMultiplier * 30 * Math.pow(1.35, itemLevel) * (1 + itemLevel * 0.1));
 
         if (playerStats.coins < cost) {
             addLog(`<strong class="text-red-400">골드가 부족합니다!</strong>`);
@@ -1794,7 +2088,7 @@ const App = () => {
             setSelectedForgeItem(updatedItem);
             addLog(`[${itemToForge.name}] 강화 성공! <strong class="${rarityInfo.textClass}">(+${updatedItem.level})</strong>`);
         });
-    }, [playerStats.coins, equipment, addLog, handleUpgrade]);
+    }, [playerStats.coins, addLog, handleUpgrade]);
     
     const handleUpgradeRarity = useCallback((item) => {
         const currentRarityIndex = RARITY_ORDER.indexOf(item.rarity);
@@ -1821,7 +2115,7 @@ const App = () => {
         setSelectedForgeItem(updatedItem);
         addLog(`[${item.name}] 등급 승급! <strong class="${RARITIES[nextRarityKey].textClass}">[${RARITIES[nextRarityKey].name}]</strong> 달성!`);
         needsSave.current = true;
-    }, [playerStats.coins, equipment, addLog]);
+    }, [playerStats.coins, addLog]);
 
     const handleReforgeItem = useCallback((item) => {
         const rarityInfo = RARITIES[item.rarity];
@@ -1842,7 +2136,7 @@ const App = () => {
         setSelectedForgeItem(updatedItem);
         addLog(`[${item.name}] 능력치 재련 완료!`);
         needsSave.current = true;
-    }, [playerStats.coins, equipment, addLog]);
+    }, [playerStats.coins, addLog]);
 
     const handleSelectForgeItem = (item) => {
         if (item) {
@@ -1858,17 +2152,17 @@ const App = () => {
         }
     }, []);
 
-    const handleToggleSalvageMode = () => {
-        setIsSalvageMode(prev => {
+    const handleToggleSellMode = () => {
+        setIsSellMode(prev => {
             if (prev) {
-                setSalvageList(new Set());
+                setSellList(new Set());
             }
             return !prev;
         });
     };
 
-    const handleToggleSalvageItem = (item) => {
-        setSalvageList(prev => {
+    const handleToggleSellItem = (item) => {
+        setSellList(prev => {
             const newSet = new Set(prev);
             if (newSet.has(item.id)) {
                 newSet.delete(item.id);
@@ -1879,26 +2173,26 @@ const App = () => {
         });
     };
 
-    const handleBulkSalvage = () => {
-        if (salvageList.size === 0) return;
+    const handleBulkSell = () => {
+        if (sellList.size === 0) return;
 
         let totalGoldGained = 0;
-        const itemsToSalvage = inventory.filter(item => salvageList.has(item.id));
+        const itemsToSell = inventory.filter(item => sellList.has(item.id));
 
-        itemsToSalvage.forEach(itemToSalvage => {
-            const rarityInfo = RARITIES[itemToSalvage.rarity];
-            const itemLevel = itemToSalvage.level || 0;
-            const goldGained = Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (itemToSalvage.baseLevel || 1));
+        itemsToSell.forEach(itemToSell => {
+            const rarityInfo = RARITIES[itemToSell.rarity];
+            const itemLevel = itemToSell.level || 0;
+            const goldGained = Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (itemToSell.baseLevel || 1));
             totalGoldGained += goldGained;
         });
 
-        if (window.confirm(`${salvageList.size}개의 아이템을 분해하여 ${formatNumber(totalGoldGained)} 골드를 얻습니다. 계속하시겠습니까?`)) {
+        if (window.confirm(`${sellList.size}개의 아이템을 판매하여 ${formatNumber(totalGoldGained)} 골드를 얻습니다. 계속하시겠습니까?`)) {
             setPlayerStats(prev => ({ ...prev, coins: prev.coins + totalGoldGained }));
             updateMissionProgress('EARN_GOLD', totalGoldGained);
-            setInventory(prev => prev.filter(item => !salvageList.has(item.id)));
-            addLog(`아이템 ${salvageList.size}개를 분해하여 <strong class="text-yellow-400">${formatNumber(totalGoldGained)} 골드</strong>를 획득했습니다.`);
-            setSalvageList(new Set());
-            setIsSalvageMode(false);
+            setInventory(prev => prev.filter(item => !sellList.has(item.id)));
+            addLog(`아이템 ${sellList.size}개를 판매하여 <strong class="text-yellow-400">${formatNumber(totalGoldGained)} 골드</strong>를 획득했습니다.`);
+            setSellList(new Set());
+            setIsSellMode(false);
             needsSave.current = true;
         }
     };
@@ -1948,6 +2242,71 @@ const App = () => {
         setOfflineProgress(null);
         needsSave.current = true;
     };
+    
+    const handleEquipArtifact = (id) => {
+        if (equippedArtifacts.length < 3) {
+            setEquippedArtifacts(prev => [...prev, id]);
+            needsSave.current = true;
+        } else {
+            addLog(`<strong class="text-red-400">유물은 3개까지만 장착할 수 있습니다.</strong>`);
+        }
+    };
+
+    const handleUnequipArtifact = (id) => {
+        setEquippedArtifacts(prev => prev.filter(artId => artId !== id));
+        needsSave.current = true;
+    };
+
+    const handleArtifactGacha = () => {
+        const unownedArtifacts = ARTIFACTS.filter(a => !ownedArtifacts.includes(a.id));
+        if (unownedArtifacts.length === 0) {
+            addLog('모든 유물을 획득했습니다!');
+            return;
+        }
+
+        const cost = 1000;
+        if (playerStats.coins < cost) {
+            addLog(`<strong class="text-red-400">골드가 부족합니다!</strong> (필요: ${formatNumber(cost)})`);
+            return;
+        }
+
+        setPlayerStats(prev => ({...prev, coins: prev.coins - cost}));
+        
+        const droppedArtifact = unownedArtifacts[Math.floor(Math.random() * unownedArtifacts.length)];
+        setOwnedArtifacts(prev => [...prev, droppedArtifact.id]);
+        addLog(`유물 뽑기 성공! <strong class="text-yellow-200">[${droppedArtifact.name}]</strong> 획득!`);
+        needsSave.current = true;
+    };
+
+
+    const handleSpinSlots = (cost, callback) => {
+        setPlayerStats(prev => ({...prev, coins: prev.coins - cost}));
+        const symbols = ['💰', '⚔️', '💧', '💎', '🍀']; // Coin, Sword, Slime, Gem, Clover
+        const reels = [symbols[Math.floor(Math.random()*symbols.length)], symbols[Math.floor(Math.random()*symbols.length)], symbols[Math.floor(Math.random()*symbols.length)]];
+        let reward = { message: "꽝!", gold: 0 };
+
+        if (reels[0] === reels[1] && reels[1] === reels[2]) {
+            switch(reels[0]) {
+                case '💰': reward = { message: `골드 잭팟!`, gold: cost * 10 }; break;
+                case '⚔️': reward = { message: `전투력 잭팟!`, gold: cost * 5 }; break;
+                case '💧': reward = { message: `슬라임 잭팟!`, gold: cost * 3 }; break;
+                case '💎': reward = { message: `보석 잭팟!`, gold: cost * 20 }; break;
+                case '🍀': reward = { message: `행운 잭팟!`, gold: cost * 50 }; break;
+            }
+        } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
+             reward = { message: `2개 일치!`, gold: cost * 2 };
+        }
+        
+        if (reward.gold > 0) {
+            setPlayerStats(prev => ({...prev, coins: prev.coins + reward.gold}));
+            addLog(`슬롯머신: ${reward.message} (+${formatNumber(reward.gold)} 골드)`);
+        } else {
+            addLog(`슬롯머신: 꽝!`);
+        }
+
+        callback(reels, reward);
+        needsSave.current = true;
+    };
 
     const liberationCost = useMemo(() => LIBERATION_COST_BASE * Math.pow(LIBERATION_COST_MULTIPLIER, liberationCount), [liberationCount]);
     const equipmentGachaCost = useMemo(() => EQUIPMENT_GACHA_COST_BASE + playerStats.level * EQUIPMENT_GACHA_COST_LEVEL_MULTIPLIER, [playerStats.level]);
@@ -1962,9 +2321,6 @@ const App = () => {
                 <button onClick={handleResetGame} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm shadow-lg">
                     게임 초기화
                 </button>
-            </div>
-            <div className="fixed top-4 right-4 z-10">
-                <p className="text-gray-500 text-sm">제작자: 한국인이라면</p>
             </div>
 
             {(isJobSelectionOpen || !playerClass) && <JobSelectionModal onSelect={handleJobSelect} onClose={() => setIsJobSelectionOpen(false)}/>}
@@ -1989,12 +2345,12 @@ const App = () => {
                         difficulty={difficulty}
                         onDifficultyChangeClick={() => setIsDifficultyModalOpen(true)}
                         isAutoDropEnabled={isAutoDropEnabled}
-                        onToggleAutoDrop={() => { setIsAutoDropEnabled(p => !p); needsSave.current = true; }}
+                        onToggleAutoDrop={() => { setIsAutoDropEnabled(p => !p); needsSave.current = true; addLog(`장비 자동 판매가 ${!isAutoDropEnabled ? '활성화' : '비활성화'}되었습니다.`) }}
                     />
                    <EquipmentPanel equipment={equipment} onSelectItem={handleSelectForgeItem} />
                 </div>
                 <div className="w-full md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-start order-2 md:order-2 relative overflow-hidden">
-                    <MonsterDisplay monster={monsterStats} onClick={handleMonsterClick} damagePopups={damagePopups} />
+                    <MonsterDisplay monster={monsterStats} onClick={handleMonsterClick} damagePopups={damagePopups} treasureGolem={treasureGolem} />
                     {playerClass && (
                         <div className="w-full mt-8">
                             <ActiveSkillButton 
@@ -2012,33 +2368,28 @@ const App = () => {
                     selectedForgeItem={selectedForgeItem}
                     upgrades={upgrades}
                     playerCoins={playerStats.coins}
+                    playerStats={playerStats}
                     abilityStats={finalAbilityStats}
                     equipmentGachaCost={equipmentGachaCost}
                     inventory={inventory}
-                    isSalvageMode={isSalvageMode}
-                    salvageList={salvageList}
+                    isSellMode={isSellMode}
+                    sellList={sellList}
                     missions={missions}
+                    ownedArtifacts={ownedArtifacts}
+                    equippedArtifacts={equippedArtifacts}
                     handlers={{
-                        onUpgradeClick: handleUpgradeClick,
-                        onUpgradeAutoAttack: handleUpgradeAutoAttack,
-                        onUpgradeAttackSpeed: handleUpgradeAttackSpeed,
-                        onUpgradeCritChance: handleUpgradeCritChance,
-                        onUpgradeCritDamage: handleUpgradeCritDamage,
-                        onUpgradeGoldGain: handleUpgradeGoldGain,
-                        onUpgradeXpGain: handleUpgradeXpGain,
-                        onUpgradeSkillDamage: handleUpgradeSkillDamage,
-                        onUpgradeHaste: handleUpgradeHaste,
-                        onUpgradeLuck: handleUpgradeLuck,
-                        onUpgradeBossDamage: handleUpgradeBossDamage,
-                        onEquipmentGacha: handleEquipmentGacha,
+                        onUpgradeClick: handleUpgradeClick, onUpgradeAutoAttack: handleUpgradeAutoAttack, onUpgradeAttackSpeed: handleUpgradeAttackSpeed,
+                        onUpgradeCritChance: handleUpgradeCritChance, onUpgradeCritDamage: handleUpgradeCritDamage, onUpgradeGoldGain: handleUpgradeGoldGain,
+                        onUpgradeXpGain: handleUpgradeXpGain, onUpgradeSkillDamage: handleUpgradeSkillDamage, onUpgradeHaste: handleUpgradeHaste,
+                        onUpgradeLuck: handleUpgradeLuck, onUpgradeBossDamage: handleUpgradeBossDamage, onEquipmentGacha: handleEquipmentGacha,
+                        onUpgradeArtifactPower: handleUpgradeArtifactPower,
                         onSelectItem: (item) => setSelectedInventoryItem(item),
-                        onForgeItem: handleForgeItem,
-                        onUpgradeRarity: handleUpgradeRarity,
-                        onReforgeItem: handleReforgeItem,
-                        onToggleSalvageMode: handleToggleSalvageMode,
-                        onToggleSalvageItem: handleToggleSalvageItem,
-                        onBulkSalvage: handleBulkSalvage,
+                        onForgeItem: handleForgeItem, onUpgradeRarity: handleUpgradeRarity, onReforgeItem: handleReforgeItem,
+                        onToggleSellMode: handleToggleSellMode, onToggleSellItem: handleToggleSellItem, onBulkSell: handleBulkSell,
                         onClaimMission: handleClaimMission,
+                        onEquipArtifact: handleEquipArtifact, onUnequipArtifact: handleUnequipArtifact,
+                        onArtifactGacha: handleArtifactGacha,
+                        onSpinSlots: handleSpinSlots,
                     }}
                 />
             </main>
@@ -2063,7 +2414,7 @@ const App = () => {
                 currentEquipped={selectedInventoryItem ? equipment[selectedInventoryItem.type.toLowerCase()] : null}
                 onClose={() => setSelectedInventoryItem(null)}
                 onEquip={handleEquipItem}
-                onSalvage={handleSalvageItem}
+                onSell={handleSellItem}
                 onSelectForge={handleSelectForgeItem}
             />
         </div>
