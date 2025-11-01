@@ -152,6 +152,12 @@ const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.41;
 const ARTIFACT_POWER_UPGRADE_COST_BASE = 5000;
 const ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER = 1.5;
 
+const FINAL_DAMAGE_UPGRADE_COST_BASE = 1000;
+const FINAL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.55;
+
+const SKILL_DURATION_UPGRADE_COST_BASE = 800;
+const SKILL_DURATION_UPGRADE_COST_MULTIPLIER = 1.5;
+
 const LIBERATION_COST_BASE = 10000;
 const LIBERATION_COST_MULTIPLIER = 100;
 
@@ -169,6 +175,22 @@ const TREASURE_GOLEM_SPAWN_CHANCE = 0.02; // 2% chance
 const TREASURE_GOLEM_TIMER = 30; // 30 seconds
 
 const SAVED_GAME_KEY = 'slimeHunterSaveData';
+
+// --- ELEMENTAL DATA ---
+const ELEMENT_TYPES = {
+    FIRE: { name: '불', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-red-500" {...props}><path fillRule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071 1.071L12 4.432a2.25 2.25 0 01-1.429 2.457c-1.28.45-2.29 1.628-2.583 3.016.244-.24.522-.444.82-.607a23.345 23.345 0 014.288-1.547.75.75 0 00.564-1.233 23.01 23.01 0 00-4.288-1.547 3.75 3.75 0 00-2.83 4.474c-.363 1.543.253 3.15.993 4.394a.75.75 0 001.28-.733 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 01.69-2.29c.433-.402 1.01-.63 1.62-.596a21.727 21.727 0 014.288 1.547.75.75 0 001.28-.732 21.52 21.52 0 00-4.288-1.548 3.75 3.75 0 00-3.953 2.825c-.095.408-.146.828-.159 1.258-.042 1.34.21 2.67.65 3.929a.75.75 0 001.28-.732 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 011.084-2.523c.828-.466 1.838-.504 2.686-.118a23.345 23.345 0 014.288 1.547.75.75 0 00.564-1.233 23.01 23.01 0 00-4.288-1.547 3.75 3.75 0 00-2.83 4.474c-.363 1.543.253 3.15.993 4.394a.75.75 0 001.28-.733 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 01.69-2.29c.433-.402 1.01-.63 1.62-.596a21.727 21.727 0 014.288 1.547.75.75 0 001.28-.732 21.52 21.52 0 00-4.288-1.548A3.75 3.75 0 0012 21a3.75 3.75 0 00-3.953-2.825c-.095.408-.146.828-.159 1.258-.042 1.34.21 2.67.65 3.929a.75.75 0 001.4-.258 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 011.084-2.523c.828-.466 1.838-.504 2.686-.118a23.345 23.345 0 014.288 1.547.75.75 0 00.564-1.233 23.01 23.01 0 00-4.288-1.547 3.75 3.75 0 00-2.83 4.474c-.363 1.543.253 3.15.993 4.394a.75.75 0 001.28-.733 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 01.69-2.29c.433-.402 1.01-.63 1.62-.596a21.727 21.727 0 014.288 1.547.75.75 0 001.28-.732 21.52 21.52 0 00-4.288-1.548 3.75 3.75 0 00-3.953 2.825c-.095.408-.146.828-.159 1.258-.042 1.34.21 2.67.65 3.929a.75.75 0 001.4-.258 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 011.084-2.523c.828-.466 1.838-.504 2.686-.118a23.345 23.345 0 014.288 1.547.75.75 0 00.564-1.233 23.01 23.01 0 00-4.288-1.547 3.75 3.75 0 00-2.83 4.474c-.363 1.543.253 3.15.993 4.394a.75.75 0 001.28-.733 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 01.69-2.29c.433-.402 1.01-.63 1.62-.596a21.727 21.727 0 014.288 1.547.75.75 0 001.28-.732 21.52 21.52 0 00-4.288-1.548 3.75 3.75 0 00-3.953 2.825c-.095.408-.146.828-.159 1.258-.042 1.34.21 2.67.65 3.929a.75.75 0 001.4-.258 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 011.084-2.523c.828-.466 1.838-.504 2.686-.118a23.345 23.345 0 014.288 1.547.75.75 0 00.564-1.233 23.01 23.01 0 00-4.288-1.547 3.75 3.75 0 00-2.83 4.474c-.363 1.543.253 3.15.993 4.394a.75.75 0 001.28-.733 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 01.69-2.29c.433-.402 1.01-.63 1.62-.596a21.727 21.727 0 014.288 1.547.75.75 0 001.28-.732 21.52 21.52 0 00-4.288-1.548 3.75 3.75 0 00-3.953 2.825c-.095.408-.146.828-.159 1.258-.042 1.34.21 2.67.65 3.929a.75.75 0 001.4-.258 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 011.084-2.523c.828-.466 1.838-.504 2.686-.118a23.345 23.345 0 014.288 1.547.75.75 0 00.564-1.233 23.01 23.01 0 00-4.288-1.547 3.75 3.75 0 00-2.83 4.474c-.363 1.543.253 3.15.993 4.394a.75.75 0 001.28-.733 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 01.69-2.29c.433-.402 1.01-.63 1.62-.596a21.727 21.727 0 014.288 1.547.75.75 0 001.28-.732 21.52 21.52 0 00-4.288-1.548 3.75 3.75 0 00-3.953 2.825c-.095.408-.146.828-.159 1.258-.042 1.34.21 2.67.65 3.929a.75.75 0 001.4-.258 21.52 21.52 0 01-.65-2.885 2.25 2.25 0 011.084-2.523c.828-.466 1.838-.504 2.686-.118z" clipRule="evenodd" /></svg> },
+    WATER: { name: '물', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-blue-500" {...props}><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 3a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V6a.75.75 0 01.75-.75zm0 13.5a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V18a.75.75 0 01.75-.75zm-4.5-4.5a.75.75 0 01.75.75h2.25a.75.75 0 010 1.5H8.25a.75.75 0 01-.75-.75zm9 0a.75.75 0 01.75.75h2.25a.75.75 0 010 1.5H16.5a.75.75 0 01-.75-.75zm-9-4.5a.75.75 0 01.75-.75h2.25a.75.75 0 010-1.5H8.25a.75.75 0 01-.75.75zm4.5 9a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V15a.75.75 0 01-.75.75zm4.5-9a.75.75 0 01.75-.75h2.25a.75.75 0 010-1.5H16.5a.75.75 0 01-.75.75zM12 6a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V6.75A.75.75 0 0112 6z" clipRule="evenodd" /></svg> },
+    EARTH: { name: '땅', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-700" {...props}><path fillRule="evenodd" d="M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm4.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 10.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm3.5 1.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" /></svg> },
+    WIND: { name: '바람', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-gray-400" {...props}><path d="M12 2.25a.75.75 0 01.75.75v16.5a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75z" /><path d="M12 4.125a.75.75 0 01.75-.75h5.25a.75.75 0 010 1.5h-4.5v15.375a.75.75 0 01-1.5 0V4.125z" /><path d="M12 5.625a.75.75 0 01.75.75v14.625a.75.75 0 01-1.5 0V6.375a.75.75 0 01.75-.75z" /><path d="M12 18.375a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25a.75.75 0 01.75-.75z" /><path d="M12 15.375a.75.75 0 01.75.75v5.25a.75.75 0 01-1.5 0v-5.25a.75.75 0 01.75-.75z" /><path d="M12 12.375a.75.75 0 01.75.75v8.25a.75.75 0 01-1.5 0v-8.25a.75.75 0 01.75-.75z" /></svg> },
+};
+const ELEMENTAL_RELATIONSHIPS = {
+    FIRE: { weak: 'WIND', strong: 'WATER' },
+    WATER: { weak: 'FIRE', strong: 'EARTH' },
+    EARTH: { weak: 'WATER', strong: 'WIND' },
+    WIND: { weak: 'EARTH', strong: 'FIRE' },
+};
+const ELEMENTAL_ADVANTAGE_MULTIPLIER = 1.25;
+const ELEMENTAL_DISADVANTAGE_MULTIPLIER = 0.75;
 
 // --- DIFFICULTY DATA ---
 const DIFFICULTIES = {
@@ -261,6 +283,8 @@ const HelmetIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" classNam
 const GlovesIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.264-2.55-.724-3.682z" /><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" /></svg> );
 const BootsIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg> );
 const ArtifactIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H7.5A2.25 2.25 0 005.25 6.75v9.75a2.25 2.25 0 002.25 2.25z" /> </svg> );
+const LockIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}> <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /> </svg> );
+const ElementIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.362-3.797z" /></svg> );
 
 // Monster Icons
 const GreenSlimeIcon = ({className, ...props}) => ( <svg viewBox="0 0 100 80" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path> <circle cx="28" cy="50" r="5" fill="#fecaca"></circle> <circle cx="72" cy="50" r="5" fill="#fecaca"></circle> <circle cx="38" cy="45" r="8" fill="white"></circle> <circle cx="62" cy="45" r="8" fill="white"></circle> <circle cx="40" cy="46" r="4" fill="black"></circle> <circle cx="64" cy="46" r="4" fill="black"></circle> <circle cx="37" cy="42" r="2" fill="white"></circle> <circle cx="61" cy="42" r="2" fill="white"></circle> <path d="M 45 60 Q 50 68, 55 60" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
@@ -430,6 +454,7 @@ const EquipmentTooltip = ({ item }) => {
                 {enhancedStats.goldGainBonus > 0 && <p className="flex items-center"><CoinIcon className="h-4 w-4 mr-1.5" /> <span>골드 획득 +{Math.round(enhancedStats.goldGainBonus)}%</span></p>}
                 {enhancedStats.xpGainBonus > 0 && <p className="flex items-center"><XPIcon className="h-4 w-4 mr-1.5" /> <span>경험치 획득 +{Math.round(enhancedStats.xpGainBonus)}%</span></p>}
             </div>
+            {item.locked && <p className="mt-2 text-yellow-400 font-bold flex items-center"><LockIcon className="w-4 h-4 mr-1"/> 잠금 상태</p>}
         </div>
     );
 };
@@ -464,15 +489,55 @@ const EquipmentPanel = ({ equipment, onSelectItem }) => (
     </div>
 );
 
+const ElementPanel = ({ playerElement, onOpenModal }) => (
+    <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 text-green-400 flex items-center"><ElementIcon className="w-6 h-6 mr-2" /> 원소</h2>
+        <div className="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
+            {playerElement ? (
+                <div className="flex items-center gap-3">
+                    {React.createElement(ELEMENT_TYPES[playerElement].icon, { className: 'h-10 w-10' })}
+                    <span className="text-xl font-bold">{ELEMENT_TYPES[playerElement].name}</span>
+                </div>
+            ) : (
+                <span className="text-gray-400">원소를 선택하세요</span>
+            )}
+            <button onClick={onOpenModal} className="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-md transition-colors">변경</button>
+        </div>
+    </div>
+);
+
+const EquippedArtifactsPanel = ({ equipped, onSlotClick }) => (
+    <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold mb-4 text-green-400 flex items-center"><ArtifactIcon className="w-6 h-6 mr-2" /> 유물</h2>
+        <div className="grid grid-cols-3 gap-2">
+            {[0, 1, 2].map(index => {
+                const artifactId = equipped[index];
+                const artifact = artifactId ? ARTIFACTS.find(a => a.id === artifactId) : null;
+                const tooltipText = artifact ? `${artifact.name}: ${artifact.description}` : "비어있는 유물 슬롯입니다. 오른쪽 '유물' 탭에서 장착할 수 있습니다.";
+                
+                return (
+                    <div key={index} onClick={onSlotClick} className="tooltip">
+                        <div className={`aspect-square flex items-center justify-center p-1 border-2 rounded-md cursor-pointer hover:bg-gray-700 transition-colors ${artifact ? 'border-yellow-400 bg-gray-800' : 'border-gray-600 bg-gray-700'}`}>
+                            {artifact ? <artifact.icon className="h-8 w-8 text-yellow-400" /> : <span className="text-gray-500 text-3xl font-bold">?</span>}
+                        </div>
+                        <span className="tooltiptext">{tooltipText}</span>
+                    </div>
+                );
+            })}
+        </div>
+    </div>
+);
 
 const MonsterDisplay = ({ monster, onClick, damagePopups, treasureGolem }) => {
     const MonsterIcon = monster.Icon;
     const isTreasureGolem = treasureGolem.isActive;
+    const ElementInfo = monster.element ? ELEMENT_TYPES[monster.element] : null;
 
     return (
         <div className="transition-transform duration-100">
-            <h2 className={`text-3xl font-bold text-center mb-2 ${monster.isBoss ? 'text-red-400' : ''} ${isTreasureGolem ? 'text-yellow-400' : ''}`}>
-                {monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level})
+             <h2 className={`text-3xl font-bold text-center mb-2 flex items-center justify-center gap-2 ${monster.isBoss ? 'text-red-400' : ''} ${isTreasureGolem ? 'text-yellow-400' : ''}`}>
+                {ElementInfo && React.createElement(ElementInfo.icon, { className: 'h-8 w-8' })}
+                <span>{monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level})</span>
             </h2>
             {isTreasureGolem && <p className="text-center text-2xl font-bold text-yellow-300 mb-2">남은 시간: {treasureGolem.timer}초</p>}
             <div className={`w-full bg-gray-700 rounded-full h-6 mb-2 border-2 ${monster.isBoss ? 'border-red-400' : 'border-gray-600'}`}>
@@ -489,7 +554,7 @@ const MonsterDisplay = ({ monster, onClick, damagePopups, treasureGolem }) => {
                             ${popup.type === 'crit' ? 'text-yellow-200 animate-damage-popup-crit' : ''}
                          `}
                          style={{ left: `${popup.x}%`, top: `${popup.y}%` }}>
-                        {formatNumber(popup.damage)}
+                        {popup.prefix}{formatNumber(popup.damage)}
                     </div>
                 ))}
             </div>
@@ -537,6 +602,16 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
                 </button>
                  <span className="tooltiptext"> <p className="font-bold">보스 데미지 증가</p> <p className="text-sm text-gray-300">보스 몬스터에게 주는 모든 피해량이 증가합니다.</p> <p className="text-sm text-red-300 mt-2">현재: +{Math.round(abilityStats.bossDamageBonus)}%</p> </span>
             </div>
+            <div className="tooltip w-full">
+                <button onClick={handlers.onUpgradeFinalDamage} disabled={playerCoins < upgrades.finalDamageUpgradeCost} className="w-full bg-slate-700 hover:bg-slate-600 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    최종 데미지 (+1%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.finalDamageUpgradeCost)}
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">최종 데미지 증가</p>
+                    <p className="text-sm text-gray-300">모든 데미지 계산이 끝난 후 추가로 적용되는 강력한 증폭 효과입니다.</p>
+                    <p className="text-sm text-slate-300 mt-2">현재: +{Math.round(abilityStats.finalDamageBonus)}%</p>
+                </span>
+            </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">보조 능력</h3>
@@ -575,6 +650,16 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
                 </button>
                 <span className="tooltiptext"> <p className="font-bold">가속 (쿨타임 감소)</p> <p className="text-sm text-gray-300">스킬 재사용 대기시간을 줄입니다.</p> <p className="text-sm text-teal-300 mt-2">현재: 쿨타임 -{Math.round(abilityStats.haste)}%</p> </span>
             </div>
+            <div className="tooltip w-full">
+                <button onClick={handlers.onUpgradeSkillDuration} disabled={playerCoins < upgrades.skillDurationUpgradeCost} className="w-full bg-lime-600 hover:bg-lime-700 disabled:bg-gray-600 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    스킬 지속시간 (+2%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.skillDurationUpgradeCost)}
+                </button>
+                <span className="tooltiptext">
+                    <p className="font-bold">스킬 지속시간 증가</p>
+                    <p className="text-sm text-gray-300">버프 및 디버프 스킬의 지속시간을 늘립니다.</p>
+                    <p className="text-sm text-lime-300 mt-2">현재: +{Math.round(abilityStats.skillDurationBonus)}%</p>
+                </span>
+            </div>
         </div>
 
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">특별</h3>
@@ -599,7 +684,7 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
     </div>
 );
 
-const InventoryPanel = ({ inventory, onSelectItem, isSellMode, onToggleSellMode, sellList, onToggleSellItem, onBulkSell }) => {
+const InventoryPanel = ({ inventory, onSelectItem, isSellMode, onToggleSellMode, sellList, onToggleSellItem, onBulkSell, onBulkSellByRarity }) => {
     const [filter, setFilter] = useState('ALL');
 
     const filteredInventory = useMemo(() => {
@@ -637,7 +722,7 @@ const InventoryPanel = ({ inventory, onSelectItem, isSellMode, onToggleSellMode,
                 <FilterButton type="GLOVES"><GlovesIcon className="w-5 h-5 mx-auto"/></FilterButton>
                 <FilterButton type="BOOTS"><BootsIcon className="w-5 h-5 mx-auto"/></FilterButton>
             </div>
-            <div className="grid grid-cols-4 gap-2 h-[380px] overflow-y-auto bg-gray-900/50 p-2 rounded">
+            <div className="grid grid-cols-4 gap-2 h-[300px] overflow-y-auto bg-gray-900/50 p-2 rounded">
                 {filteredInventory.map(item => {
                     const rarityInfo = RARITIES[item.rarity];
                     const IconComponent = EQUIPMENT_TYPES[item.type].icon;
@@ -648,13 +733,14 @@ const InventoryPanel = ({ inventory, onSelectItem, isSellMode, onToggleSellMode,
                                  <IconComponent className={`h-8 w-8 ${rarityInfo.textClass}`} />
                                  {item.level > 0 && <span className="absolute bottom-0 right-0 text-xs bg-gray-900 px-1 rounded-sm">+{item.level}</span>}
                                  {isSelected && <div className="absolute inset-0 bg-red-500/50 flex items-center justify-center"><CoinIcon className="w-6 h-6 text-white"/></div>}
+                                 {item.locked && <LockIcon className="absolute top-1 left-1 h-4 w-4 text-yellow-400" />}
                             </div>
                             <EquipmentTooltip item={item} />
                         </div>
                     );
                 })}
             </div>
-            {isSellMode && (
+            {isSellMode ? (
                 <div className="mt-2 p-2 bg-gray-900/50 rounded">
                     <p className="text-center mb-2 text-sm text-gray-300">{sellList.size}개 아이템 선택됨</p>
                     <button
@@ -664,6 +750,15 @@ const InventoryPanel = ({ inventory, onSelectItem, isSellMode, onToggleSellMode,
                     >
                         선택 아이템 판매
                     </button>
+                </div>
+            ) : (
+                <div className="mt-2 p-2 bg-gray-900/50 rounded text-center">
+                    <p className="text-sm text-gray-400 mb-2">일괄 판매</p>
+                    <div className="grid grid-cols-3 gap-2">
+                        <button onClick={() => onBulkSellByRarity('COMMON')} className="bg-gray-600 hover:bg-gray-500 text-xs py-2 px-1 rounded transition-colors">일반 등급</button>
+                        <button onClick={() => onBulkSellByRarity('UNCOMMON')} className="bg-green-800 hover:bg-green-700 text-xs py-2 px-1 rounded transition-colors">고급 등급</button>
+                        <button onClick={() => onBulkSellByRarity('RARE')} className="bg-blue-800 hover:bg-blue-700 text-xs py-2 px-1 rounded transition-colors">희귀 등급</button>
+                    </div>
                 </div>
             )}
         </div>
@@ -729,7 +824,7 @@ const ForgePanel = ({ selectedItem, handlers, playerCoins }) => {
         }
         const nextRarityKey = RARITY_ORDER[currentRarityIndex + 1];
         
-        const upgradeCost = Math.ceil(Math.pow(10, currentRarityIndex + 2) * (selectedItem.baseLevel || 1) * rarityInfo.statMultiplier);
+        const upgradeCost = Math.ceil(Math.pow(8, currentRarityIndex + 1.5) * (selectedItem.baseLevel || 1) * rarityInfo.statMultiplier * 10);
         const canUpgrade = playerCoins >= upgradeCost;
 
         return (
@@ -866,13 +961,13 @@ const ArtifactPanel = ({ owned, equipped, onEquip, onUnequip, onGacha, playerCoi
     );
 };
 
-const SlotMachineGame = ({ playerCoins, playerLevel, onSpin }) => {
+const SlotMachineGame = ({ playerCoins, onSpin }) => {
     const [reels, setReels] = useState(['🍀', '🍀', '🍀']);
     const [spinning, setSpinning] = useState(false);
     const [result, setResult] = useState(null);
     const spinIntervalRef = useRef(null);
     const symbols = useMemo(() => ['💰', '⚔️', '💧', '💎', '🍀'], []);
-    const cost = 100 + playerLevel * 50;
+    const cost = 100;
     
     const handleSpin = () => {
         if (playerCoins < cost || spinning) return;
@@ -926,9 +1021,11 @@ const SlotMachineGame = ({ playerCoins, playerLevel, onSpin }) => {
     );
 };
 
-const WhackASlimeGame = ({ playerCoins, playerLevel, onStart, onEnd }) => {
+const WhackASlimeGame = ({ playerCoins, onStart, onEnd }) => {
     const [gameState, setGameState] = useState({ status: 'idle', score: 0, timeLeft: 15, holes: Array(9).fill(false) });
-    const cost = 200 + playerLevel * 100;
+    const cost = 100;
+    const gameTimerRef = useRef(null);
+    const slimeTimerRef = useRef(null);
 
     const handleStart = () => {
         if (playerCoins >= cost && onStart(cost)) {
@@ -942,46 +1039,47 @@ const WhackASlimeGame = ({ playerCoins, playerLevel, onStart, onEnd }) => {
     };
 
     useEffect(() => {
-        if (gameState.status !== 'playing') return;
+        if (gameState.status === 'playing') {
+            gameTimerRef.current = setInterval(() => {
+                setGameState(prev => {
+                    if (prev.timeLeft <= 1) {
+                        clearInterval(gameTimerRef.current);
+                        clearInterval(slimeTimerRef.current);
+                        onEnd(100 + prev.score * 10);
+                        return { ...prev, status: 'ended', timeLeft: 0 };
+                    }
+                    return { ...prev, timeLeft: prev.timeLeft - 1 };
+                });
+            }, 1000);
 
-        const timerId = setInterval(() => {
-            setGameState(prev => {
-                if (prev.status !== 'playing') return prev;
-                const newTime = prev.timeLeft - 1;
-                if (newTime <= 0) {
-                    onEnd(prev.score * playerLevel * 5); // Reward calculation
-                    return { ...prev, status: 'ended', timeLeft: 0 };
-                }
-                return { ...prev, timeLeft: newTime };
-            });
-        }, 1000);
-
-        const slimeId = setInterval(() => {
-            setGameState(prev => {
-                if (prev.status !== 'playing') return prev;
-                const newHoles = [...prev.holes];
-                const availableHoles = newHoles.map((h, i) => !h ? i : -1).filter(i => i !== -1);
-                if (availableHoles.length > 0) {
-                    const randomIndex = availableHoles[Math.floor(Math.random() * availableHoles.length)];
-                    newHoles[randomIndex] = true;
-                    setTimeout(() => {
-                        setGameState(p => {
-                            if (p.status !== 'playing') return p;
-                            const latestHoles = [...p.holes];
-                            latestHoles[randomIndex] = false;
-                            return {...p, holes: latestHoles};
-                        });
-                    }, 700 + Math.random() * 400);
-                }
-                return { ...prev, holes: newHoles };
-            });
-        }, 450);
+            slimeTimerRef.current = setInterval(() => {
+                setGameState(prev => {
+                    if (prev.status !== 'playing') return prev;
+                    const newHoles = [...prev.holes];
+                    const availableHoles = newHoles.map((h, i) => !h ? i : -1).filter(i => i !== -1);
+                    if (availableHoles.length > 0) {
+                        const randomIndex = availableHoles[Math.floor(Math.random() * availableHoles.length)];
+                        newHoles[randomIndex] = true;
+                        setTimeout(() => {
+                            setGameState(p => {
+                                if (p.status !== 'playing') return p;
+                                const latestHoles = [...p.holes];
+                                latestHoles[randomIndex] = false;
+                                return {...p, holes: latestHoles};
+                            });
+                        }, 700 + Math.random() * 400);
+                    }
+                    return { ...prev, holes: newHoles };
+                });
+            }, 450);
+        }
 
         return () => {
-            clearInterval(timerId);
-            clearInterval(slimeId);
+            clearInterval(gameTimerRef.current);
+            clearInterval(slimeTimerRef.current);
         };
-    }, [gameState.status, playerLevel, onEnd]);
+    }, [gameState.status, onEnd]);
+
 
     const handleWhack = (index) => {
         if (gameState.holes[index]) {
@@ -1026,8 +1124,141 @@ const WhackASlimeGame = ({ playerCoins, playerLevel, onStart, onEnd }) => {
     );
 };
 
+const SlimeMatcherGame = ({ playerCoins, onStart, onEnd }) => {
+    const GRID_SIZE = 6;
+    const TIME_LIMIT = 20;
+    const TARGET_SCORE = 50;
+    const SLIME_TYPES = useMemo(() => [
+        { Icon: GreenSlimeIcon, color: 'green' },
+        { Icon: RedSlimeIcon, color: 'red' },
+        { Icon: BlueSlimeIcon, color: 'blue' }
+    ], []);
 
-const MinigamePanel = ({ playerCoins, playerLevel, onSlotSpin, onSlimeWhackStart, onSlimeWhackEnd }) => {
+    const createGrid = () => Array.from({ length: GRID_SIZE }, () => 
+        Array.from({ length: GRID_SIZE }, () => SLIME_TYPES[Math.floor(Math.random() * SLIME_TYPES.length)])
+    );
+
+    const [gameState, setGameState] = useState({ status: 'idle', score: 0, timeLeft: TIME_LIMIT, grid: [] });
+    const cost = 100;
+
+    const handleStart = () => {
+        if (playerCoins >= cost && onStart(cost)) {
+            setGameState({ status: 'playing', score: 0, timeLeft: TIME_LIMIT, grid: createGrid() });
+        }
+    };
+
+    useEffect(() => {
+        if (gameState.status !== 'playing') return;
+        const timerId = setInterval(() => {
+            setGameState(prev => {
+                if (prev.status !== 'playing') return prev;
+                const newTime = prev.timeLeft - 1;
+                if (newTime <= 0) {
+                    const reward = prev.score >= TARGET_SCORE ? 300 : 0;
+                    onEnd(reward, prev.score);
+                    return { ...prev, status: 'ended' };
+                }
+                return { ...prev, timeLeft: newTime };
+            });
+        }, 1000);
+        return () => clearInterval(timerId);
+    }, [gameState.status, onEnd]);
+
+    const handleSlimeClick = (r, c) => {
+        if (gameState.status !== 'playing') return;
+
+        const grid = gameState.grid.map(row => [...row]);
+        const slimeType = grid[r][c];
+        if (!slimeType) return;
+        
+        const matches = [];
+        const q = [[r, c]];
+        const visited = Array(GRID_SIZE).fill(0).map(() => Array(GRID_SIZE).fill(false));
+        visited[r][c] = true;
+        
+        while(q.length > 0) {
+            const [row, col] = q.shift();
+            matches.push([row, col]);
+            [[0,1], [0,-1], [1,0], [-1,0]].forEach(([dr, dc]) => {
+                const nr = row + dr, nc = col + dc;
+                if(nr >= 0 && nr < GRID_SIZE && nc >= 0 && nc < GRID_SIZE && !visited[nr][nc] && grid[nr][nc]?.color === slimeType.color) {
+                    visited[nr][nc] = true;
+                    q.push([nr, nc]);
+                }
+            });
+        }
+        
+        if (matches.length >= 3) {
+            matches.forEach(([row, col]) => grid[row][col] = null);
+
+            for (let col = 0; col < GRID_SIZE; col++) {
+                let emptyRow = GRID_SIZE - 1;
+                for (let row = GRID_SIZE - 1; row >= 0; row--) {
+                    if (grid[row][col]) {
+                        [grid[emptyRow][col], grid[row][col]] = [grid[row][col], grid[emptyRow][col]];
+                        emptyRow--;
+                    }
+                }
+            }
+
+            for(let row = 0; row < GRID_SIZE; row++) {
+                for(let col = 0; col < GRID_SIZE; col++) {
+                    if(grid[row][col] === null) {
+                        grid[row][col] = SLIME_TYPES[Math.floor(Math.random() * SLIME_TYPES.length)];
+                    }
+                }
+            }
+            
+            const newScore = gameState.score + matches.length;
+            if (newScore >= TARGET_SCORE) {
+                onEnd(300 + cost, newScore); // Reward + cost back
+                setGameState(prev => ({ ...prev, status: 'ended', score: newScore, grid }));
+            } else {
+                setGameState(prev => ({...prev, grid, score: newScore}));
+            }
+        }
+    };
+    
+    if (gameState.status === 'idle' || gameState.status === 'ended') {
+        return (
+            <div className="bg-gray-900/50 p-4 rounded-lg text-center">
+                {gameState.status === 'ended' && (
+                    <p className="text-xl mb-4">
+                        게임 종료! 최종 점수: <span className={`font-bold ${gameState.score >= TARGET_SCORE ? 'text-green-400' : 'text-red-400'}`}>{gameState.score}</span>
+                        {gameState.score >= TARGET_SCORE ? ' (성공!)' : ' (실패)'}
+                    </p>
+                )}
+                <p className="mb-1">{TIME_LIMIT}초 안에 {TARGET_SCORE}점을 달성하세요!</p>
+                <p className="text-sm text-gray-400 mb-4">같은 색 슬라임을 3개 이상 연결하여 터트리세요.</p>
+                <button onClick={handleStart} disabled={playerCoins < cost} className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-bold py-3 px-4 rounded">
+                    시작하기 ({formatNumber(cost)} 골드)
+                </button>
+            </div>
+        );
+    }
+    
+    return (
+        <div className="bg-gray-900/50 p-4 rounded-lg">
+            <div className="flex justify-between text-xl font-bold mb-4">
+                <span>점수: {gameState.score} / {TARGET_SCORE}</span>
+                <span>시간: {gameState.timeLeft}</span>
+            </div>
+            <div className="grid grid-cols-6 gap-1 bg-gray-700 p-1 rounded">
+                {gameState.grid.map((row, r) => row.map((slime, c) => {
+                    const { Icon } = slime;
+                    return (
+                        <div key={`${r}-${c}`} onClick={() => handleSlimeClick(r,c)} className="aspect-square bg-gray-800 rounded flex items-center justify-center cursor-pointer hover:bg-gray-600">
+                             <Icon className="w-10 h-10" />
+                        </div>
+                    );
+                }))}
+            </div>
+        </div>
+    );
+};
+
+
+const MinigamePanel = ({ playerCoins, onSlotSpin, onSlimeWhackStart, onSlimeWhackEnd, onSlimeMatcherStart, onSlimeMatcherEnd }) => {
     const [activeGame, setActiveGame] = useState('slots');
     return (
         <div>
@@ -1035,9 +1266,11 @@ const MinigamePanel = ({ playerCoins, playerLevel, onSlotSpin, onSlimeWhackStart
              <div className="flex border-b border-gray-700 mb-4 text-sm">
                 <button onClick={() => setActiveGame('slots')} className={`flex-1 py-2 text-center font-semibold ${activeGame === 'slots' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>행운의 슬롯</button>
                 <button onClick={() => setActiveGame('whack')} className={`flex-1 py-2 text-center font-semibold ${activeGame === 'whack' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>두더지 슬라임</button>
+                <button onClick={() => setActiveGame('matcher')} className={`flex-1 py-2 text-center font-semibold ${activeGame === 'matcher' ? 'text-green-400 border-b-2 border-green-400' : 'text-gray-400'}`}>슬라임 매칭</button>
             </div>
-            {activeGame === 'slots' && <SlotMachineGame playerCoins={playerCoins} playerLevel={playerLevel} onSpin={onSlotSpin} />}
-            {activeGame === 'whack' && <WhackASlimeGame playerCoins={playerCoins} playerLevel={playerLevel} onStart={onSlimeWhackStart} onEnd={onSlimeWhackEnd} />}
+            {activeGame === 'slots' && <SlotMachineGame playerCoins={playerCoins} onSpin={onSlotSpin} />}
+            {activeGame === 'whack' && <WhackASlimeGame playerCoins={playerCoins} onStart={onSlimeWhackStart} onEnd={onSlimeWhackEnd} />}
+            {activeGame === 'matcher' && <SlimeMatcherGame playerCoins={playerCoins} onStart={onSlimeMatcherStart} onEnd={onSlimeMatcherEnd} />}
         </div>
     );
 };
@@ -1069,11 +1302,12 @@ const RightPanel = ({ activeTab, setActiveTab, selectedForgeItem, ...props }) =>
                 sellList={props.sellList}
                 onToggleSellItem={props.handlers.onToggleSellItem}
                 onBulkSell={props.handlers.onBulkSell}
+                onBulkSellByRarity={props.handlers.onBulkSellByRarity}
                  />}
             {activeTab === 'forge' && <ForgePanel selectedItem={selectedForgeItem} handlers={forgeHandlers} playerCoins={props.playerCoins} />}
             {activeTab === 'missions' && <MissionsPanel missions={props.missions} onClaim={props.handlers.onClaimMission} />}
             {activeTab === 'artifacts' && <ArtifactPanel owned={props.ownedArtifacts} equipped={props.equippedArtifacts} onEquip={props.handlers.onEquipArtifact} onUnequip={props.handlers.onUnequipArtifact} onGacha={props.handlers.onArtifactGacha} playerCoins={props.playerCoins} />}
-            {activeTab === 'minigame' && <MinigamePanel playerCoins={props.playerCoins} onSlotSpin={props.handlers.onSlotSpin} onSlimeWhackStart={props.handlers.onSlimeWhackStart} onSlimeWhackEnd={props.handlers.onSlimeWhackEnd} playerLevel={props.playerStats.level} />}
+            {activeTab === 'minigame' && <MinigamePanel playerCoins={props.playerCoins} onSlotSpin={props.handlers.onSlotSpin} onSlimeWhackStart={props.handlers.onSlimeWhackStart} onSlimeWhackEnd={props.handlers.onSlimeWhackEnd} onSlimeMatcherStart={props.handlers.onSlimeMatcherStart} onSlimeMatcherEnd={props.handlers.onSlimeMatcherEnd} />}
             </div>
         </div>
     );
@@ -1213,7 +1447,7 @@ const JobSelectionModal = ({ onSelect, onClose }) => {
     );
 };
 
-const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSell, onSelectForge, onClose }) => {
+const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSell, onSelectForge, onToggleLock, onClose }) => {
     if (!item) return null;
 
     const renderItemStats = (itemToRender, title) => {
@@ -1251,10 +1485,11 @@ const InventoryItemDetailModal = ({ item, currentEquipped, onEquip, onSell, onSe
                     {renderItemStats(item, "선택한 아이템")}
                     {renderItemStats(currentEquipped, "현재 장착")}
                 </div>
-                <div className="flex justify-center gap-4">
-                    <button onClick={() => { onEquip(item); onClose(); }} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg">장착</button>
-                    <button onClick={() => { onSell(item); onClose(); }} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg">판매</button>
-                    <button onClick={() => { onSelectForge(item); onClose(); }} className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg text-lg">대장간</button>
+                <div className="flex justify-center gap-2 flex-wrap">
+                    <button onClick={() => { onEquip(item); onClose(); }} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-5 rounded-lg text-lg">장착</button>
+                    <button onClick={() => { onToggleLock(item); }} className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-5 rounded-lg text-lg">{item.locked ? '잠금 해제' : '잠금'}</button>
+                    <button onClick={() => { onSell(item); onClose(); }} disabled={item.locked} className="bg-red-600 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-3 px-5 rounded-lg text-lg">판매</button>
+                    <button onClick={() => { onSelectForge(item); onClose(); }} className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-5 rounded-lg text-lg">대장간</button>
                 </div>
             </div>
         </div>
@@ -1332,10 +1567,54 @@ const OfflineProgressModal = ({ progress, onClaim }) => {
     );
 };
 
+const ElementSelectionModal = ({ currentElement, onSelect, onClose }) => {
+    const elements = [
+        { key: 'FIRE', passive: '+15% 스킬 데미지', effect: '10% 확률로 3초간 화상(초당 자동공격력의 20% 피해) 부여' },
+        { key: 'WATER', passive: '+15% 골드 & 경험치 획득', effect: '5% 확률로 클릭 데미지의 200% 추가 피해' },
+        { key: 'EARTH', passive: '+10% 크리티컬 데미지', effect: '크리티컬 시 20% 확률로 0.5초 스턴 (스턴 중 모든 공격은 크리티컬)' },
+        { key: 'WIND', passive: '+5% 공속 & 크리 확률', effect: '공격마다 공속 1% 증가 (최대 20 중첩), 5초 미공격 시 초기화' },
+    ];
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+            <div className="bg-gray-900 p-8 rounded-lg shadow-2xl w-full max-w-4xl border border-gray-700 text-center relative">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+                <h2 className="text-4xl font-bold mb-4 text-green-400">원소 선택</h2>
+                <p className="text-gray-400 mb-8">전투에 적용할 원소 친화력을 선택하세요.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {elements.map(({ key, passive, effect }) => {
+                        const elementInfo = ELEMENT_TYPES[key];
+                        const isCurrent = currentElement === key;
+                        return (
+                            <div key={key} className={`bg-gray-800 p-6 rounded-lg border-2 ${isCurrent ? 'border-green-500' : 'border-gray-700 hover:border-green-400'} transition-all flex flex-col`}>
+                                <div className="flex items-center gap-3 mb-3">
+                                    {React.createElement(elementInfo.icon, { className: 'w-10 h-10' })}
+                                    <h3 className="text-2xl font-bold text-white">{elementInfo.name}</h3>
+                                </div>
+                                <div className="text-left space-y-2 text-sm flex-grow">
+                                    <p><strong className="text-yellow-400">지속 효과:</strong> {passive}</p>
+                                    <p><strong className="text-orange-400">공격 효과:</strong> {effect}</p>
+                                </div>
+                                <button
+                                    onClick={() => onSelect(key)}
+                                    disabled={isCurrent}
+                                    className={`mt-6 w-full text-white font-bold py-3 px-6 rounded-lg text-lg ${isCurrent ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                                >
+                                    {isCurrent ? '현재 원소' : '선택'}
+                                </button>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // --- DEFAULT STATE ---
 const getDefaultState = () => ({
     difficulty: null,
     playerClass: null,
+    playerElement: 'FIRE',
     playerStats: {
         playerName: '용사',
         level: 1,
@@ -1356,6 +1635,7 @@ const getDefaultState = () => ({
         hp: MONSTER_HP_BASE,
         maxHp: MONSTER_HP_BASE,
         isBoss: false,
+        element: 'FIRE',
     },
     upgrades: {
         clickUpgradeCost: CLICK_UPGRADE_COST_BASE,
@@ -1372,6 +1652,8 @@ const getDefaultState = () => ({
         luckUpgradeCost: LUCK_UPGRADE_COST_BASE,
         bossDamageUpgradeCost: BOSS_DAMAGE_UPGRADE_COST_BASE,
         artifactPowerUpgradeCost: ARTIFACT_POWER_UPGRADE_COST_BASE,
+        finalDamageUpgradeCost: FINAL_DAMAGE_UPGRADE_COST_BASE,
+        skillDurationUpgradeCost: SKILL_DURATION_UPGRADE_COST_BASE,
     },
     equipment: {
         weapon: null, armor: null, amulet: null, helmet: null, gloves: null, boots: null
@@ -1384,6 +1666,8 @@ const getDefaultState = () => ({
         skillDamageBonus: 0,
         bossDamageBonus: 0,
         artifactPowerBonus: 0,
+        finalDamageBonus: 0,
+        skillDurationBonus: 0,
     },
     liberationCount: 0,
     rebirthCount: 0,
@@ -1411,6 +1695,13 @@ const App = () => {
         if (!saved) return getDefaultState().playerClass;
         try { return JSON.parse(saved).playerClass || getDefaultState().playerClass; }
         catch (e) { return getDefaultState().playerClass; }
+    });
+
+    const [playerElement, setPlayerElement] = useState(() => {
+        const saved = localStorage.getItem(SAVED_GAME_KEY);
+        if (!saved) return getDefaultState().playerElement;
+        try { return JSON.parse(saved).playerElement || getDefaultState().playerElement; }
+        catch(e) { return getDefaultState().playerElement; }
     });
 
     const [playerStats, setPlayerStats] = useState(() => {
@@ -1519,6 +1810,7 @@ const App = () => {
     const [isJobSelectionOpen, setIsJobSelectionOpen] = useState(false);
     const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
     const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
+    const [isElementModalOpen, setIsElementModalOpen] = useState(false);
     const [isSellMode, setIsSellMode] = useState(false);
     const [sellList, setSellList] = useState(new Set());
     const [offlineProgress, setOfflineProgress] = useState(null);
@@ -1584,9 +1876,22 @@ const App = () => {
         return bonuses;
     }, [equippedArtifacts, abilityStats.artifactPowerBonus]);
 
+    const elementalBonuses = useMemo(() => {
+        const bonuses = { skillDamage: 0, goldGain: 0, xpGain: 0, critDamage: 0, attackSpeed: 0, critChance: 0 };
+        if (!playerElement) return bonuses;
+
+        switch(playerElement) {
+            case 'FIRE': bonuses.skillDamage = 15; break;
+            case 'WATER': bonuses.goldGain = 15; bonuses.xpGain = 15; break;
+            case 'EARTH': bonuses.critDamage = 10; break;
+            case 'WIND': bonuses.attackSpeed = 5; bonuses.critChance = 5; break;
+        }
+        return bonuses;
+    }, [playerElement]);
+
     const finalAbilityStats = useMemo(() => {
         let haste = abilityStats.haste;
-        let skillDamage = abilityStats.skillDamageBonus;
+        let skillDamage = abilityStats.skillDamageBonus + elementalBonuses.skillDamage;
         if (playerClass === 'MAGE') {
             haste *= 1.25;
             skillDamage *= (1 + JOBS.MAGE.bonuses.skillEffect);
@@ -1609,14 +1914,14 @@ const App = () => {
         return {
             ...abilityStats,
             luck: playerStats.luck,
-            goldGainBonus: abilityStats.goldGainBonus + rebirthBonus + artifactBonuses.goldGain + goldBonusFromItems,
-            xpGainBonus: abilityStats.xpGainBonus + rebirthBonus + artifactBonuses.xpGain + xpBonusFromItems,
+            goldGainBonus: abilityStats.goldGainBonus + rebirthBonus + artifactBonuses.goldGain + goldBonusFromItems + elementalBonuses.goldGain,
+            xpGainBonus: abilityStats.xpGainBonus + rebirthBonus + artifactBonuses.xpGain + xpBonusFromItems + elementalBonuses.xpGain,
             bossDamageBonus: abilityStats.bossDamageBonus + rebirthBonus + artifactBonuses.bossDamage,
             haste: haste + artifactBonuses.haste + hasteFromItems,
             skillDamageBonus: skillDamage,
             activeSkillCooldown: BASE_SKILL_COOLDOWN * (1 - (haste + artifactBonuses.haste + hasteFromItems) / 100),
         }
-    }, [abilityStats, playerClass, rebirthCount, artifactBonuses, equipment, playerStats.luck]);
+    }, [abilityStats, playerClass, rebirthCount, artifactBonuses, equipment, playerStats.luck, elementalBonuses]);
 
     const finalStats = useMemo(() => {
         let combined = { ...playerStats };
@@ -1645,10 +1950,10 @@ const App = () => {
         combined.clickDamage *= rebirthMultiplier;
         combined.autoAttackDamage *= rebirthMultiplier;
 
-        combined.critChance += artifactBonuses.critChance;
-        combined.critDamage += artifactBonuses.critDamage;
+        combined.critChance += artifactBonuses.critChance + elementalBonuses.critChance;
+        combined.critDamage += artifactBonuses.critDamage + elementalBonuses.critDamage;
         combined.clickDamage *= (1 + artifactBonuses.clickDamageMult);
-        combined.attackSpeed = playerStats.attackSpeed * (1 + artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems / 100);
+        combined.attackSpeed = playerStats.attackSpeed * (1 + (artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems + elementalBonuses.attackSpeed) / 100);
 
         if (frenzyActive) {
             combined.clickDamage *= 2;
@@ -1658,14 +1963,18 @@ const App = () => {
             combined.critChance = Math.min(100, combined.critChance + 25);
         }
 
+        const finalDamageMultiplier = 1 + (finalAbilityStats.finalDamageBonus / 100);
+        combined.clickDamage *= finalDamageMultiplier;
+        combined.autoAttackDamage *= finalDamageMultiplier;
+
         return combined;
-    }, [playerStats, equipment, playerClass, frenzyActive, arrowRainActive, rebirthCount, artifactBonuses]);
+    }, [playerStats, equipment, playerClass, frenzyActive, arrowRainActive, rebirthCount, artifactBonuses, finalAbilityStats.finalDamageBonus, elementalBonuses]);
     
     const saveGame = useCallback(() => {
         try {
             const serializableMonsterStats = { ...monsterStats, Icon: undefined };
             const gameStateToSave = {
-                difficulty, playerClass, playerStats, monsterStats: serializableMonsterStats,
+                difficulty, playerClass, playerElement, playerStats, monsterStats: serializableMonsterStats,
                 upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount,
                 inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts,
                 lastSaveTimestamp: Date.now()
@@ -1673,7 +1982,7 @@ const App = () => {
             localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(gameStateToSave));
             needsSave.current = false;
         } catch (error) { console.error("Could not save game state", error); }
-    }, [difficulty, playerClass, playerStats, monsterStats, upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount, inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts]);
+    }, [difficulty, playerClass, playerElement, playerStats, monsterStats, upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount, inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts]);
 
     useEffect(() => { if (needsSave.current) { saveGame(); } });
 
@@ -1813,6 +2122,13 @@ const App = () => {
         needsSave.current = true;
     };
 
+    const handleSelectElement = (elementKey) => {
+        addLog(`<strong style="color: ${ELEMENT_TYPES[elementKey].icon({}).props.className.match(/text-([^ ]+)/)[1]}">원소를 ${ELEMENT_TYPES[elementKey].name}(으)로 변경했습니다!</strong>`);
+        setPlayerElement(elementKey);
+        setIsElementModalOpen(false);
+        needsSave.current = true;
+    };
+
     const generateRandomItem = useCallback((monsterLevel) => {
         const luckFactor = 1 + (finalStats.luck / 200);
         const rarityRoll = Math.random() / luckFactor;
@@ -1831,6 +2147,7 @@ const App = () => {
             id: Date.now() + Math.random(), type: typeKey, rarity: rarityKey, name: `${rarity.name} ${EQUIPMENT_TYPES[typeKey].name}`,
             level: 0,
             baseLevel: monsterLevel,
+            locked: false,
             stats: {}
         };
         item.stats = calculateItemStats(item.baseLevel, item.rarity, item.type);
@@ -1886,9 +2203,12 @@ const App = () => {
         }
         
         const newMonsterLevel = monsterStats.level + (treasureGolem.isActive ? 0 : 1);
+        const elementKeys = Object.keys(ELEMENT_TYPES);
+        const randomElement = elementKeys[Math.floor(Math.random() * elementKeys.length)];
+
         if (Math.random() < TREASURE_GOLEM_SPAWN_CHANCE) {
             const hp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * 10 * difficultyMultipliers.monsterHp);
-            setMonsterStats({ ...SPECIAL_MONSTERS.TREASURE_GOLEM, level: newMonsterLevel, hp, maxHp: hp, isBoss: false });
+            setMonsterStats({ ...SPECIAL_MONSTERS.TREASURE_GOLEM, level: newMonsterLevel, hp, maxHp: hp, isBoss: false, element: randomElement });
             setTreasureGolem({ isActive: true, timer: TREASURE_GOLEM_TIMER });
         } else {
             let nextMonster;
@@ -1896,18 +2216,26 @@ const App = () => {
                 const bossIndex = Math.floor((newMonsterLevel / BOSS_LEVEL_INTERVAL - 1)) % BOSS_TYPES.length;
                 const bossData = BOSS_TYPES[bossIndex];
                 const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultipliers.monsterHp);
-                nextMonster = { name: bossData.name, Icon: bossData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: true };
+                nextMonster = { name: bossData.name, Icon: bossData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: true, element: randomElement };
             } else {
                 const availableMonsters = MONSTER_TYPES.filter(m => newMonsterLevel >= m.minLevel);
                 const monsterData = availableMonsters.length > 0 ? availableMonsters[Math.floor(Math.random() * availableMonsters.length)] : MONSTER_TYPES[0];
                 const newMonsterHp = Math.floor(MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newMonsterLevel - 1) * difficultyMultipliers.monsterHp);
-                nextMonster = { name: monsterData.name, Icon: monsterData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: false };
+                nextMonster = { name: monsterData.name, Icon: monsterData.Icon, level: newMonsterLevel, hp: newMonsterHp, maxHp: newMonsterHp, isBoss: false, element: randomElement };
             }
             setMonsterStats(nextMonster);
         }
         needsSave.current = true;
     }, [monsterStats, addLog, generateRandomItem, newItemDrop, finalAbilityStats, finalStats.luck, difficultyMultipliers, isAutoDropEnabled, updateMissionProgress, ownedArtifacts, treasureGolem.isActive]);
     
+    const getElementalMultiplier = useCallback(() => {
+        if (!playerElement || !monsterStats.element) return 1;
+        const relationship = ELEMENTAL_RELATIONSHIPS[playerElement];
+        if (relationship.weak === monsterStats.element) return ELEMENTAL_ADVANTAGE_MULTIPLIER;
+        if (relationship.strong === monsterStats.element) return ELEMENTAL_DISADVANTAGE_MULTIPLIER;
+        return 1;
+    }, [playerElement, monsterStats.element]);
+
     useEffect(() => {
         if (finalStats.autoAttackDamage <= 0) return;
         const interval = setInterval(() => {
@@ -1916,7 +2244,8 @@ const App = () => {
             const isCrit = Math.random() * 100 < finalStats.critChance;
             const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
             const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
-            const damageDealt = Math.floor(finalStats.autoAttackDamage * critMultiplier * bossMultiplier * debuffMultiplier);
+            const elementalMultiplier = getElementalMultiplier();
+            const damageDealt = Math.floor(finalStats.autoAttackDamage * critMultiplier * bossMultiplier * debuffMultiplier * elementalMultiplier);
 
             setMonsterStats(prev => {
                 const newHp = prev.hp - damageDealt;
@@ -1925,7 +2254,7 @@ const App = () => {
             });
         }, 1000 / finalStats.attackSpeed);
         return () => clearInterval(interval);
-    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats, difficulty, arcaneBlastDebuff, offlineProgress, treasureGolem.isActive]);
+    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats, difficulty, arcaneBlastDebuff, offlineProgress, treasureGolem.isActive, getElementalMultiplier]);
     
     useEffect(() => {
         if (activeSkillCooldown > 0) {
@@ -1949,8 +2278,8 @@ const App = () => {
         }
     }, [treasureGolem, addLog, monsterStats.level, difficultyMultipliers]);
     
-    const createDamagePopup = (damage, type = 'normal') => {
-        const newPopup = { id: Date.now() + Math.random(), damage, x: 40 + Math.random() * 20, y: 40 + Math.random() * 20, type };
+    const createDamagePopup = (damage, type = 'normal', prefix = '') => {
+        const newPopup = { id: Date.now() + Math.random(), damage, prefix, x: 40 + Math.random() * 20, y: 40 + Math.random() * 20, type };
         setDamagePopups(prev => [...prev, newPopup]);
         setTimeout(() => { setDamagePopups(prev => prev.filter(p => p.id !== newPopup.id)); }, 1000);
     };
@@ -1963,8 +2292,14 @@ const App = () => {
         
         const isCrit = Math.random() * 100 < finalStats.critChance;
         const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
-        const damageDealt = Math.floor(finalStats.clickDamage * critMultiplier * bossMultiplier * debuffMultiplier);
-        createDamagePopup(damageDealt, isCrit ? 'crit' : 'normal');
+        const elementalMultiplier = getElementalMultiplier();
+        const damageDealt = Math.floor(finalStats.clickDamage * critMultiplier * bossMultiplier * debuffMultiplier * elementalMultiplier);
+        
+        let prefix = '';
+        if (elementalMultiplier > 1) prefix = '⚡';
+        if (elementalMultiplier < 1) prefix = '🛡️';
+
+        createDamagePopup(damageDealt, isCrit ? 'crit' : 'normal', prefix);
         setMonsterStats(prev => {
             const newHp = prev.hp - damageDealt;
             if (newHp <= 0) { handleMonsterDefeat(); return { ...prev, hp: 0 }; }
@@ -2028,6 +2363,14 @@ const App = () => {
         setAbilityStats(prev => ({ ...prev, artifactPowerBonus: prev.artifactPowerBonus + 1 }));
         setUpgrades(prev => ({ ...prev, artifactPowerUpgradeCost: Math.floor(prev.artifactPowerUpgradeCost * ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER) }));
     });
+    const handleUpgradeFinalDamage = () => handleUpgrade(upgrades.finalDamageUpgradeCost, () => {
+        setAbilityStats(prev => ({ ...prev, finalDamageBonus: prev.finalDamageBonus + 1 }));
+        setUpgrades(prev => ({ ...prev, finalDamageUpgradeCost: Math.floor(prev.finalDamageUpgradeCost * FINAL_DAMAGE_UPGRADE_COST_MULTIPLIER) }));
+    });
+    const handleUpgradeSkillDuration = () => handleUpgrade(upgrades.skillDurationUpgradeCost, () => {
+        setAbilityStats(prev => ({ ...prev, skillDurationBonus: prev.skillDurationBonus + 2 }));
+        setUpgrades(prev => ({ ...prev, skillDurationUpgradeCost: Math.floor(prev.skillDurationUpgradeCost * SKILL_DURATION_UPGRADE_COST_MULTIPLIER) }));
+    });
 
     const handleActiveSkill = () => {
         if (activeSkillCooldown > 0 || newItemDrop || !playerClass) return;
@@ -2037,26 +2380,28 @@ const App = () => {
         const skillMultiplier = 1 + (finalAbilityStats.skillDamageBonus / 100);
         const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
         const debuffMultiplier = arcaneBlastDebuff ? 1.2 : 1;
+        const skillDurationMultiplier = 1 + (finalAbilityStats.skillDurationBonus / 100);
+        const elementalMultiplier = getElementalMultiplier();
 
         switch(playerClass) {
             case 'WARRIOR':
                 setFrenzyActive(true);
-                setTimeout(() => setFrenzyActive(false), 8000);
-                logMessage = `광란 발동! 8초간 공격이 강화됩니다!`;
+                setTimeout(() => setFrenzyActive(false), 8000 * skillDurationMultiplier);
+                logMessage = `광란 발동! ${8 * skillDurationMultiplier}초간 공격이 강화됩니다!`;
                 break;
             case 'ARCHER':
-                damageDealt = Math.floor(finalStats.clickDamage * 3 * skillMultiplier * bossMultiplier * debuffMultiplier);
+                damageDealt = Math.floor(finalStats.clickDamage * 3 * skillMultiplier * bossMultiplier * debuffMultiplier * elementalMultiplier);
                 createDamagePopup(damageDealt, 'skill');
                 setArrowRainActive(true);
-                setTimeout(() => setArrowRainActive(false), 5000);
-                logMessage = `화살비! 즉시 ${formatNumber(damageDealt)}의 피해를 주고 5초간 크리티컬 확률이 증가합니다!`;
+                setTimeout(() => setArrowRainActive(false), 5000 * skillDurationMultiplier);
+                logMessage = `화살비! 즉시 ${formatNumber(damageDealt)}의 피해를 주고 ${5 * skillDurationMultiplier}초간 크리티컬 확률이 증가합니다!`;
                 break;
             case 'MAGE':
-                damageDealt = Math.floor((finalStats.autoAttackDamage + finalStats.clickDamage) * 15 * skillMultiplier * bossMultiplier * debuffMultiplier);
+                damageDealt = Math.floor((finalStats.autoAttackDamage + finalStats.clickDamage) * 15 * skillMultiplier * bossMultiplier * debuffMultiplier * elementalMultiplier);
                 createDamagePopup(damageDealt, 'skill');
                 setArcaneBlastDebuff(true);
-                setTimeout(() => setArcaneBlastDebuff(false), 10000);
-                logMessage = `신비한 폭발! ${formatNumber(damageDealt)}의 피해를 주고 10초간 적을 약화시킵니다!`;
+                setTimeout(() => setArcaneBlastDebuff(false), 10000 * skillDurationMultiplier);
+                logMessage = `신비한 폭발! ${formatNumber(damageDealt)}의 피해를 주고 ${10 * skillDurationMultiplier}초간 적을 약화시킵니다!`;
                 break;
         }
 
@@ -2157,7 +2502,13 @@ const App = () => {
     };
     
     const handleSellItem = useCallback((itemToSell) => {
-        if (!itemToSell || !window.confirm(`[${itemToSell.name}] 아이템을 정말로 판매하시겠습니까?`)) return;
+        if (!itemToSell) return;
+
+        if(itemToSell.locked) {
+            addLog(`<strong class="text-red-400">[${itemToSell.name}] 아이템은 잠겨있어 판매할 수 없습니다.</strong>`);
+            return;
+        }
+        if (!window.confirm(`[${itemToSell.name}] 아이템을 정말로 판매하시겠습니까?`)) return;
 
         const rarityKey = itemToSell.rarity;
         const rarityInfo = RARITIES[rarityKey];
@@ -2185,6 +2536,10 @@ const App = () => {
         } else {
             setInventory(prev => prev.map(i => i.id === updatedItem.id ? updatedItem : i));
         }
+        // Also update selected inventory item if it's the one being changed
+        if (selectedInventoryItem && selectedInventoryItem.id === updatedItem.id) {
+            setSelectedInventoryItem(updatedItem);
+        }
     };
 
     const handleForgeItem = useCallback((itemToForge) => {
@@ -2203,14 +2558,14 @@ const App = () => {
             setSelectedForgeItem(updatedItem);
             addLog(`[${itemToForge.name}] 강화 성공! <strong class="${rarityInfo.textClass}">(+${updatedItem.level})</strong>`);
         });
-    }, [playerStats.coins, addLog, handleUpgrade]);
+    }, [playerStats.coins, addLog, handleUpgrade, selectedInventoryItem]);
     
     const handleUpgradeRarity = useCallback((item) => {
         const currentRarityIndex = RARITY_ORDER.indexOf(item.rarity);
         if(currentRarityIndex >= RARITY_ORDER.length - 1) return;
 
         const rarityInfo = RARITIES[item.rarity];
-        const cost = Math.ceil(Math.pow(10, currentRarityIndex + 2) * (item.baseLevel || 1) * rarityInfo.statMultiplier);
+        const cost = Math.ceil(Math.pow(8, currentRarityIndex + 1.5) * (item.baseLevel || 1) * rarityInfo.statMultiplier * 10);
 
         if(playerStats.coins < cost) {
             addLog(`<strong class="text-red-400">골드가 부족합니다!</strong>`);
@@ -2230,7 +2585,7 @@ const App = () => {
         setSelectedForgeItem(updatedItem);
         addLog(`[${item.name}] 등급 승급! <strong class="${RARITIES[nextRarityKey].textClass}">[${RARITIES[nextRarityKey].name}]</strong> 달성!`);
         needsSave.current = true;
-    }, [playerStats.coins, addLog]);
+    }, [playerStats.coins, addLog, selectedInventoryItem]);
 
     const handleReforgeItem = useCallback((item) => {
         const rarityInfo = RARITIES[item.rarity];
@@ -2251,7 +2606,14 @@ const App = () => {
         setSelectedForgeItem(updatedItem);
         addLog(`[${item.name}] 능력치 재련 완료!`);
         needsSave.current = true;
-    }, [playerStats.coins, addLog]);
+    }, [playerStats.coins, addLog, selectedInventoryItem]);
+
+    const handleToggleLockItem = (itemToToggle) => {
+        const updatedItem = { ...itemToToggle, locked: !itemToToggle.locked };
+        updateItemInState(updatedItem);
+        addLog(`[${itemToToggle.name}] 아이템을 ${updatedItem.locked ? '잠금' : '잠금 해제'}했습니다.`);
+        needsSave.current = true;
+    };
 
     const handleSelectForgeItem = (item) => {
         if (item) {
@@ -2277,6 +2639,10 @@ const App = () => {
     };
 
     const handleToggleSellItem = (item) => {
+        if (item.locked) {
+            addLog(`<strong class="text-red-400">잠긴 아이템은 판매 선택할 수 없습니다.</strong>`);
+            return;
+        }
         setSellList(prev => {
             const newSet = new Set(prev);
             if (newSet.has(item.id)) {
@@ -2292,7 +2658,13 @@ const App = () => {
         if (sellList.size === 0) return;
 
         let totalGoldGained = 0;
-        const itemsToSell = inventory.filter(item => sellList.has(item.id));
+        const itemsToSell = inventory.filter(item => sellList.has(item.id) && !item.locked);
+
+        if (itemsToSell.length === 0) {
+            addLog("판매할 아이템이 없습니다 (선택한 아이템이 모두 잠겨있습니다).");
+            setSellList(new Set());
+            return;
+        }
 
         itemsToSell.forEach(itemToSell => {
             const rarityInfo = RARITIES[itemToSell.rarity];
@@ -2301,16 +2673,39 @@ const App = () => {
             totalGoldGained += goldGained;
         });
 
-        if (window.confirm(`${sellList.size}개의 아이템을 판매하여 ${formatNumber(totalGoldGained)} 골드를 얻습니다. 계속하시겠습니까?`)) {
+        if (window.confirm(`${itemsToSell.length}개의 아이템을 판매하여 ${formatNumber(totalGoldGained)} 골드를 얻습니다. 계속하시겠습니까?`)) {
             setPlayerStats(prev => ({ ...prev, coins: prev.coins + totalGoldGained }));
             updateMissionProgress('EARN_GOLD', totalGoldGained);
             setInventory(prev => prev.filter(item => !sellList.has(item.id)));
-            addLog(`아이템 ${sellList.size}개를 판매하여 <strong class="text-yellow-400">${formatNumber(totalGoldGained)} 골드</strong>를 획득했습니다.`);
+            addLog(`아이템 ${itemsToSell.length}개를 판매하여 <strong class="text-yellow-400">${formatNumber(totalGoldGained)} 골드</strong>를 획득했습니다.`);
             setSellList(new Set());
             setIsSellMode(false);
             needsSave.current = true;
         }
     };
+
+    const handleBulkSellByRarity = useCallback((rarityToSell) => {
+        const itemsToSell = inventory.filter(item => item.rarity === rarityToSell && !item.locked);
+        if (itemsToSell.length === 0) {
+            addLog(`${RARITIES[rarityToSell].name} 등급 중 판매 가능한 아이템이 없습니다.`);
+            return;
+        }
+
+        let totalGoldGained = 0;
+        itemsToSell.forEach(item => {
+            const rarityInfo = RARITIES[item.rarity];
+            const itemLevel = item.level || 0;
+            totalGoldGained += Math.ceil(rarityInfo.statMultiplier * 25 * Math.pow(1.3, itemLevel) * (item.baseLevel || 1));
+        });
+
+        if (window.confirm(`${itemsToSell.length}개의 ${RARITIES[rarityToSell].name} 등급 아이템을 판매하여 ${formatNumber(totalGoldGained)} 골드를 얻습니다. 계속하시겠습니까?`)) {
+            setPlayerStats(prev => ({ ...prev, coins: prev.coins + totalGoldGained }));
+            updateMissionProgress('EARN_GOLD', totalGoldGained);
+            setInventory(prev => prev.filter(item => item.rarity !== rarityToSell || item.locked));
+            addLog(`${RARITIES[rarityToSell].name} 등급 아이템 ${itemsToSell.length}개를 판매하여 <strong class="text-yellow-400">${formatNumber(totalGoldGained)} 골드</strong>를 획득했습니다.`);
+            needsSave.current = true;
+        }
+    }, [inventory, addLog, updateMissionProgress]);
 
     const handleClaimMission = (missionId) => {
         const missionToClaim = missions.find(m => m.id === missionId);
@@ -2393,7 +2788,7 @@ const App = () => {
         needsSave.current = true;
     };
 
-    const handleSlotSpin = (cost, callback) => {
+    const handleSlotSpin = useCallback((cost, callback) => {
         setPlayerStats(prev => ({...prev, coins: prev.coins - cost}));
         const symbols = ['💰', '⚔️', '💧', '💎', '🍀'];
         const reels = [symbols[Math.floor(Math.random()*symbols.length)], symbols[Math.floor(Math.random()*symbols.length)], symbols[Math.floor(Math.random()*symbols.length)]];
@@ -2401,14 +2796,14 @@ const App = () => {
 
         if (reels[0] === reels[1] && reels[1] === reels[2]) {
             switch(reels[0]) {
-                case '💰': reward = { message: `골드 잭팟!`, gold: cost * 10 }; break;
-                case '⚔️': reward = { message: `전투력 잭팟!`, gold: cost * 5 }; break;
+                case '💰': reward = { message: `골드 잭팟!`, gold: cost * 5 }; break;
+                case '⚔️': reward = { message: `전투력 잭팟!`, gold: cost * 3 }; break;
                 case '💧': reward = { message: `슬라임 잭팟!`, gold: cost * 3 }; break;
-                case '💎': reward = { message: `보석 잭팟!`, gold: cost * 20 }; break;
-                case '🍀': reward = { message: `행운 잭팟!`, gold: cost * 50 }; break;
+                case '💎': reward = { message: `보석 잭팟!`, gold: cost * 10 }; break;
+                case '🍀': reward = { message: `행운 잭팟!`, gold: cost * 25 }; break;
             }
         } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
-             reward = { message: `2개 일치!`, gold: cost * 2 };
+             reward = { message: `2개 일치!`, gold: Math.floor(cost * 1.5) };
         }
         
         if (reward.gold > 0) {
@@ -2420,9 +2815,9 @@ const App = () => {
 
         callback(reels, reward);
         needsSave.current = true;
-    };
+    }, [addLog]);
     
-    const handleSlimeWhackStart = (cost) => {
+    const handleSlimeWhackStart = useCallback((cost) => {
         if (playerStats.coins < cost) {
             addLog(`<strong class="text-red-400">골드가 부족합니다!</strong>`);
             return false;
@@ -2431,9 +2826,9 @@ const App = () => {
         addLog(`두더지 슬라임 게임 시작! (-${formatNumber(cost)} 골드)`);
         needsSave.current = true;
         return true;
-    };
+    }, [playerStats.coins, addLog]);
 
-    const handleSlimeWhackEnd = (reward) => {
+    const handleSlimeWhackEnd = useCallback((reward) => {
         if (reward > 0) {
             setPlayerStats(prev => ({ ...prev, coins: prev.coins + reward }));
             addLog(`두더지 슬라임 게임 종료! 보상 <strong class="text-yellow-400">${formatNumber(reward)}</strong> 골드 획득!`);
@@ -2441,7 +2836,28 @@ const App = () => {
         } else {
             addLog(`두더지 슬라임 게임 종료!`);
         }
-    };
+    }, [addLog]);
+
+    const handleSlimeMatcherStart = useCallback((cost) => {
+        if (playerStats.coins < cost) {
+            addLog(`<strong class="text-red-400">골드가 부족합니다!</strong>`);
+            return false;
+        }
+        setPlayerStats(prev => ({ ...prev, coins: prev.coins - cost }));
+        addLog(`슬라임 매칭 게임 시작! (-${formatNumber(cost)} 골드)`);
+        needsSave.current = true;
+        return true;
+    }, [playerStats.coins, addLog]);
+
+    const handleSlimeMatcherEnd = useCallback((reward, score) => {
+        if (reward > 0) {
+            setPlayerStats(prev => ({ ...prev, coins: prev.coins + reward }));
+            addLog(`슬라임 매칭 성공! (점수: ${score}) 보상 <strong class="text-yellow-400">${formatNumber(reward)}</strong> 골드 획득!`);
+            needsSave.current = true;
+        } else {
+            addLog(`슬라임 매칭 실패! (점수: ${score})`);
+        }
+    }, [addLog]);
 
 
     const liberationCost = useMemo(() => LIBERATION_COST_BASE * Math.pow(LIBERATION_COST_MULTIPLIER, liberationCount), [liberationCount]);
@@ -2461,6 +2877,7 @@ const App = () => {
 
             {(isJobSelectionOpen || !playerClass) && <JobSelectionModal onSelect={handleJobSelect} onClose={() => setIsJobSelectionOpen(false)}/>}
             {isDifficultyModalOpen && <DifficultyChangeModal currentDifficulty={difficulty} onSelect={handleChangeDifficulty} onClose={() => setIsDifficultyModalOpen(false)} />}
+            {isElementModalOpen && <ElementSelectionModal currentElement={playerElement} onSelect={handleSelectElement} onClose={() => setIsElementModalOpen(false)} />}
             <OfflineProgressModal progress={offlineProgress} onClaim={handleClaimOfflineProgress} />
 
             <header className="text-center">
@@ -2484,6 +2901,11 @@ const App = () => {
                         onToggleAutoDrop={() => { setIsAutoDropEnabled(p => !p); needsSave.current = true; addLog(`장비 자동 판매가 ${!isAutoDropEnabled ? '활성화' : '비활성화'}되었습니다.`) }}
                     />
                    <EquipmentPanel equipment={equipment} onSelectItem={handleSelectForgeItem} />
+                   <EquippedArtifactsPanel 
+                        equipped={equippedArtifacts} 
+                        onSlotClick={() => setActiveTab('artifacts')} 
+                    />
+                    <ElementPanel playerElement={playerElement} onOpenModal={() => setIsElementModalOpen(true)} />
                 </div>
                 <div className="w-full md:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col items-center justify-start order-2 md:order-2 relative overflow-hidden">
                     <MonsterDisplay monster={monsterStats} onClick={handleMonsterClick} damagePopups={damagePopups} treasureGolem={treasureGolem} />
@@ -2504,7 +2926,6 @@ const App = () => {
                     selectedForgeItem={selectedForgeItem}
                     upgrades={upgrades}
                     playerCoins={playerStats.coins}
-                    playerStats={playerStats}
                     abilityStats={finalAbilityStats}
                     equipmentGachaCost={equipmentGachaCost}
                     inventory={inventory}
@@ -2518,16 +2939,19 @@ const App = () => {
                         onUpgradeCritChance: handleUpgradeCritChance, onUpgradeCritDamage: handleUpgradeCritDamage, onUpgradeGoldGain: handleUpgradeGoldGain,
                         onUpgradeXpGain: handleUpgradeXpGain, onUpgradeSkillDamage: handleUpgradeSkillDamage, onUpgradeHaste: handleUpgradeHaste,
                         onUpgradeLuck: handleUpgradeLuck, onUpgradeBossDamage: handleUpgradeBossDamage, onEquipmentGacha: handleEquipmentGacha,
-                        onUpgradeArtifactPower: handleUpgradeArtifactPower,
+                        onUpgradeArtifactPower: handleUpgradeArtifactPower, onUpgradeFinalDamage: handleUpgradeFinalDamage, onUpgradeSkillDuration: handleUpgradeSkillDuration,
                         onSelectItem: (item) => setSelectedInventoryItem(item),
                         onForgeItem: handleForgeItem, onUpgradeRarity: handleUpgradeRarity, onReforgeItem: handleReforgeItem,
                         onToggleSellMode: handleToggleSellMode, onToggleSellItem: handleToggleSellItem, onBulkSell: handleBulkSell,
+                        onBulkSellByRarity: handleBulkSellByRarity,
                         onClaimMission: handleClaimMission,
                         onEquipArtifact: handleEquipArtifact, onUnequipArtifact: handleUnequipArtifact,
                         onArtifactGacha: handleArtifactGacha,
                         onSlotSpin: handleSlotSpin,
                         onSlimeWhackStart: handleSlimeWhackStart,
                         onSlimeWhackEnd: handleSlimeWhackEnd,
+                        onSlimeMatcherStart: handleSlimeMatcherStart,
+                        onSlimeMatcherEnd: handleSlimeMatcherEnd,
                     }}
                 />
             </main>
@@ -2554,6 +2978,7 @@ const App = () => {
                 onEquip={handleEquipItem}
                 onSell={handleSellItem}
                 onSelectForge={handleSelectForgeItem}
+                onToggleLock={handleToggleLockItem}
             />
         </div>
     );
