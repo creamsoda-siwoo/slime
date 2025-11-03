@@ -114,6 +114,14 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <!-- Babel for JSX and TypeScript transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
 </head>
   <body class="bg-gray-900 text-white antialiased">
     <div id="root"></div>
@@ -183,10 +191,6 @@ const LIBERATION_COST_BASE = 10000;
 const LIBERATION_COST_MULTIPLIER = 100;
 
 const BASE_SKILL_COOLDOWN = 30000; // 30 seconds
-const HUNTERS_FOCUS_COOLDOWN = 60000; // 60 seconds
-const HUNTERS_FOCUS_DURATION = 10000; // 10 seconds
-const HUNTERS_FOCUS_CRIT_CHANCE_BONUS = 20; // +20%p
-const HUNTERS_FOCUS_CRIT_DAMAGE_BONUS = 50; // +50%p
 
 const EQUIPMENT_DROP_CHANCE_BASE = 0.15;
 const EQUIPMENT_GACHA_COST_BASE = 100;
@@ -242,6 +246,7 @@ const JOBS = {
         description: '강력한 클릭 공격과 지속적인 전투에 특화되었습니다.',
         passive: '클릭 데미지 +25%, 자동 공격 데미지 +10%',
         skill: { name: '광란', description: '8초간 클릭 데미지 +100%, 자동 공격 데미지 +50% 증가' },
+        skill2: { name: '방패 강타', description: '자동 공격력의 5배 피해를 주고 1.5초간 몬스터를 기절시킵니다.', cooldown: 25000 },
         bonuses: { clickDamage: 0.25, autoAttackDamage: 0.10, critChance: 0, critDamage: 0, skillEffect: 0 },
         icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
     },
@@ -250,6 +255,7 @@ const JOBS = {
         description: '치명타를 활용하여 폭발적인 데미지를 입힙니다.',
         passive: '크리티컬 확률 +10%p, 크리티컬 데미지 +50%p',
         skill: { name: '화살비', description: '즉시 클릭 데미지의 3배 피해를 주고, 5초간 크리티컬 확률이 25%p 증가합니다.' },
+        skill2: { name: '약점 조준', description: '10초간 모든 크리티컬 공격의 최종 데미지가 100%p 증가합니다.', cooldown: 45000 },
         bonuses: { clickDamage: 0, autoAttackDamage: 0, critChance: 10, critDamage: 50, skillEffect: 0 },
         icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
     },
@@ -258,6 +264,7 @@ const JOBS = {
         description: '강력한 스킬로 전장을 지배합니다.',
         passive: '스킬 데미지 +50%, 스킬 쿨타임 감소 효과 +25%',
         skill: { name: '신비한 폭발', description: '총 공격력의 15배 피해를 주고, 10초간 몬스터가 받는 모든 피해가 20% 증가합니다.' },
+        skill2: { name: '마나 순환', description: "'신비한 폭발' 스킬의 쿨타임을 즉시 초기화하고, 가속 강화 비용의 10%만큼 골드를 즉시 획득합니다.", cooldown: 90000 },
         bonuses: { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0, skillEffect: 0.5 },
         icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.362-3.797z" /></svg>
     }
@@ -314,7 +321,6 @@ const ArtifactIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" classN
 const LockIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}> <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /> </svg> );
 const ElementIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.362-3.797z" /></svg> );
 const OfflineIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> );
-const FocusIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15.91 15.91a4.5 4.5 0 01-6.364 0 4.5 4.5 0 010-6.364 4.5 4.5 0 016.364 0z" /><path d="M12 8v.01" /><path d="M12 16v.01" /><path d="M8 12h.01" /><path d="M16 12h.01" /></svg> );
 
 // Monster Icons
 const GreenSlimeIcon = ({className, ...props}) => ( <svg viewBox="0 0 100 80" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path> <circle cx="28" cy="50" r="5" fill="#fecaca"></circle> <circle cx="72" cy="50" r="5" fill="#fecaca"></circle> <circle cx="38" cy="45" r="8" fill="white"></circle> <circle cx="62" cy="45" r="8" fill="white"></circle> <circle cx="40" cy="46" r="4" fill="black"></circle> <circle cx="64" cy="46" r="4" fill="black"></circle> <circle cx="37" cy="42" r="2" fill="white"></circle> <circle cx="61" cy="42" r="2" fill="white"></circle> <path d="M 45 60 Q 50 68, 55 60" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
@@ -573,7 +579,7 @@ const MonsterDisplay = ({ monster, onClick, damagePopups, treasureGolem }) => {
     const ElementInfo = monster.element ? ELEMENT_TYPES[monster.element] : null;
 
     return (
-        <div className="transition-transform duration-100 flex-grow flex flex-col justify-center">
+        <div className="transition-transform duration-100 flex flex-col justify-center">
              <h2 className={`text-3xl font-bold text-center mb-2 flex items-center justify-center gap-2 ${monster.isBoss ? 'text-red-400' : ''} ${isTreasureGolem ? 'text-yellow-400' : ''}`}>
                 {ElementInfo && React.createElement(ElementInfo.icon, { className: 'h-8 w-8' })}
                 <span>{monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level})</span>
@@ -1481,27 +1487,6 @@ const ActiveSkillButton = ({ skill, onClick, cooldown, maxCooldown }) => {
     );
 };
 
-const HuntersFocusButton = ({ onClick, cooldown, maxCooldown, isActive }) => {
-    const isDisabled = cooldown > 0;
-    const cooldownPercentage = (cooldown / maxCooldown) * 100;
-    
-    return (
-        <button
-            onClick={onClick}
-            disabled={isDisabled}
-            className={`relative w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-2 rounded-lg transition-colors shadow-lg overflow-hidden h-16 flex items-center justify-center gap-2 ${isActive ? 'ring-2 ring-teal-300 animate-pulse' : ''}`}>
-            {cooldown > 0 && !isActive && (
-                 <div className="absolute top-0 left-0 h-full bg-black opacity-50" style={{ width: `${100 - cooldownPercentage}%` }}></div>
-            )}
-            <FocusIcon className="w-6 h-6 text-teal-200" />
-            <div className="relative z-10 text-center">
-                <p className="text-md font-bold">사냥꾼의 집중</p>
-                <p className="text-xs">{cooldown > 0 ? `${Math.ceil(cooldown / 1000)}초` : `사용 가능`}</p>
-            </div>
-        </button>
-    )
-};
-
 const GameLog = ({ log }) => (
      <div className="w-full bg-gray-800 p-4 rounded-lg shadow-lg order-4 h-40 overflow-y-auto">
         <h3 className="text-lg font-bold mb-2 text-green-400">게임 로그</h3>
@@ -1569,7 +1554,8 @@ const JobSelectionModal = ({ onSelect, onClose }) => {
                                 <h3 className="text-2xl font-bold mb-3 text-white">{job.name}</h3>
                                 <p className="text-gray-300 mb-4 flex-grow">{job.description}</p>
                                 <p className="text-sm text-yellow-400 mb-1"><strong>지속 효과:</strong> {job.passive}</p>
-                                <p className="text-sm text-orange-400 mb-6"><strong>액티브 스킬:</strong> {job.skill.name}</p>
+                                <p className="text-sm text-orange-400 mb-2"><strong>스킬 1:</strong> {job.skill.name}</p>
+                                <p className="text-sm text-cyan-400 mb-6"><strong>스킬 2:</strong> {job.skill2.name}</p>
                                 <button onClick={() => onSelect(jobKey)} className="mt-auto w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg">
                                     {job.name}(으)로 선택
                                 </button>
@@ -1958,13 +1944,14 @@ const App = () => {
     const [offlineProgress, setOfflineProgress] = useState(null);
 
     const [activeSkillCooldown, setActiveSkillCooldown] = useState(0);
-    const [huntersFocusCooldown, setHuntersFocusCooldown] = useState(0);
+    const [secondSkillCooldown, setSecondSkillCooldown] = useState(0);
     const [damagePopups, setDamagePopups] = useState([]);
     const [newItemDrop, setNewItemDrop] = useState(null);
     const [frenzyActive, setFrenzyActive] = useState(false);
     const [arrowRainActive, setArrowRainActive] = useState(false);
     const [arcaneBlastDebuff, setArcaneBlastDebuff] = useState(false);
-    const [huntersFocusActive, setHuntersFocusActive] = useState(false);
+    const [isMonsterStunned, setIsMonsterStunned] = useState(false);
+    const [aimForWeaknessActive, setAimForWeaknessActive] = useState(false);
     const [treasureGolem, setTreasureGolem] = useState({ isActive: false, timer: 0 });
     const needsSave = useRef(false);
 
@@ -2112,9 +2099,8 @@ const App = () => {
         if (arrowRainActive) {
             combined.critChance = Math.min(100, combined.critChance + 25);
         }
-        if (huntersFocusActive) {
-            combined.critChance += HUNTERS_FOCUS_CRIT_CHANCE_BONUS;
-            combined.critDamage += HUNTERS_FOCUS_CRIT_DAMAGE_BONUS;
+        if (aimForWeaknessActive) {
+            combined.critDamage += 100;
         }
 
         const finalDamageMultiplier = 1 + (finalAbilityStats.finalDamageBonus / 100);
@@ -2122,7 +2108,7 @@ const App = () => {
         combined.autoAttackDamage *= finalDamageMultiplier;
 
         return combined;
-    }, [playerStats, equipment, playerClass, frenzyActive, arrowRainActive, huntersFocusActive, rebirthCount, artifactBonuses, finalAbilityStats.finalDamageBonus, elementalBonuses]);
+    }, [playerStats, equipment, playerClass, frenzyActive, arrowRainActive, aimForWeaknessActive, rebirthCount, artifactBonuses, finalAbilityStats.finalDamageBonus, elementalBonuses]);
     
     const saveGame = useCallback(() => {
         try {
@@ -2399,7 +2385,7 @@ const App = () => {
     useEffect(() => {
         if (finalStats.autoAttackDamage <= 0) return;
         const interval = setInterval(() => {
-            if (newItemDrop || isJobSelectionOpen || selectedInventoryItem || !difficulty || offlineProgress || treasureGolem.isActive) return;
+            if (newItemDrop || isJobSelectionOpen || selectedInventoryItem || !difficulty || offlineProgress || treasureGolem.isActive || isMonsterStunned) return;
             const debuffMultiplier = arcaneBlastDebuff ? 1.2 : 1;
             const isCrit = Math.random() * 100 < finalStats.critChance;
             const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
@@ -2420,7 +2406,7 @@ const App = () => {
             });
         }, 1000 / finalStats.attackSpeed);
         return () => clearInterval(interval);
-    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats, difficulty, arcaneBlastDebuff, offlineProgress, treasureGolem.isActive, getElementalEffect]);
+    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats, difficulty, arcaneBlastDebuff, offlineProgress, treasureGolem.isActive, getElementalEffect, isMonsterStunned]);
     
     useEffect(() => {
         if (activeSkillCooldown > 0) {
@@ -2430,11 +2416,11 @@ const App = () => {
     }, [activeSkillCooldown]);
     
     useEffect(() => {
-        if (huntersFocusCooldown > 0) {
-            const timer = setTimeout(() => { setHuntersFocusCooldown(prev => Math.max(0, prev - 100)); }, 100);
+        if (secondSkillCooldown > 0) {
+            const timer = setTimeout(() => { setSecondSkillCooldown(prev => Math.max(0, prev - 100)); }, 100);
             return () => clearTimeout(timer);
         }
-    }, [huntersFocusCooldown]);
+    }, [secondSkillCooldown]);
 
     useEffect(() => {
         if (treasureGolem.isActive && treasureGolem.timer > 0) {
@@ -2458,7 +2444,7 @@ const App = () => {
     };
 
     const handleMonsterClick = () => {
-        if (monsterStats.hp <= 0 || newItemDrop || isJobSelectionOpen || selectedInventoryItem) return;
+        if (monsterStats.hp <= 0 || newItemDrop || isJobSelectionOpen || selectedInventoryItem || isMonsterStunned) return;
         
         const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
         const debuffMultiplier = arcaneBlastDebuff ? 1.2 : 1;
@@ -2558,6 +2544,12 @@ const App = () => {
         setUpgrades(prev => ({ ...prev, treasureGolemChanceUpgradeCost: Math.floor(prev.treasureGolemChanceUpgradeCost * TREASURE_GOLEM_CHANCE_UPGRADE_COST_MULTIPLIER) }));
     });
 
+    const secondSkillMaxCooldown = useMemo(() => {
+        if (!playerClass) return 0;
+        const baseCooldown = JOBS[playerClass].skill2.cooldown;
+        return baseCooldown * (1 - finalAbilityStats.haste / 100);
+    }, [playerClass, finalAbilityStats.haste]);
+
     const handleActiveSkill = () => {
         if (activeSkillCooldown > 0 || newItemDrop || !playerClass) return;
         
@@ -2604,15 +2596,51 @@ const App = () => {
         needsSave.current = true;
     };
 
-    const handleHuntersFocus = () => {
-        if (huntersFocusCooldown > 0 || newItemDrop || huntersFocusActive) return;
-        setHuntersFocusActive(true);
-        const duration = HUNTERS_FOCUS_DURATION * (1 + finalAbilityStats.skillDurationBonus / 100);
-        setTimeout(() => setHuntersFocusActive(false), duration);
-        addLog(`<strong class="text-teal-400">사냥꾼의 집중 발동! ${duration / 1000}초간 치명타 확률과 피해량이 증가합니다.</strong>`);
-        setHuntersFocusCooldown(HUNTERS_FOCUS_COOLDOWN);
+    const handleSecondActiveSkill = () => {
+        if (secondSkillCooldown > 0 || newItemDrop || !playerClass) return;
+
+        let damageDealt = 0;
+        let logMessage = '';
+        const skillMultiplier = 1 + (finalAbilityStats.skillDamageBonus / 100);
+        const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
+        const debuffMultiplier = arcaneBlastDebuff ? 1.2 : 1;
+        const skillDurationMultiplier = 1 + (finalAbilityStats.skillDurationBonus / 100);
+        const elementalEffect = getElementalEffect();
+
+        switch (playerClass) {
+            case 'WARRIOR':
+                damageDealt = Math.floor(finalStats.autoAttackDamage * 5 * skillMultiplier * bossMultiplier * debuffMultiplier * elementalEffect.multiplier);
+                createDamagePopup(damageDealt, 'skill');
+                setIsMonsterStunned(true);
+                setTimeout(() => setIsMonsterStunned(false), 1500);
+                logMessage = `방패 강타! ${formatNumber(damageDealt)}의 피해를 주고 1.5초간 기절시킵니다!`;
+                break;
+            case 'ARCHER':
+                setAimForWeaknessActive(true);
+                setTimeout(() => setAimForWeaknessActive(false), 10000 * skillDurationMultiplier);
+                logMessage = `약점 조준! ${10 * skillDurationMultiplier}초간 치명타 피해량이 대폭 증가합니다!`;
+                break;
+            case 'MAGE':
+                setActiveSkillCooldown(0);
+                const goldGained = Math.floor(upgrades.hasteUpgradeCost * 0.1);
+                setPlayerStats(prev => ({ ...prev, coins: prev.coins + goldGained }));
+                logMessage = `마나 순환! '신비한 폭발'의 쿨타임을 초기화하고 ${formatNumber(goldGained)} 골드를 획득합니다!`;
+                break;
+        }
+
+        addLog(logMessage);
+        setSecondSkillCooldown(secondSkillMaxCooldown);
+
+        if (damageDealt > 0) {
+            setMonsterStats(prev => {
+                const newHp = prev.hp - damageDealt;
+                if (newHp <= 0) { handleMonsterDefeat(); return { ...prev, hp: 0 }; }
+                return { ...prev, hp: newHp };
+            });
+        }
         needsSave.current = true;
     };
+
 
     const handleLiberation = () => {
         const cost = liberationCost;
@@ -3066,7 +3094,7 @@ const App = () => {
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-2 sm:p-4 space-y-4">
             <div className="fixed top-2 right-4 z-50 text-xs text-gray-500">
-                제작자:한국인
+                제작자:한국인이라면
             </div>
 
             {(isJobSelectionOpen || !playerClass) && <JobSelectionModal onSelect={handleJobSelect} onClose={() => setIsJobSelectionOpen(false)}/>}
@@ -3102,23 +3130,25 @@ const App = () => {
                     />
                     <ElementPanel playerElement={playerElement} onOpenModal={() => setIsElementModalOpen(true)} />
                 </div>
-                <div className="w-full md:w-1/2 bg-gray-800 p-2 sm:p-6 rounded-lg shadow-lg flex flex-col items-center justify-between order-2 md:order-2 relative overflow-hidden">
+                <div className="w-full md:w-1/2 bg-gray-800 p-2 sm:p-6 rounded-lg shadow-lg flex flex-col items-center justify-start order-2 md:order-2 relative overflow-hidden flex-grow">
                     <MonsterDisplay monster={monsterStats} onClick={handleMonsterClick} damagePopups={damagePopups} treasureGolem={treasureGolem} />
                     <div className="w-full mt-4 grid grid-cols-2 gap-2">
                         {playerClass && (
-                             <ActiveSkillButton 
-                                skill={JOBS[playerClass].skill}
-                                onClick={handleActiveSkill} 
-                                cooldown={activeSkillCooldown} 
-                                maxCooldown={finalAbilityStats.activeSkillCooldown}
-                            />
+                            <>
+                                <ActiveSkillButton 
+                                    skill={JOBS[playerClass].skill}
+                                    onClick={handleActiveSkill} 
+                                    cooldown={activeSkillCooldown} 
+                                    maxCooldown={finalAbilityStats.activeSkillCooldown}
+                                />
+                                 <ActiveSkillButton 
+                                    skill={JOBS[playerClass].skill2}
+                                    onClick={handleSecondActiveSkill} 
+                                    cooldown={secondSkillCooldown} 
+                                    maxCooldown={secondSkillMaxCooldown}
+                                />
+                            </>
                         )}
-                        <HuntersFocusButton
-                            onClick={handleHuntersFocus}
-                            cooldown={huntersFocusCooldown}
-                            maxCooldown={HUNTERS_FOCUS_COOLDOWN}
-                            isActive={huntersFocusActive}
-                        />
                     </div>
                 </div>
                 <RightPanel 
