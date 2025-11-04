@@ -141,51 +141,50 @@ const BOSS_HP_MULTIPLIER = 4.0;
 const BOSS_REWARD_MULTIPLIER = 3;
 const BOSS_DROP_CHANCE_BOOST = 0.2;
 
-const CLICK_UPGRADE_COST_BASE = 4;
-const CLICK_UPGRADE_COST_MULTIPLIER = 1.15;
-const AUTO_ATTACK_UPGRADE_COST_BASE = 10;
-const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.20;
-const CRIT_CHANCE_UPGRADE_COST_BASE = 30;
-const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.35;
+const CLICK_UPGRADE_COST_BASE = 50;
+const CLICK_UPGRADE_COST_MULTIPLIER = 1.25;
+const AUTO_ATTACK_UPGRADE_COST_BASE = 120;
+const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.32;
+const CRIT_CHANCE_UPGRADE_COST_BASE = 300;
+const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.48;
 const CRIT_CHANCE_UPGRADE_INCREASE = 1;
-const CRIT_DAMAGE_UPGRADE_COST_BASE = 50;
-const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.33;
+const CRIT_DAMAGE_UPGRADE_COST_BASE = 500;
+const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.45;
 const CRIT_DAMAGE_UPGRADE_INCREASE = 5;
 
-const GOLD_GAIN_UPGRADE_COST_BASE = 50;
-const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.36;
-const XP_GAIN_UPGRADE_COST_BASE = 75;
-const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.45;
+const GOLD_GAIN_UPGRADE_COST_BASE = 600;
+const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.55;
+const XP_GAIN_UPGRADE_COST_BASE = 1000;
+const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.65;
 
-const ATTACK_SPEED_UPGRADE_COST_BASE = 100;
-const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.30;
-const HASTE_UPGRADE_COST_BASE = 250;
-const HASTE_UPGRADE_COST_MULTIPLIER = 1.52;
-const LUCK_UPGRADE_COST_BASE = 200;
-const LUCK_UPGRADE_COST_MULTIPLIER = 1.40;
+const ATTACK_SPEED_UPGRADE_COST_BASE = 1200;
+const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.48;
+const HASTE_UPGRADE_COST_BASE = 2500;
+const HASTE_UPGRADE_COST_MULTIPLIER = 1.70;
+const LUCK_UPGRADE_COST_BASE = 2000;
+const LUCK_UPGRADE_COST_MULTIPLIER = 1.60;
 
-const SKILL_DAMAGE_UPGRADE_COST_BASE = 150;
-const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.48;
+const SKILL_DAMAGE_UPGRADE_COST_BASE = 1800;
+const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.68;
 
-const BOSS_DAMAGE_UPGRADE_COST_BASE = 200;
-const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.44;
+const BOSS_DAMAGE_UPGRADE_COST_BASE = 2200;
+const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.62;
 
-const ARTIFACT_POWER_UPGRADE_COST_BASE = 5000;
-const ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER = 1.55;
+const ARTIFACT_POWER_UPGRADE_COST_BASE = 25000;
+const ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER = 1.80;
 
-const FINAL_DAMAGE_UPGRADE_COST_BASE = 1000;
-const FINAL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.60;
+const FINAL_DAMAGE_UPGRADE_COST_BASE = 8000;
+const FINAL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.85;
 
-const SKILL_DURATION_UPGRADE_COST_BASE = 800;
-const SKILL_DURATION_UPGRADE_COST_MULTIPLIER = 1.55;
+const SKILL_DURATION_UPGRADE_COST_BASE = 5000;
+const SKILL_DURATION_UPGRADE_COST_MULTIPLIER = 1.75;
 
-const ELEMENTAL_POWER_UPGRADE_COST_BASE = 1200;
-const ELEMENTAL_POWER_UPGRADE_COST_MULTIPLIER = 1.56;
-const OFFLINE_REWARDS_UPGRADE_COST_BASE = 1500;
-const OFFLINE_REWARDS_UPGRADE_COST_MULTIPLIER = 1.65;
-const TREASURE_GOLEM_CHANCE_UPGRADE_COST_BASE = 2500;
-const TREASURE_GOLEM_CHANCE_UPGRADE_COST_MULTIPLIER = 1.75;
-
+const ELEMENTAL_POWER_UPGRADE_COST_BASE = 6000;
+const ELEMENTAL_POWER_UPGRADE_COST_MULTIPLIER = 1.82;
+const OFFLINE_REWARDS_UPGRADE_COST_BASE = 10000;
+const OFFLINE_REWARDS_UPGRADE_COST_MULTIPLIER = 1.90;
+const TREASURE_GOLEM_CHANCE_UPGRADE_COST_BASE = 15000;
+const TREASURE_GOLEM_CHANCE_UPGRADE_COST_MULTIPLIER = 2.0;
 
 const LIBERATION_COST_BASE = 10000;
 const LIBERATION_COST_MULTIPLIER = 100;
@@ -739,7 +738,7 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
                 <span className="tooltiptext">
                     <p className="font-bold">보물 골렘 등장 확률</p>
                     <p className="text-sm text-gray-300">막대한 골드를 주는 희귀 몬스터의 등장 확률을 높입니다.</p>
-                    <p className="text-sm text-yellow-300 mt-2">현재: {((abilityStats.treasureGolemChanceBonus / 100) + TREASURE_GOLEM_SPAWN_CHANCE).toFixed(2)}%</p>
+                    <p className="text-sm text-yellow-300 mt-2">{(TREASURE_GOLEM_SPAWN_CHANCE + (abilityStats.treasureGolemChanceBonus / 100)).toFixed(2)}%</p>
                 </span>
             </div>
         </div>
@@ -1785,12 +1784,14 @@ const App = () => {
     const [newItemDrop, setNewItemDrop] = useState(null);
     const [isMonsterStunned, setIsMonsterStunned] = useState(false);
     const [treasureGolem, setTreasureGolem] = useState({ isActive: false, timer: 0 });
+    const [elementalEffects, setElementalEffects] = useState({ fire_dot: null, wind_stacks: 0 });
     
     // New skill effect states
     const [overwhelmState, setOverwhelmState] = useState({ active: false, clicksLeft: 0 });
     const [focusTimeActive, setFocusTimeActive] = useState(false);
     const [timeWarpActive, setTimeWarpActive] = useState(false);
     const whirlwindIntervalRef = useRef(null);
+    const windStackDecayTimer = useRef(null);
 
     const needsSave = useRef(false);
 
@@ -1932,7 +1933,13 @@ const App = () => {
         combined.critChance += artifactBonuses.critChance + elementalBonuses.critChance;
         combined.critDamage += artifactBonuses.critDamage + elementalBonuses.critDamage;
         combined.clickDamage *= (1 + artifactBonuses.clickDamageMult);
-        combined.attackSpeed = playerStats.attackSpeed * (1 + (artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems + elementalBonuses.attackSpeed) / 100);
+        
+        let windAttackSpeedBonus = 0;
+        if (playerElement === 'WIND') {
+            windAttackSpeedBonus = elementalEffects.wind_stacks;
+        }
+        combined.attackSpeed = playerStats.attackSpeed * (1 + (artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems + elementalBonuses.attackSpeed + windAttackSpeedBonus) / 100);
+
 
         if (focusTimeActive) {
             combined.attackSpeed *= 1.5;
@@ -1948,7 +1955,7 @@ const App = () => {
         combined.autoAttackDamage *= finalDamageMultiplier;
 
         return combined;
-    }, [playerStats, equipment, playerClass, focusTimeActive, rebirthCount, liberationCount, artifactBonuses, finalAbilityStats.finalDamageBonus, elementalBonuses]);
+    }, [playerStats, equipment, playerClass, focusTimeActive, rebirthCount, liberationCount, artifactBonuses, finalAbilityStats.finalDamageBonus, elementalBonuses, playerElement, elementalEffects.wind_stacks]);
     
     const saveGame = useCallback(() => {
         try {
@@ -2147,23 +2154,31 @@ const App = () => {
         return { multiplier: 1, prefix: '', type: 'normal' };
     }, [playerElement, monsterStats.element]);
 
+    const createDamagePopup = useCallback((damage, type = 'normal', prefix = '') => {
+        const newPopup = { id: Date.now() + Math.random(), damage, prefix, x: 40 + Math.random() * 20, y: 40 + Math.random() * 20, type };
+        setDamagePopups(prev => [...prev, newPopup]);
+        setTimeout(() => { setDamagePopups(prev => prev.filter(p => p.id !== newPopup.id)); }, 1200);
+    }, []);
+
     const handleMonsterDefeat = useCallback(() => {
         if (whirlwindIntervalRef.current) {
             clearInterval(whirlwindIntervalRef.current);
             whirlwindIntervalRef.current = null;
         }
 
+        let coinsGained = 0;
+        let xpGained = 0;
+        const currentMonsterLevel = monsterStats.level;
+
         if (treasureGolem.isActive) {
-            const goldReward = Math.floor(monsterStats.maxHp * 5 * (1 + finalAbilityStats.goldGainBonus / 100));
-            addLog(`<strong class="text-yellow-400">보물 골렘 처치! +${formatNumber(goldReward)} 골드!</strong>`);
-            setPlayerStats(prev => ({ ...prev, coins: prev.coins + goldReward }));
+            coinsGained = Math.floor(monsterStats.maxHp * 5 * (1 + finalAbilityStats.goldGainBonus / 100));
+            addLog(`<strong class="text-yellow-400">보물 골렘 처치! +${formatNumber(coinsGained)} 골드!</strong>`);
             setTreasureGolem({ isActive: false, timer: 0 });
         } else {
             const isBossDefeated = monsterStats.isBoss;
-            const currentMonsterLevel = monsterStats.level;
             const rewardMultiplier = (isBossDefeated ? BOSS_REWARD_MULTIPLIER : 1) * difficultyMultipliers.monsterReward;
-            const xpGained = Math.ceil(currentMonsterLevel * 2.5 * rewardMultiplier * (1 + finalAbilityStats.xpGainBonus / 100));
-            let coinsGained = Math.ceil(MONSTER_REWARD_BASE * Math.pow(MONSTER_REWARD_MULTIPLIER, currentMonsterLevel - 1) * rewardMultiplier * (1 + finalAbilityStats.goldGainBonus / 100));
+            xpGained = Math.ceil(currentMonsterLevel * 2.5 * rewardMultiplier * (1 + finalAbilityStats.xpGainBonus / 100));
+            coinsGained = Math.ceil(MONSTER_REWARD_BASE * Math.pow(MONSTER_REWARD_MULTIPLIER, currentMonsterLevel - 1) * rewardMultiplier * (1 + finalAbilityStats.goldGainBonus / 100));
             
             if (timeWarpActive) {
                 coinsGained *= 1.5;
@@ -2185,43 +2200,62 @@ const App = () => {
                     setNewItemDrop(newItem);
                 }
             }
-
-            setPlayerStats(prev => {
-                let newXp = prev.xp + xpGained;
-                let newLevel = prev.level;
-                let newMaxXp = prev.maxXp;
-                let newClickDamage = prev.clickDamage;
-                let newAutoAttackDamage = prev.autoAttackDamage;
-                
-                while (newXp >= newMaxXp) {
-                    newXp -= newMaxXp;
-                    newLevel++;
-                    newMaxXp = Math.floor(LEVEL_EXPERIENCE_BASE * Math.pow(LEVEL_EXPERIENCE_MULTIPLIER, newLevel - 1));
-                    newClickDamage = Math.ceil(newClickDamage * 1.05);
-                    newAutoAttackDamage = Math.ceil(newAutoAttackDamage * 1.05);
-                    addLog(`<strong class="text-purple-400">레벨 업! ${newLevel}레벨 달성!</strong>`);
-                }
-                
-                return {
-                    ...prev,
-                    xp: newXp,
-                    level: newLevel,
-                    maxXp: newMaxXp,
-                    coins: prev.coins + coinsGained,
-                    clickDamage: newClickDamage,
-                    autoAttackDamage: newAutoAttackDamage,
-                };
-            });
         }
         
-        const nextLevel = treasureGolem.isActive ? monsterStats.level : (monsterStats.isBoss ? monsterStats.level + 1 : monsterStats.level);
-        const isNextBoss = (nextLevel > 0 && nextLevel % BOSS_LEVEL_INTERVAL === 0);
+        let newXp = playerStats.xp + xpGained;
+        let newLevel = playerStats.level;
+        let newMaxXp = playerStats.maxXp;
+        let newClickDamage = playerStats.clickDamage;
+        let newAutoAttackDamage = playerStats.autoAttackDamage;
+        
+        while (newXp >= newMaxXp) {
+            newXp -= newMaxXp;
+            newLevel++;
+            newMaxXp = Math.floor(LEVEL_EXPERIENCE_BASE * Math.pow(LEVEL_EXPERIENCE_MULTIPLIER, newLevel - 1));
+            newClickDamage = Math.ceil(newClickDamage * 1.05);
+            newAutoAttackDamage = Math.ceil(newAutoAttackDamage * 1.05);
+            addLog(`<strong class="text-purple-400">레벨 업! ${newLevel}레벨 달성!</strong>`);
+        }
+        
+        setPlayerStats(prev => ({
+            ...prev,
+            xp: newXp,
+            level: newLevel,
+            maxXp: newMaxXp,
+            coins: prev.coins + coinsGained,
+            clickDamage: newClickDamage,
+            autoAttackDamage: newAutoAttackDamage,
+        }));
+        
+        const golemSpawnChance = TREASURE_GOLEM_SPAWN_CHANCE + (finalAbilityStats.treasureGolemChanceBonus / 100);
+        if (!treasureGolem.isActive && !monsterStats.isBoss && Math.random() < golemSpawnChance) {
+            addLog(`<strong class="text-yellow-400">보물 골렘이 나타났습니다!</strong>`);
+            setTreasureGolem({ isActive: true, timer: TREASURE_GOLEM_TIMER });
+            
+            const golemData = SPECIAL_MONSTERS.TREASURE_GOLEM;
+            const golemHp = MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, newLevel - 1) * 2 * difficultyMultipliers.monsterHp;
+            
+            setMonsterStats({
+                name: golemData.name,
+                Icon: golemData.Icon,
+                level: newLevel,
+                hp: Math.ceil(golemHp),
+                maxHp: Math.ceil(golemHp),
+                isBoss: false,
+                element: null,
+            });
+            needsSave.current = true;
+            return;
+        }
+        
+        const nextMonsterLevel = newLevel;
+        const isNextBoss = (nextMonsterLevel > 0 && nextMonsterLevel % BOSS_LEVEL_INTERVAL === 0);
         const difficultyMultiplier = difficultyMultipliers.monsterHp;
         const newMonsterHp = isNextBoss
-            ? MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultiplier
-            : MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextLevel - 1) * difficultyMultiplier;
+            ? MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextMonsterLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultiplier
+            : MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextMonsterLevel - 1) * difficultyMultiplier;
         
-        const availableMonsters = MONSTER_TYPES.filter(m => m.minLevel <= nextLevel);
+        const availableMonsters = MONSTER_TYPES.filter(m => m.minLevel <= nextMonsterLevel);
         const monsterData = isNextBoss
             ? BOSS_TYPES[Math.floor(Math.random() * BOSS_TYPES.length)]
             : availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
@@ -2232,7 +2266,7 @@ const App = () => {
         setMonsterStats({
             name: monsterData.name,
             Icon: monsterData.Icon,
-            level: nextLevel,
+            level: nextMonsterLevel,
             hp: Math.ceil(newMonsterHp),
             maxHp: Math.ceil(newMonsterHp),
             isBoss: isNextBoss,
@@ -2240,17 +2274,13 @@ const App = () => {
         });
         
         needsSave.current = true;
-    }, [monsterStats, finalAbilityStats, finalStats.luck, difficultyMultipliers, addLog, generateRandomItem, isAutoDropEnabled, timeWarpActive, treasureGolem.isActive, updateMissionProgress]);
+    }, [playerStats, monsterStats, finalAbilityStats, finalStats.luck, difficultyMultipliers, addLog, generateRandomItem, isAutoDropEnabled, timeWarpActive, treasureGolem.isActive, updateMissionProgress]);
 
-    const createDamagePopup = useCallback((damage, type = 'normal', prefix = '') => {
-        const newPopup = { id: Date.now() + Math.random(), damage, prefix, x: 40 + Math.random() * 20, y: 40 + Math.random() * 20, type };
-        setDamagePopups(prev => [...prev, newPopup]);
-        setTimeout(() => { setDamagePopups(prev => prev.filter(p => p.id !== newPopup.id)); }, 1200);
-    }, []);
 
     const handleMonsterClick = () => {
-        if (monsterStats.hp <= 0 || newItemDrop || isJobSelectionOpen || selectedInventoryItem || isMonsterStunned) return;
+        if (monsterStats.hp <= 0 || newItemDrop || isJobSelectionOpen || selectedInventoryItem) return;
         
+        const isStunned = isMonsterStunned;
         const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
         
         let overwhelmMultiplier = 1;
@@ -2258,30 +2288,58 @@ const App = () => {
             overwhelmMultiplier = 3; // 200% additional damage
             const newClicksLeft = overwhelmState.clicksLeft - 1;
             if (newClicksLeft === 0) {
-                setIsMonsterStunned(true);
-                setTimeout(() => setIsMonsterStunned(false), 1500);
-                addLog('압도 마지막 타격! 몬스터를 1.5초간 기절시킵니다!');
+                if(!isMonsterStunned) {
+                    setIsMonsterStunned(true);
+                    setTimeout(() => setIsMonsterStunned(false), 1500);
+                    addLog('압도 마지막 타격! 몬스터를 1.5초간 기절시킵니다!');
+                }
             }
             setOverwhelmState({ active: newClicksLeft > 0, clicksLeft: newClicksLeft });
         }
         
-        const isCrit = Math.random() * 100 < finalStats.critChance;
+        const isCrit = isStunned || (Math.random() * 100 < finalStats.critChance);
         const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
         const elementalEffect = getElementalEffect();
-        const damageDealt = Math.floor(finalStats.clickDamage * critMultiplier * bossMultiplier * elementalEffect.multiplier * overwhelmMultiplier);
+        let damageDealt = Math.floor(finalStats.clickDamage * critMultiplier * bossMultiplier * elementalEffect.multiplier * overwhelmMultiplier);
         
+        // Elemental Procs
+        const powerMultiplier = 1 + (abilityStats.elementalPowerBonus / 100);
+        let bonusDamage = 0;
         let popupType = elementalEffect.type;
-        if (popupType === 'normal' && isCrit) {
-            popupType = 'crit';
+
+        if (playerElement === 'WATER' && Math.random() < (0.05 * powerMultiplier)) {
+            bonusDamage = Math.floor(finalStats.clickDamage * 2.0);
+            addLog(`<strong class="text-blue-400">물의 원소: 추가 피해 +${formatNumber(bonusDamage)}!</strong>`);
+        } else if (playerElement === 'EARTH' && isCrit && Math.random() < (0.20 * powerMultiplier)) {
+            if(!isMonsterStunned) {
+                setIsMonsterStunned(true);
+                setTimeout(() => setIsMonsterStunned(false), 500);
+                addLog('<strong class="text-yellow-700">땅의 원소: 몬스터 0.5초 기절!</strong>');
+            }
+        } else if (playerElement === 'FIRE' && Math.random() < (0.10 * powerMultiplier) && !elementalEffects.fire_dot) {
+            const dotDamage = finalStats.autoAttackDamage * 0.20 * powerMultiplier;
+            setElementalEffects(prev => ({ ...prev, fire_dot: { expires: Date.now() + 3000, damagePerTick: dotDamage } }));
+            addLog('<strong class="text-red-500">불의 원소: 몬스터에게 화상!</strong>');
         }
+
+        if (playerElement === 'WIND') {
+            if(windStackDecayTimer.current) clearTimeout(windStackDecayTimer.current);
+            windStackDecayTimer.current = setTimeout(() => {
+                setElementalEffects(prev => ({...prev, wind_stacks: 0}));
+                addLog('<strong class="text-gray-400">바람의 원소: 중첩 초기화.</strong>');
+            }, 5000);
+            setElementalEffects(prev => ({...prev, wind_stacks: Math.min(20, prev.wind_stacks + 1)}));
+        }
+
+        damageDealt += bonusDamage;
+
+        if (bonusDamage > 0) popupType = 'elemental';
+        else if (popupType === 'normal' && isCrit) popupType = 'crit';
+
         createDamagePopup(damageDealt, popupType, elementalEffect.prefix);
 
         setMonsterStats(prev => {
             const newHp = prev.hp - damageDealt;
-            if (newHp <= 0) {
-                handleMonsterDefeat();
-                return { ...prev, hp: 0 };
-            }
             return { ...prev, hp: newHp };
         });
     };
@@ -2303,6 +2361,106 @@ const App = () => {
         updateMissionProgress('UPGRADE_TIMES', 1);
         needsSave.current = true;
     }, [upgrades, playerStats.coins, updateMissionProgress]);
+
+    const handleUseSkill1 = useCallback(() => {
+        if (!playerClass || activeSkillCooldown > 0 || monsterStats.hp <= 0) return;
+
+        const job = JOBS[playerClass];
+        const skill = job.skill;
+        addLog(`<strong class="text-orange-400">스킬 사용: ${skill.name}!</strong>`);
+        setActiveSkillCooldown(finalAbilityStats.activeSkillCooldown);
+
+        const skillPower = 1 + (finalAbilityStats.skillDamageBonus / 100);
+        const skillDuration = 1 + (finalAbilityStats.skillDurationBonus / 100);
+
+        switch (playerClass) {
+            case 'WARRIOR': { // 소용돌이
+                if (whirlwindIntervalRef.current) clearInterval(whirlwindIntervalRef.current);
+                let ticks = 0;
+                const duration = 5000 * skillDuration;
+                whirlwindIntervalRef.current = setInterval(() => {
+                    if (ticks >= 5) {
+                        clearInterval(whirlwindIntervalRef.current);
+                        whirlwindIntervalRef.current = null;
+                        return;
+                    }
+                    const damage = Math.floor(finalStats.autoAttackDamage * 3.0 * skillPower);
+                    createDamagePopup(damage, 'skill');
+                    setMonsterStats(prev => {
+                        if (prev.hp <= 0) {
+                           clearInterval(whirlwindIntervalRef.current);
+                           whirlwindIntervalRef.current = null;
+                           return prev;
+                        }
+                        const newHp = prev.hp - damage;
+                        return { ...prev, hp: newHp };
+                    });
+                    ticks++;
+                }, duration / 5);
+                break;
+            }
+            case 'ARCHER': { // 집중의 시간
+                setFocusTimeActive(true);
+                setTimeout(() => setFocusTimeActive(false), 10000 * skillDuration);
+                break;
+            }
+            case 'MAGE': { // 운석 낙하
+                const totalAtk = finalStats.clickDamage + finalStats.autoAttackDamage;
+                const damage = Math.floor(totalAtk * 25 * skillPower);
+                createDamagePopup(damage, 'skill');
+                
+                const elementalEffect = getElementalEffect();
+                if (elementalEffect.type === 'elemental') {
+                    addLog('몬스터가 빙결되었습니다!');
+                    setIsMonsterStunned(true);
+                    setTimeout(() => setIsMonsterStunned(false), 3000 * skillDuration);
+                }
+
+                setMonsterStats(prev => {
+                    const newHp = prev.hp - damage;
+                    return { ...prev, hp: newHp };
+                });
+                break;
+            }
+        }
+    }, [playerClass, activeSkillCooldown, finalStats, finalAbilityStats, monsterStats.hp, addLog, createDamagePopup, getElementalEffect]);
+
+    const handleUseSkill2 = useCallback(() => {
+        if (!playerClass || secondSkillCooldown > 0 || monsterStats.hp <= 0) return;
+
+        const job = JOBS[playerClass];
+        const skill = job.skill2;
+        addLog(`<strong class="text-cyan-400">스킬 사용: ${skill.name}!</strong>`);
+        setSecondSkillCooldown(job.skill2.cooldown * (1 - finalAbilityStats.haste / 100));
+
+        const skillPower = 1 + (finalAbilityStats.skillDamageBonus / 100);
+        const skillDuration = 1 + (finalAbilityStats.skillDurationBonus / 100);
+
+        switch (playerClass) {
+            case 'WARRIOR': { // 압도
+                setOverwhelmState({ active: true, clicksLeft: 5 });
+                break;
+            }
+            case 'ARCHER': { // 저격
+                const missingHp = monsterStats.maxHp - monsterStats.hp;
+                let damage = missingHp * 0.15 * skillPower;
+                const maxDamage = finalStats.autoAttackDamage * 20;
+                damage = Math.min(damage, maxDamage);
+                damage = Math.floor(damage * (finalStats.critDamage / 100)); // Always crit
+                createDamagePopup(damage, 'crit');
+                setMonsterStats(prev => {
+                    const newHp = prev.hp - damage;
+                    return { ...prev, hp: newHp };
+                });
+                break;
+            }
+            case 'MAGE': { // 시간 왜곡
+                setTimeWarpActive(true);
+                setTimeout(() => setTimeWarpActive(false), 10000 * skillDuration);
+                break;
+            }
+        }
+    }, [playerClass, secondSkillCooldown, finalStats, finalAbilityStats, monsterStats, addLog, createDamagePopup]);
 
     // All handler functions that were missing
     const handlers = useMemo(() => ({
@@ -2520,30 +2678,83 @@ const App = () => {
     }), [playerStats, upgrades, abilityStats, equipment, inventory, missions, ownedArtifacts, equippedArtifacts, sellList, liberationCost, equipmentGachaCost, handleGenericUpgrade, generateRandomItem, addLog, generateMission]);
     
     useEffect(() => {
+        if (monsterStats.hp <= 0) {
+            handleMonsterDefeat();
+        }
+    }, [monsterStats.hp, handleMonsterDefeat]);
+    
+    useEffect(() => {
         if (finalStats.autoAttackDamage <= 0) return;
         const interval = setInterval(() => {
-            if (newItemDrop || isJobSelectionOpen || selectedInventoryItem || !difficulty || offlineProgress || treasureGolem.isActive || isMonsterStunned) return;
-            const isCrit = Math.random() * 100 < finalStats.critChance;
+            if (newItemDrop || isJobSelectionOpen || selectedInventoryItem || !difficulty || offlineProgress || treasureGolem.isActive || monsterStats.hp <= 0) return;
+            
+            const isStunned = isMonsterStunned;
+            const isCrit = isStunned || (Math.random() * 100 < finalStats.critChance);
             const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
             const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
             const elementalEffect = getElementalEffect();
-            const damageDealt = Math.floor(finalStats.autoAttackDamage * critMultiplier * bossMultiplier * elementalEffect.multiplier);
-
+            let damageDealt = Math.floor(finalStats.autoAttackDamage * critMultiplier * bossMultiplier * elementalEffect.multiplier);
+            
+            // Elemental Procs
+            const powerMultiplier = 1 + (abilityStats.elementalPowerBonus / 100);
+            let bonusDamage = 0;
             let popupType = elementalEffect.type;
-            if (popupType === 'normal' && isCrit) {
-                popupType = 'crit';
+
+            if (playerElement === 'WATER' && Math.random() < (0.05 * powerMultiplier)) {
+                bonusDamage = Math.floor(finalStats.clickDamage * 2.0);
+            } else if (playerElement === 'EARTH' && isCrit && Math.random() < (0.20 * powerMultiplier)) {
+                if(!isMonsterStunned) {
+                    setIsMonsterStunned(true);
+                    setTimeout(() => setIsMonsterStunned(false), 500);
+                }
+            } else if (playerElement === 'FIRE' && Math.random() < (0.10 * powerMultiplier) && !elementalEffects.fire_dot) {
+                const dotDamage = finalStats.autoAttackDamage * 0.20 * powerMultiplier;
+                setElementalEffects(prev => ({ ...prev, fire_dot: { expires: Date.now() + 3000, damagePerTick: dotDamage } }));
             }
+            if (playerElement === 'WIND') {
+                if(windStackDecayTimer.current) clearTimeout(windStackDecayTimer.current);
+                windStackDecayTimer.current = setTimeout(() => setElementalEffects(prev => ({...prev, wind_stacks: 0})), 5000);
+                setElementalEffects(prev => ({...prev, wind_stacks: Math.min(20, prev.wind_stacks + 1)}));
+            }
+            damageDealt += bonusDamage;
+
+            if (bonusDamage > 0) popupType = 'elemental';
+            else if (popupType === 'normal' && isCrit) popupType = 'crit';
+
             createDamagePopup(damageDealt, popupType, elementalEffect.prefix);
 
             setMonsterStats(prev => {
+                if(prev.hp <= 0) return prev;
                 const newHp = prev.hp - damageDealt;
-                if (newHp <= 0) { handleMonsterDefeat(); return { ...prev, hp: 0 }; }
                 return { ...prev, hp: newHp };
             });
         }, 1000 / finalStats.attackSpeed);
         return () => clearInterval(interval);
-    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats.isBoss, finalAbilityStats, difficulty, offlineProgress, treasureGolem.isActive, getElementalEffect, isMonsterStunned, createDamagePopup]);
+    }, [finalStats, handleMonsterDefeat, newItemDrop, isJobSelectionOpen, selectedInventoryItem, monsterStats, finalAbilityStats, difficulty, offlineProgress, treasureGolem.isActive, getElementalEffect, isMonsterStunned, createDamagePopup, playerElement, elementalEffects.fire_dot, abilityStats.elementalPowerBonus]);
     
+    // Fire DoT Effect
+    useEffect(() => {
+        if (!elementalEffects.fire_dot) return;
+
+        const interval = setInterval(() => {
+            setElementalEffects(prev => {
+                if (!prev.fire_dot) {
+                    return prev;
+                }
+                if (Date.now() > prev.fire_dot.expires) {
+                    return { ...prev, fire_dot: null };
+                }
+                
+                const damage = Math.floor(prev.fire_dot.damagePerTick);
+                createDamagePopup(damage, 'skill');
+                setMonsterStats(m => ({ ...m, hp: Math.max(0, m.hp - damage) }));
+                
+                return prev;
+            });
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [elementalEffects.fire_dot, createDamagePopup]);
+
     useEffect(() => {
         if (activeSkillCooldown > 0) {
             const multiplier = timeWarpActive ? 2 : 1;
@@ -2577,8 +2788,9 @@ const App = () => {
 
     const handleEquipNewItem = useCallback(() => {
         if (!newItemDrop) return;
-        const itemToStore = equipment[newItemDrop.type];
-        setEquipment(prev => ({...prev, [newItemDrop.type]: newItemDrop}));
+        const typeKey = newItemDrop.type.toLowerCase();
+        const itemToStore = equipment[typeKey];
+        setEquipment(prev => ({...prev, [typeKey]: newItemDrop}));
         if (itemToStore) {
             setInventory(prev => [...prev, itemToStore]);
         }
@@ -2596,8 +2808,9 @@ const App = () => {
     }, [newItemDrop, addLog]);
     
     const handleEquipFromInventory = useCallback((item) => {
-        const currentEquipped = equipment[item.type];
-        setEquipment(prev => ({...prev, [item.type]: item}));
+        const typeKey = item.type.toLowerCase();
+        const currentEquipped = equipment[typeKey];
+        setEquipment(prev => ({...prev, [typeKey]: item}));
         setInventory(prev => {
             const newInv = prev.filter(i => i.id !== item.id);
             if(currentEquipped) newInv.push(currentEquipped);
@@ -2674,8 +2887,8 @@ const App = () => {
         <div className="container mx-auto p-2 sm:p-4 max-w-screen-2xl">
             {isJobSelectionOpen && <JobSelectionModal onSelect={handleJobSelect} onClose={() => setIsJobSelectionOpen(false)} />}
             {isDifficultyModalOpen && <DifficultyChangeModal currentDifficulty={difficulty} onSelect={handleChangeDifficulty} onClose={() => setIsDifficultyModalOpen(false)} />}
-            {newItemDrop && <NewItemDropModal newItem={newItemDrop} currentItem={equipment[newItemDrop.type]} onEquip={handleEquipNewItem} onStore={handleStoreNewItem} />}
-            {selectedInventoryItem && <InventoryItemDetailModal item={selectedInventoryItem} currentEquipped={equipment[selectedInventoryItem.type]} onEquip={handleEquipFromInventory} onSell={handleSellItem} onSelectForge={handleSelectForge} onToggleLock={handleToggleLock} onClose={() => setSelectedInventoryItem(null)} />}
+            {newItemDrop && <NewItemDropModal newItem={newItemDrop} currentItem={equipment[newItemDrop.type.toLowerCase()]} onEquip={handleEquipNewItem} onStore={handleStoreNewItem} />}
+            {selectedInventoryItem && <InventoryItemDetailModal item={selectedInventoryItem} currentEquipped={equipment[selectedInventoryItem.type.toLowerCase()]} onEquip={handleEquipFromInventory} onSell={handleSellItem} onSelectForge={handleSelectForge} onToggleLock={handleToggleLock} onClose={() => setSelectedInventoryItem(null)} />}
             {offlineProgress && <OfflineProgressModal progress={offlineProgress} onClaim={handleOfflineClaim} />}
             {isElementModalOpen && <ElementSelectionModal currentElement={playerElement} onSelect={handleSelectElement} onClose={() => setIsElementModalOpen(false)} />}
 
@@ -2690,13 +2903,13 @@ const App = () => {
                         rebirthCount={rebirthCount}
                         onJobChangeClick={() => setIsJobSelectionOpen(true)}
                         difficulty={difficulty}
-                        onDifficultyChangeClick={() => setIsDifficultyModalOpen(true)}
+                        onDifficultyChangeClick={() => setIsDifficultyModalOpen(false)}
                         isAutoDropEnabled={isAutoDropEnabled}
                         onToggleAutoDrop={() => {setIsAutoDropEnabled(p => !p); needsSave.current = true;}}
                         onReset={() => { if(confirm('정말 초기화하시겠습니까? 모든 진행 상황이 삭제됩니다.')) { localStorage.removeItem(SAVED_GAME_KEY); window.location.reload(); }}}
                     />
                     <EquipmentPanel equipment={equipment} onSelectItem={(item) => setSelectedInventoryItem(item)} />
-                    <ElementPanel playerElement={playerElement} onOpenModal={() => setIsElementModalOpen(true)} />
+                    <ElementPanel playerElement={playerElement} onOpenModal={() => setIsElementModalOpen(false)} />
                     <EquippedArtifactsPanel equipped={equippedArtifacts} onSlotClick={() => setActiveTab('artifacts')} />
                 </div>
 
@@ -2704,8 +2917,8 @@ const App = () => {
                     <MonsterDisplay monster={monsterStats} onClick={handleMonsterClick} damagePopups={damagePopups} treasureGolem={treasureGolem}>
                         {playerClass && (
                             <div className="grid grid-cols-2 gap-2 w-full max-w-sm mt-4">
-                                <ActiveSkillButton skill={JOBS[playerClass].skill} onClick={()=>{}} cooldown={activeSkillCooldown} maxCooldown={finalAbilityStats.activeSkillCooldown} />
-                                <ActiveSkillButton skill={JOBS[playerClass].skill2} onClick={()=>{}} cooldown={secondSkillCooldown} maxCooldown={JOBS[playerClass].skill2.cooldown * (1 - finalAbilityStats.haste / 100)} />
+                                <ActiveSkillButton skill={JOBS[playerClass].skill} onClick={handleUseSkill1} cooldown={activeSkillCooldown} maxCooldown={finalAbilityStats.activeSkillCooldown} />
+                                <ActiveSkillButton skill={JOBS[playerClass].skill2} onClick={handleUseSkill2} cooldown={secondSkillCooldown} maxCooldown={JOBS[playerClass].skill2.cooldown * (1 - finalAbilityStats.haste / 100)} />
                             </div>
                         )}
                         <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-lg">
@@ -2732,7 +2945,7 @@ const App = () => {
                     onToggleSellItem={handlers.onToggleSellItem}
                     onBulkSell={handlers.onBulkSell}
                     onBulkSellByRarity={handlers.onBulkSellByRarity}
-                    selectedForgeItem={selectedForgeItem}
+                    selectedForgeitem={selectedForgeItem}
                     missions={missions}
                     onClaimMission={handlers.onClaimMission}
                     ownedArtifacts={ownedArtifacts}
@@ -2750,6 +2963,7 @@ const App = () => {
     );
 };
 
+// Render the App component into the root element.
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
     </script>
