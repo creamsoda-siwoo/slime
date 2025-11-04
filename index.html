@@ -27,12 +27,12 @@
         .animate-damage-popup-crit {
             animation: damage-popup-crit 1s ease-out forwards;
         }
-        @keyframes damage-popup-elemental {
+        @keyframes damage-popup-attribute {
             0% { transform: translateY(0) scale(1.5); opacity: 1; text-shadow: 0 0 5px #fff, 0 0 10px #ff00ff, 0 0 15px #00ffff, 0 0 20px #ffff00; }
             100% { transform: translateY(-120px) scale(3.2); opacity: 0; }
         }
-        .animate-damage-popup-elemental {
-            animation: damage-popup-elemental 1.2s ease-out forwards;
+        .animate-damage-popup-attribute {
+            animation: damage-popup-attribute 1.2s ease-out forwards;
         }
         @keyframes damage-popup-resist {
             0% { transform: translateY(0) scale(0.8); opacity: 0.9; }
@@ -142,36 +142,36 @@ const BOSS_REWARD_MULTIPLIER = 3;
 const BOSS_DROP_CHANCE_BOOST = 0.2;
 
 const CLICK_UPGRADE_COST_BASE = 50;
-const CLICK_UPGRADE_COST_MULTIPLIER = 1.25;
+const CLICK_UPGRADE_COST_MULTIPLIER = 1.23;
 const AUTO_ATTACK_UPGRADE_COST_BASE = 120;
-const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.32;
+const AUTO_ATTACK_UPGRADE_COST_MULTIPLIER = 1.30;
 const CRIT_CHANCE_UPGRADE_COST_BASE = 300;
-const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.48;
+const CRIT_CHANCE_UPGRADE_COST_MULTIPLIER = 1.45;
 const CRIT_CHANCE_UPGRADE_INCREASE = 1;
 const CRIT_DAMAGE_UPGRADE_COST_BASE = 500;
-const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.45;
+const CRIT_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.42;
 const CRIT_DAMAGE_UPGRADE_INCREASE = 5;
 
 const GOLD_GAIN_UPGRADE_COST_BASE = 600;
-const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.55;
+const GOLD_GAIN_UPGRADE_COST_MULTIPLIER = 1.52;
 const XP_GAIN_UPGRADE_COST_BASE = 1000;
-const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.65;
+const XP_GAIN_UPGRADE_COST_MULTIPLIER = 1.60;
 
 const ATTACK_SPEED_UPGRADE_COST_BASE = 1200;
-const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.48;
+const ATTACK_SPEED_UPGRADE_COST_MULTIPLIER = 1.44;
 const HASTE_UPGRADE_COST_BASE = 2500;
-const HASTE_UPGRADE_COST_MULTIPLIER = 1.70;
+const HASTE_UPGRADE_COST_MULTIPLIER = 1.65;
 const LUCK_UPGRADE_COST_BASE = 2000;
-const LUCK_UPGRADE_COST_MULTIPLIER = 1.60;
+const LUCK_UPGRADE_COST_MULTIPLIER = 1.55;
 
 const SKILL_DAMAGE_UPGRADE_COST_BASE = 1800;
-const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.68;
+const SKILL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.63;
 
 const BOSS_DAMAGE_UPGRADE_COST_BASE = 2200;
-const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.62;
+const BOSS_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.58;
 
 const ARTIFACT_POWER_UPGRADE_COST_BASE = 25000;
-const ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER = 1.80;
+const ARTIFACT_POWER_UPGRADE_COST_MULTIPLIER = 1.75;
 
 const FINAL_DAMAGE_UPGRADE_COST_BASE = 8000;
 const FINAL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.85;
@@ -179,8 +179,8 @@ const FINAL_DAMAGE_UPGRADE_COST_MULTIPLIER = 1.85;
 const SKILL_DURATION_UPGRADE_COST_BASE = 5000;
 const SKILL_DURATION_UPGRADE_COST_MULTIPLIER = 1.75;
 
-const ELEMENTAL_POWER_UPGRADE_COST_BASE = 6000;
-const ELEMENTAL_POWER_UPGRADE_COST_MULTIPLIER = 1.82;
+const ATTRIBUTE_POWER_UPGRADE_COST_BASE = 6000;
+const ATTRIBUTE_POWER_UPGRADE_COST_MULTIPLIER = 1.82;
 const OFFLINE_REWARDS_UPGRADE_COST_BASE = 10000;
 const OFFLINE_REWARDS_UPGRADE_COST_MULTIPLIER = 1.90;
 const TREASURE_GOLEM_CHANCE_UPGRADE_COST_BASE = 15000;
@@ -203,21 +203,21 @@ const TREASURE_GOLEM_TIMER = 30; // 30 seconds
 
 const SAVED_GAME_KEY = 'slimeHunterSaveData';
 
-// --- ELEMENTAL DATA ---
-const ELEMENT_TYPES = {
+// --- ATTRIBUTE DATA ---
+const ATTRIBUTE_TYPES = {
     FIRE: { name: '불', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-red-500" {...props}><path d="M12 2.25c.991 1.726 2.5 3.013 2.5 4.75 0 1.933-1.567 3.5-3.5 3.5-1.933 0-3.5-1.567-3.5-3.5 0-1.737 1.509-3.024 2.5-4.75z M12 21.75c-3.314 0-6-2.686-6-6 0-3.314 2.686-6 6-6s6 2.686 6 6c0 3.314-2.686 6-6 6z M12 11.25c-2.485 0-4.5 2.015-4.5 4.5s2.015 4.5 4.5 4.5 4.5-2.015 4.5-4.5-2.015-4.5-4.5-4.5z"/></svg> },
     WATER: { name: '물', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-blue-500" {...props}><path d="M12 2c-5.523 0-10 4.477-10 10 0 5.523 4.477 10 10 10s10-4.477 10-10c0-5.523-4.477-10-10-10z M12 20c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z M12 6c-3.309 0-6 2.691-6 6s2.691 6 6 6 6-2.691 6-6-2.691-6-6-6z M12 16c-2.206 0-4-1.794-4-4s1.794-4 4-4 4 1.794 4 4-1.794 4-4 4z"/></svg> },
     EARTH: { name: '땅', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-yellow-700" {...props}><path d="M12 2L2 12l10 10 10-10L12 2z m0 17.172L4.828 12 12 4.828 19.172 12 12 19.172z"/></svg> },
     WIND: { name: '바람', icon: (props) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="text-gray-400" {...props}><path d="M12 2c-5.523 0-10 4.477-10 10s4.477 10 10 10c2.761 0 5.261-1.121 7.071-2.929l-1.414-1.414c-1.569 1.569-3.71 2.343-5.657 2.343-4.411 0-8-3.589-8-8s3.589-8 8-8c1.947 0 3.788 0.774 5.146 2.059l-1.146 1.146h5v-5l-1.464 1.464c-1.85-1.85-4.408-2.669-6.936-2.669z"/></svg> },
 };
-const ELEMENTAL_RELATIONSHIPS = {
+const ATTRIBUTE_RELATIONSHIPS = {
     FIRE: { weak: 'WIND', strong: 'WATER' },
     WATER: { weak: 'FIRE', strong: 'EARTH' },
     EARTH: { weak: 'WATER', strong: 'WIND' },
     WIND: { weak: 'EARTH', strong: 'FIRE' },
 };
-const ELEMENTAL_ADVANTAGE_MULTIPLIER = 1.25;
-const ELEMENTAL_DISADVANTAGE_MULTIPLIER = 1.0;
+const ATTRIBUTE_ADVANTAGE_MULTIPLIER = 1.25;
+const ATTRIBUTE_DISADVANTAGE_MULTIPLIER = 1.0;
 
 // --- DIFFICULTY DATA ---
 const DIFFICULTIES = {
@@ -264,7 +264,7 @@ const JOBS = {
         name: '마법사',
         description: '강력한 스킬로 전장을 지배합니다.',
         passive: '스킬 데미지 +50%, 스킬 쿨타임 감소 효과 +25%',
-        skill: { name: '운석 낙하', description: '총 공격력의 25배 피해를 주고, 몬스터가 약점 원소일 경우 3초간 빙결시킵니다.' },
+        skill: { name: '운석 낙하', description: '총 공격력의 25배 피해를 주고, 몬스터가 약점 속성일 경우 3초간 빙결시킵니다.' },
         skill2: { name: '시간 왜곡', description: '총 공격력의 500% 피해를 주고, 10초간 모든 스킬 쿨타임이 2배 빠르게 감소하며 몬스터 처치 시 골드 획득량이 50% 증가합니다.', cooldown: 90000 },
         skill3: { name: '마력 폭풍', description: '총 공격력의 15배에 해당하는 피해를 주고, 5초간 몬스터가 받는 모든 피해가 20% 증가하는 디버프를 겁니다.', cooldown: 80000 },
         bonuses: { clickDamage: 0, autoAttackDamage: 0, critChance: 0, critDamage: 0, skillEffect: 0.5 },
@@ -321,13 +321,14 @@ const RingIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className=
 const CloakIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v16h16V4H4zm8 4l-4 4h8l-4-4z" /></svg> );
 const ArtifactIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H7.5A2.25 2.25 0 005.25 6.75v9.75a2.25 2.25 0 002.25 2.25z" /> </svg> );
 const LockIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}> <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" /> </svg> );
-const ElementIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.362-3.797z" /></svg> );
+const AttributeIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.362-3.797z" /></svg> );
 const OfflineIcon = (props) => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> );
 
 // Monster Icons
 const GreenSlimeIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 80" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path> <circle cx="28" cy="50" r="5" fill="#fecaca"></circle> <circle cx="72" cy="50" r="5" fill="#fecaca"></circle> <circle cx="38" cy="45" r="8" fill="white"></circle> <circle cx="62" cy="45" r="8" fill="white"></circle> <circle cx="40" cy="46" r="4" fill="black"></circle> <circle cx="64" cy="46" r="4" fill="black"></circle> <circle cx="37" cy="42" r="2" fill="white"></circle> <circle cx="61" cy="42" r="2" fill="white"></circle> <path d="M 45 60 Q 50 68, 55 60" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
 const RedSlimeIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 80" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#ef4444" stroke="#991b1b" strokeWidth="3"></path> <circle cx="38" cy="45" r="7" fill="white"></circle> <circle cx="62" cy="45" r="7" fill="white"></circle> <circle cx="40" cy="47" r="3" fill="black"></circle> <circle cx="64" cy="47" r="3" fill="black"></circle> <path d="M 45 62 Q 50 55, 55 62" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
 const BlueSlimeIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 80" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 35 25 C 40 20, 50 20, 55 25" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 10, 40 10, 50 10 C 60 10, 90 10, 90 40 C 90 40, 90 80, 50 80 Z" fill="#3b82f6" stroke="#1e3a8a" strokeWidth="3"></path> <path d="M 32 40 C 35 45, 41 45, 44 40" stroke="white" fill="transparent" strokeWidth="3" strokeLinecap="round"></path> <path d="M 56 40 C 59 45, 65 45, 68 40" stroke="white" fill="transparent" strokeWidth="3" strokeLinecap="round"></path> <path d="M 45 60 Q 50 65, 55 60" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
+const GoblinIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 100" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 30 20 L 15 40 L 25 45 Z" fill="#65a30d" stroke="#4d7c0f" strokeWidth="2"></path> <path d="M 70 20 L 85 40 L 75 45 Z" fill="#65a30d" stroke="#4d7c0f" strokeWidth="2"></path> <circle cx="50" cy="50" r="30" fill="#84cc16" stroke="#4d7c0f" strokeWidth="3"></circle> <circle cx="40" cy="45" r="5" fill="white"></circle> <circle cx="60" cy="45" r="5" fill="white"></circle> <circle cx="41" cy="46" r="2.5" fill="black"></circle> <circle cx="61" cy="46" r="2.5" fill="black"></circle> <path d="M 40 65 Q 50 55, 60 65" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> <path d="M 45 35 C 40 32, 60 32, 55 35" stroke="#4d7c0f" fill="transparent" strokeWidth="1.5"></path> </svg> );
 const GolemIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 100" className={`drop-shadow-lg ${className}`} {...props}> <rect x="20" y="40" width="60" height="50" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect> <rect x="30" y="20" width="40" height="30" fill="#7f8c9b" stroke="#4b5563" strokeWidth="3" rx="5"></rect> <circle cx="45" cy="35" r="4" fill="#dc2626"></circle> <circle cx="55" cy="35" r="4" fill="#dc2626"></circle> <rect x="10" y="50" width="20" height="30" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect> <rect x="70" y="50" width="20" height="30" fill="#6b7280" stroke="#4b5563" strokeWidth="3" rx="5"></rect> </svg> );
 const KingSlimeIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 80" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 25 20 L 30 5 L 50 15 L 70 5 L 75 20 Z" fill="#facc15" stroke="#ca8a04" strokeWidth="2" strokeLinejoin="round"></path> <circle cx="30" cy="7" r="3" fill="#ef4444"></circle> <circle cx="50" cy="17" r="3" fill="#3b82f6"></circle> <circle cx="70" cy="7" r="3" fill="#22c55e"></circle> <path d="M 35 35 C 40 30, 50 30, 55 35" fill="rgba(255,255,255,0.5)" stroke="none"></path> <path d="M 50 80 C 10 80, 10 40, 10 40 C 10 20, 40 20, 50 20 C 60 20, 90 20, 90 40 C 90 40, 90 80, 50 80 Z" fill="#22c55e" stroke="#166534" strokeWidth="3"></path> <circle cx="28" cy="55" r="5" fill="#fecaca"></circle> <circle cx="72" cy="55" r="5" fill="#fecaca"></circle> <circle cx="38" cy="50" r="8" fill="white"></circle> <circle cx="62" cy="50" r="8" fill="white"></circle> <circle cx="40" cy="51" r="4" fill="black"></circle> <circle cx="64" cy="51" r="4" fill="black"></circle> <circle cx="37" cy="47" r="2" fill="white"></circle> <circle cx="61" cy="47" r="2" fill="white"></circle> <path d="M 45 65 Q 50 73, 55 65" stroke="black" fill="transparent" strokeWidth="2.5" strokeLinecap="round"></path> </svg> );
 const DragonIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 100 100" className={`drop-shadow-lg ${className}`} {...props}> <path d="M 50 10 C 20 40, 20 80, 50 90 C 80 80, 80 40, 50 10" fill="#b91c1c" stroke="#4a0404" strokeWidth="3"></path> <path d="M 40 20 C 30 30, 30 40, 40 50" fill="none" stroke="#fef2f2" strokeWidth="2"></path> <path d="M 60 20 C 70 30, 70 40, 60 50" fill="none" stroke="#fef2f2" strokeWidth="2"></path> <circle cx="45" cy="35" r="5" fill="#fef08a"></circle> <circle cx="55" cy="35" r="5" fill="#fef08a"></circle> <path d="M 45 70 Q 50 80, 55 70" stroke="white" strokeWidth="2" fill="none"></path> <path d="M 20 50 C 10 60, 10 70, 20 80" fill="#991b1b" stroke="#4a0404" strokeWidth="2"></path> <path d="M 80 50 C 90 60, 90 70, 80 80" fill="#991b1b" stroke="#4a0404" strokeWidth="2"></path> </svg> );
@@ -335,14 +336,15 @@ const TreasureGolemIcon = ({className = '', ...props}) => ( <svg viewBox="0 0 10
 
 // --- MONSTER DATA ---
 const MONSTER_TYPES = [
-    { name: '초록 슬라임', Icon: GreenSlimeIcon, minLevel: 1 },
-    { name: '빨간 슬라임', Icon: RedSlimeIcon, minLevel: 1 },
-    { name: '파란 슬라임', Icon: BlueSlimeIcon, minLevel: 1 },
+    { name: '초록 슬라임', Icon: GreenSlimeIcon, minLevel: 1, hpMultiplier: 1.0, rewardMultiplier: 1.0 },
+    { name: '빨간 슬라임', Icon: RedSlimeIcon, minLevel: 1, hpMultiplier: 1.0, rewardMultiplier: 1.0 },
+    { name: '파란 슬라임', Icon: BlueSlimeIcon, minLevel: 1, hpMultiplier: 1.0, rewardMultiplier: 1.0 },
+    { name: '고블린', Icon: GoblinIcon, minLevel: 5, hpMultiplier: 1.2, rewardMultiplier: 1.2 },
 ];
 const BOSS_TYPES = [
-    { name: '골렘', Icon: GolemIcon },
-    { name: '킹 슬라임', Icon: KingSlimeIcon },
-    { name: '드래곤', Icon: DragonIcon },
+    { name: '골렘', Icon: GolemIcon, hpMultiplier: 1.0, rewardMultiplier: 1.0 },
+    { name: '킹 슬라임', Icon: KingSlimeIcon, hpMultiplier: 1.0, rewardMultiplier: 1.0 },
+    { name: '드래곤', Icon: DragonIcon, hpMultiplier: 1.0, rewardMultiplier: 1.0 },
 ];
 const SPECIAL_MONSTERS = {
     TREASURE_GOLEM: { name: '보물 골렘', Icon: TreasureGolemIcon, isSpecial: true }
@@ -541,17 +543,17 @@ const EquipmentPanel = ({ equipment, onSelectItem }) => (
     </div>
 );
 
-const ElementPanel = ({ playerElement, onOpenModal }) => (
+const AttributePanel = ({ playerAttribute, onOpenModal }) => (
     <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-green-400 flex items-center"><ElementIcon className="w-6 h-6 mr-2" /> 원소</h2>
+        <h2 className="text-2xl font-bold mb-4 text-green-400 flex items-center"><AttributeIcon className="w-6 h-6 mr-2" /> 속성</h2>
         <div className="flex items-center justify-between bg-gray-700 p-3 rounded-lg">
-            {playerElement ? (
+            {playerAttribute ? (
                 <div className="flex items-center gap-3">
-                    {React.createElement(ELEMENT_TYPES[playerElement].icon, { className: 'h-10 w-10' })}
-                    <span className="text-xl font-bold">{ELEMENT_TYPES[playerElement].name}</span>
+                    {React.createElement(ATTRIBUTE_TYPES[playerAttribute].icon, { className: 'h-10 w-10' })}
+                    <span className="text-xl font-bold">{ATTRIBUTE_TYPES[playerAttribute].name}</span>
                 </div>
             ) : (
-                <span className="text-gray-400">원소를 선택하세요</span>
+                <span className="text-gray-400">속성을 선택하세요</span>
             )}
             <button onClick={onOpenModal} className="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded-md transition-colors">변경</button>
         </div>
@@ -583,12 +585,12 @@ const EquippedArtifactsPanel = ({ equipped, onSlotClick }) => (
 const MonsterDisplay = ({ monster, onClick, damagePopups, treasureGolem, children = null }) => {
     const MonsterIcon = monster.Icon;
     const isTreasureGolem = treasureGolem.isActive;
-    const ElementInfo = monster.element ? ELEMENT_TYPES[monster.element] : null;
+    const AttributeInfo = monster.attribute ? ATTRIBUTE_TYPES[monster.attribute] : null;
 
     return (
         <div className="transition-transform duration-100 flex flex-col items-center">
              <h2 className={`text-3xl font-bold text-center mb-2 flex items-center justify-center gap-2 ${monster.isBoss ? 'text-red-400' : ''} ${isTreasureGolem ? 'text-yellow-400' : ''}`}>
-                {ElementInfo && React.createElement(ElementInfo.icon, { className: 'h-8 w-8' })}
+                {AttributeInfo && React.createElement(AttributeInfo.icon, { className: 'h-8 w-8' })}
                 <span>{monster.isBoss ? `[BOSS] ${monster.name}` : monster.name} (Lv.{monster.level})</span>
             </h2>
             {isTreasureGolem && <p className="text-center text-2xl font-bold text-yellow-300 mb-2">남은 시간: {treasureGolem.timer}초</p>}
@@ -604,7 +606,7 @@ const MonsterDisplay = ({ monster, onClick, damagePopups, treasureGolem, childre
                             ${popup.type === 'skill' ? 'text-orange-400 animate-damage-popup-skill' : ''}
                             ${popup.type === 'normal' ? 'text-yellow-300 animate-damage-popup' : ''}
                             ${popup.type === 'crit' ? 'text-yellow-200 animate-damage-popup-crit' : ''}
-                            ${popup.type === 'elemental' ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-500 animate-damage-popup-elemental' : ''}
+                            ${popup.type === 'attribute' ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-500 animate-damage-popup-attribute' : ''}
                             ${popup.type === 'resist' ? 'text-gray-400 animate-damage-popup-resist' : ''}
                          `}
                          style={{ left: `${popup.x}%`, top: `${popup.y}%` }}>
@@ -720,13 +722,13 @@ const UpgradePanel = ({ upgrades, playerCoins, handlers, abilityStats, equipment
         <h3 className="text-lg font-semibold mt-4 mb-2 text-green-300">진행</h3>
         <div className="space-y-2">
              <div className="tooltip w-full">
-                <button onClick={handlers.onUpgradeElementalPower} disabled={playerCoins < upgrades.elementalPowerUpgradeCost} className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
-                    <ElementIcon className="inline-block h-4 w-4 -mt-1" /> 원소 강화 (+2%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.elementalPowerUpgradeCost)}
+                <button onClick={handlers.onUpgradeAttributePower} disabled={playerCoins < upgrades.attributePowerUpgradeCost} className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm transition-all duration-200">
+                    <AttributeIcon className="inline-block h-4 w-4 -mt-1" /> 속성 강화 (+2%) | <CoinIcon className="inline-block h-4 w-4 -mt-1" /> {formatNumber(upgrades.attributePowerUpgradeCost)}
                 </button>
                 <span className="tooltiptext">
-                    <p className="font-bold">원소 강화</p>
-                    <p className="text-sm text-gray-300">모든 원소의 지속 효과와 공격 효과를 강화합니다.</p>
-                    <p className="text-sm text-purple-300 mt-2">현재: +{Math.round(abilityStats.elementalPowerBonus)}%</p>
+                    <p className="font-bold">속성 강화</p>
+                    <p className="text-sm text-gray-300">모든 속성의 지속 효과와 공격 효과를 강화합니다.</p>
+                    <p className="text-sm text-purple-300 mt-2">현재: +{Math.round(abilityStats.attributePowerBonus)}%</p>
                 </span>
             </div>
              <div className="tooltip w-full">
@@ -1545,8 +1547,8 @@ const OfflineProgressModal = ({ progress, onClaim }) => {
     );
 };
 
-const ElementSelectionModal = ({ currentElement, onSelect, onClose }) => {
-    const elements = [
+const AttributeSelectionModal = ({ currentAttribute, onSelect, onClose }) => {
+    const attributes = [
         { key: 'FIRE', passive: '+15% 스킬 데미지', effect: '10% 확률로 3초간 화상(초당 자동공격력의 20% 피해) 부여' },
         { key: 'WATER', passive: '+15% 골드 & 경험치 획득', effect: '5% 확률로 클릭 데미지의 200% 추가 피해' },
         { key: 'EARTH', passive: '+10% 크리티컬 데미지', effect: '크리티컬 시 20% 확률로 0.5초 스턴 (스턴 중 모든 공격은 크리티컬)' },
@@ -1556,17 +1558,17 @@ const ElementSelectionModal = ({ currentElement, onSelect, onClose }) => {
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
             <div className="bg-gray-900 p-8 rounded-lg shadow-2xl w-full max-w-4xl border border-gray-700 text-center relative">
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
-                <h2 className="text-4xl font-bold mb-4 text-green-400">원소 선택</h2>
-                <p className="text-gray-400 mb-8">전투에 적용할 원소 친화력을 선택하세요.</p>
+                <h2 className="text-4xl font-bold mb-4 text-green-400">속성 선택</h2>
+                <p className="text-gray-400 mb-8">전투에 적용할 속성 친화력을 선택하세요.</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {elements.map(({ key, passive, effect }) => {
-                        const elementInfo = ELEMENT_TYPES[key];
-                        const isCurrent = currentElement === key;
+                    {attributes.map(({ key, passive, effect }) => {
+                        const attributeInfo = ATTRIBUTE_TYPES[key];
+                        const isCurrent = currentAttribute === key;
                         return (
                             <div key={key} className={`bg-gray-800 p-6 rounded-lg border-2 ${isCurrent ? 'border-green-500' : 'border-gray-700 hover:border-green-400'} transition-all flex flex-col`}>
                                 <div className="flex items-center gap-3 mb-3">
-                                    {React.createElement(elementInfo.icon, { className: 'w-10 h-10' })}
-                                    <h3 className="text-2xl font-bold text-white">{elementInfo.name}</h3>
+                                    {React.createElement(attributeInfo.icon, { className: 'w-10 h-10' })}
+                                    <h3 className="text-2xl font-bold text-white">{attributeInfo.name}</h3>
                                 </div>
                                 <div className="text-left space-y-2 text-sm flex-grow">
                                     <p><strong className="text-yellow-400">지속 효과:</strong> {passive}</p>
@@ -1577,7 +1579,7 @@ const ElementSelectionModal = ({ currentElement, onSelect, onClose }) => {
                                     disabled={isCurrent}
                                     className={`mt-6 w-full text-white font-bold py-3 px-6 rounded-lg text-lg ${isCurrent ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
                                 >
-                                    {isCurrent ? '현재 원소' : '선택'}
+                                    {isCurrent ? '현재 속성' : '선택'}
                                 </button>
                             </div>
                         );
@@ -1592,7 +1594,7 @@ const ElementSelectionModal = ({ currentElement, onSelect, onClose }) => {
 const getDefaultState = () => ({
     difficulty: null,
     playerClass: null,
-    playerElement: 'FIRE',
+    playerAttribute: 'FIRE',
     playerStats: {
         playerName: '용사',
         level: 1,
@@ -1613,7 +1615,9 @@ const getDefaultState = () => ({
         hp: MONSTER_HP_BASE,
         maxHp: MONSTER_HP_BASE,
         isBoss: false,
-        element: 'FIRE',
+        attribute: 'FIRE',
+        hpMultiplier: 1.0,
+        rewardMultiplier: 1.0,
     },
     upgrades: {
         clickUpgradeCost: CLICK_UPGRADE_COST_BASE,
@@ -1632,7 +1636,7 @@ const getDefaultState = () => ({
         artifactPowerUpgradeCost: ARTIFACT_POWER_UPGRADE_COST_BASE,
         finalDamageUpgradeCost: FINAL_DAMAGE_UPGRADE_COST_BASE,
         skillDurationUpgradeCost: SKILL_DURATION_UPGRADE_COST_BASE,
-        elementalPowerUpgradeCost: ELEMENTAL_POWER_UPGRADE_COST_BASE,
+        attributePowerUpgradeCost: ATTRIBUTE_POWER_UPGRADE_COST_BASE,
         offlineRewardsUpgradeCost: OFFLINE_REWARDS_UPGRADE_COST_BASE,
         treasureGolemChanceUpgradeCost: TREASURE_GOLEM_CHANCE_UPGRADE_COST_BASE,
     },
@@ -1649,7 +1653,7 @@ const getDefaultState = () => ({
         artifactPowerBonus: 0,
         finalDamageBonus: 0,
         skillDurationBonus: 0,
-        elementalPowerBonus: 0,
+        attributePowerBonus: 0,
         offlineRewardsBonus: 0,
         treasureGolemChanceBonus: 0,
     },
@@ -1681,11 +1685,11 @@ const App = () => {
         catch (e) { return getDefaultState().playerClass; }
     });
 
-    const [playerElement, setPlayerElement] = useState(() => {
+    const [playerAttribute, setPlayerAttribute] = useState(() => {
         const saved = localStorage.getItem(SAVED_GAME_KEY);
-        if (!saved) return getDefaultState().playerElement;
-        try { return JSON.parse(saved).playerElement || getDefaultState().playerElement; }
-        catch(e) { return getDefaultState().playerElement; }
+        if (!saved) return getDefaultState().playerAttribute;
+        try { return JSON.parse(saved).playerAttribute || getDefaultState().playerAttribute; }
+        catch(e) { return getDefaultState().playerAttribute; }
     });
 
     const [playerStats, setPlayerStats] = useState(() => {
@@ -1794,7 +1798,7 @@ const App = () => {
     const [isJobSelectionOpen, setIsJobSelectionOpen] = useState(false);
     const [selectedInventoryItem, setSelectedInventoryItem] = useState(null);
     const [isDifficultyModalOpen, setIsDifficultyModalOpen] = useState(false);
-    const [isElementModalOpen, setIsElementModalOpen] = useState(false);
+    const [isAttributeModalOpen, setIsAttributeModalOpen] = useState(false);
     const [isSellMode, setIsSellMode] = useState(false);
     const [sellList, setSellList] = useState(new Set());
     const [offlineProgress, setOfflineProgress] = useState(null);
@@ -1806,7 +1810,7 @@ const App = () => {
     const [newItemDrop, setNewItemDrop] = useState(null);
     const [isMonsterStunned, setIsMonsterStunned] = useState(false);
     const [treasureGolem, setTreasureGolem] = useState({ isActive: false, timer: 0 });
-    const [elementalEffects, setElementalEffects] = useState({ fire_dot: null, wind_stacks: 0 });
+    const [attributeEffects, setAttributeEffects] = useState({ fire_dot: null, wind_stacks: 0 });
     
     // New skill effect states
     const [overwhelmState, setOverwhelmState] = useState({ active: false, clicksLeft: 0 });
@@ -1833,7 +1837,7 @@ const App = () => {
             addLog(`<strong class="text-red-400">환생하려면 레벨 ${REBIRTH_LEVEL_REQUIREMENT}이 필요합니다.</strong>`);
             return;
         }
-        if (confirm(`정말로 환생하시겠습니까?\n레벨, 골드, 강화 상태가 초기화되지만 영구적인 스탯 보너스를 얻습니다.\n(장비, 해방, 유물, 직업, 난이도, 원소는 유지됩니다)`)) {
+        if (confirm(`정말로 환생하시겠습니까?\n레벨, 골드, 강화 상태가 초기화되지만 영구적인 스탯 보너스를 얻습니다.\n(장비, 해방, 유물, 직업, 난이도, 속성은 유지됩니다)`)) {
             const defaultState = getDefaultState();
             
             const stateToKeep = {
@@ -1845,7 +1849,7 @@ const App = () => {
                 equippedArtifacts: equippedArtifacts,
                 playerClass: playerClass,
                 difficulty: difficulty,
-                playerElement: playerElement,
+                playerAttribute: playerAttribute,
                 playerStats: {
                     ...defaultState.playerStats,
                     playerName: playerStats.playerName,
@@ -1867,12 +1871,12 @@ const App = () => {
             setEquippedArtifacts(stateToKeep.equippedArtifacts);
             setPlayerClass(stateToKeep.playerClass);
             setDifficulty(stateToKeep.difficulty);
-            setPlayerElement(stateToKeep.playerElement);
+            setPlayerAttribute(stateToKeep.playerAttribute);
             
             setActiveSkillCooldown(0);
             setSecondSkillCooldown(0);
             setThirdSkillCooldown(0);
-            setElementalEffects({ fire_dot: null, wind_stacks: 0 });
+            setAttributeEffects({ fire_dot: null, wind_stacks: 0 });
             setFocusTimeActive(false);
             setTimeWarpActive(false);
             setOverwhelmState({ active: false, clicksLeft: 0 });
@@ -1884,7 +1888,7 @@ const App = () => {
             addLog(`<strong class="text-purple-400">환생 완료! 영구 스탯이 ${REBIRTH_ALL_STAT_BONUS}% 증가했습니다.</strong>`);
             needsSave.current = true;
         }
-    }, [playerStats, rebirthCount, liberationCount, equipment, inventory, addLog, ownedArtifacts, equippedArtifacts, playerClass, difficulty, playerElement]);
+    }, [playerStats, rebirthCount, liberationCount, equipment, inventory, addLog, ownedArtifacts, equippedArtifacts, playerClass, difficulty, playerAttribute]);
 
     const updateMissionProgress = useCallback((type, amount) => {
         setMissions(prevMissions => {
@@ -1932,24 +1936,24 @@ const App = () => {
         return bonuses;
     }, [equippedArtifacts, abilityStats.artifactPowerBonus]);
 
-    const elementalBonuses = useMemo(() => {
+    const attributeBonuses = useMemo(() => {
         const bonuses = { skillDamage: 0, goldGain: 0, xpGain: 0, critDamage: 0, attackSpeed: 0, critChance: 0 };
-        if (!playerElement) return bonuses;
+        if (!playerAttribute) return bonuses;
 
-        const powerMultiplier = 1 + (abilityStats.elementalPowerBonus / 100);
+        const powerMultiplier = 1 + (abilityStats.attributePowerBonus / 100);
 
-        switch(playerElement) {
+        switch(playerAttribute) {
             case 'FIRE': bonuses.skillDamage = 15 * powerMultiplier; break;
             case 'WATER': bonuses.goldGain = 15 * powerMultiplier; bonuses.xpGain = 15 * powerMultiplier; break;
             case 'EARTH': bonuses.critDamage = 10 * powerMultiplier; break;
             case 'WIND': bonuses.attackSpeed = 5 * powerMultiplier; bonuses.critChance = 5 * powerMultiplier; break;
         }
         return bonuses;
-    }, [playerElement, abilityStats.elementalPowerBonus]);
+    }, [playerAttribute, abilityStats.attributePowerBonus]);
 
     const finalAbilityStats = useMemo(() => {
         let haste = abilityStats.haste;
-        let skillDamage = abilityStats.skillDamageBonus + elementalBonuses.skillDamage;
+        let skillDamage = abilityStats.skillDamageBonus + attributeBonuses.skillDamage;
         if (playerClass === 'MAGE') {
             haste *= 1.25;
             skillDamage *= (1 + JOBS.MAGE.bonuses.skillEffect);
@@ -1972,14 +1976,14 @@ const App = () => {
         return {
             ...abilityStats,
             luck: playerStats.luck,
-            goldGainBonus: abilityStats.goldGainBonus + rebirthBonus + artifactBonuses.goldGain + goldBonusFromItems + elementalBonuses.goldGain,
-            xpGainBonus: abilityStats.xpGainBonus + rebirthBonus + artifactBonuses.xpGain + xpBonusFromItems + elementalBonuses.xpGain,
+            goldGainBonus: abilityStats.goldGainBonus + rebirthBonus + artifactBonuses.goldGain + goldBonusFromItems + attributeBonuses.goldGain,
+            xpGainBonus: abilityStats.xpGainBonus + rebirthBonus + artifactBonuses.xpGain + xpBonusFromItems + attributeBonuses.xpGain,
             bossDamageBonus: abilityStats.bossDamageBonus + rebirthBonus + artifactBonuses.bossDamage,
             haste: haste + artifactBonuses.haste + hasteFromItems,
             skillDamageBonus: skillDamage,
             activeSkillCooldown: BASE_SKILL_COOLDOWN * (1 - (haste + artifactBonuses.haste + hasteFromItems) / 100),
         }
-    }, [abilityStats, playerClass, rebirthCount, artifactBonuses, equipment, playerStats.luck, elementalBonuses]);
+    }, [abilityStats, playerClass, rebirthCount, artifactBonuses, equipment, playerStats.luck, attributeBonuses]);
 
     const finalStats = useMemo(() => {
         let combined = { ...playerStats };
@@ -2012,15 +2016,15 @@ const App = () => {
         combined.clickDamage *= rebirthMultiplier;
         combined.autoAttackDamage *= rebirthMultiplier;
 
-        combined.critChance += artifactBonuses.critChance + elementalBonuses.critChance;
-        combined.critDamage += artifactBonuses.critDamage + elementalBonuses.critDamage;
+        combined.critChance += artifactBonuses.critChance + attributeBonuses.critChance;
+        combined.critDamage += artifactBonuses.critDamage + attributeBonuses.critDamage;
         combined.clickDamage *= (1 + artifactBonuses.clickDamageMult);
         
         let windAttackSpeedBonus = 0;
-        if (playerElement === 'WIND') {
-            windAttackSpeedBonus = elementalEffects.wind_stacks;
+        if (playerAttribute === 'WIND') {
+            windAttackSpeedBonus = attributeEffects.wind_stacks;
         }
-        combined.attackSpeed = playerStats.attackSpeed * (1 + (artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems + elementalBonuses.attackSpeed + windAttackSpeedBonus) / 100);
+        combined.attackSpeed = playerStats.attackSpeed * (1 + (artifactBonuses.attackSpeedMult + attackSpeedBonusFromItems + attributeBonuses.attackSpeed + windAttackSpeedBonus) / 100);
 
         if (weaknessFoundActive) {
             combined.critChance += 20;
@@ -2041,13 +2045,13 @@ const App = () => {
         combined.autoAttackDamage *= finalDamageMultiplier;
 
         return combined;
-    }, [playerStats, equipment, playerClass, focusTimeActive, rebirthCount, liberationCount, artifactBonuses, finalAbilityStats.finalDamageBonus, elementalBonuses, playerElement, elementalEffects.wind_stacks, weaknessFoundActive]);
+    }, [playerStats, equipment, playerClass, focusTimeActive, rebirthCount, liberationCount, artifactBonuses, finalAbilityStats.finalDamageBonus, attributeBonuses, playerAttribute, attributeEffects.wind_stacks, weaknessFoundActive]);
     
     const saveGame = useCallback(() => {
         try {
             const serializableMonsterStats = { ...monsterStats, Icon: undefined };
             const gameStateToSave = {
-                difficulty, playerClass, playerElement, playerStats, monsterStats: serializableMonsterStats,
+                difficulty, playerClass, playerAttribute, playerStats, monsterStats: serializableMonsterStats,
                 upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount,
                 inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts,
                 lastSaveTimestamp: Date.now()
@@ -2055,7 +2059,7 @@ const App = () => {
             localStorage.setItem(SAVED_GAME_KEY, JSON.stringify(gameStateToSave));
             needsSave.current = false;
         } catch (error) { console.error("Could not save game state", error); }
-    }, [difficulty, playerClass, playerElement, playerStats, monsterStats, upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount, inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts]);
+    }, [difficulty, playerClass, playerAttribute, playerStats, monsterStats, upgrades, equipment, gameLog, abilityStats, liberationCount, rebirthCount, inventory, isAutoDropEnabled, missions, ownedArtifacts, equippedArtifacts]);
 
     useEffect(() => { if (needsSave.current) { saveGame(); } });
 
@@ -2196,10 +2200,10 @@ const App = () => {
         needsSave.current = true;
     };
 
-    const handleSelectElement = (elementKey) => {
-        addLog(`<strong style="color: ${ELEMENT_TYPES[elementKey].icon({}).props.className.match(/text-([^ ]+)/)[1]}">원소를 ${ELEMENT_TYPES[elementKey].name}(으)로 변경했습니다!</strong>`);
-        setPlayerElement(elementKey);
-        setIsElementModalOpen(false);
+    const handleSelectAttribute = (attributeKey) => {
+        addLog(`<strong style="color: ${ATTRIBUTE_TYPES[attributeKey].icon({}).props.className.match(/text-([^ ]+)/)[1]}">속성을 ${ATTRIBUTE_TYPES[attributeKey].name}(으)로 변경했습니다!</strong>`);
+        setPlayerAttribute(attributeKey);
+        setIsAttributeModalOpen(false);
         needsSave.current = true;
     };
 
@@ -2228,17 +2232,17 @@ const App = () => {
         return item;
     }, [finalStats.luck]);
     
-    const getElementalEffect = useCallback(() => {
-        if (!playerElement || !monsterStats.element) return { multiplier: 1, prefix: '', type: 'normal' };
-        const relationship = ELEMENTAL_RELATIONSHIPS[playerElement];
-        if (relationship.weak === monsterStats.element) {
-            return { multiplier: ELEMENTAL_ADVANTAGE_MULTIPLIER, prefix: '⚡', type: 'elemental' };
+    const getAttributeEffect = useCallback(() => {
+        if (!playerAttribute || !monsterStats.attribute) return { multiplier: 1, prefix: '', type: 'normal' };
+        const relationship = ATTRIBUTE_RELATIONSHIPS[playerAttribute];
+        if (relationship.weak === monsterStats.attribute) {
+            return { multiplier: ATTRIBUTE_ADVANTAGE_MULTIPLIER, prefix: '⚡', type: 'attribute' };
         }
-        if (relationship.strong === monsterStats.element) {
-            return { multiplier: ELEMENTAL_DISADVANTAGE_MULTIPLIER, prefix: '🛡️', type: 'resist' };
+        if (relationship.strong === monsterStats.attribute) {
+            return { multiplier: ATTRIBUTE_DISADVANTAGE_MULTIPLIER, prefix: '🛡️', type: 'resist' };
         }
         return { multiplier: 1, prefix: '', type: 'normal' };
-    }, [playerElement, monsterStats.element]);
+    }, [playerAttribute, monsterStats.attribute]);
 
     const createDamagePopup = useCallback((damage, type = 'normal', prefix = '') => {
         const newPopup = { id: Date.now() + Math.random(), damage, prefix, x: 40 + Math.random() * 20, y: 40 + Math.random() * 20, type };
@@ -2262,7 +2266,8 @@ const App = () => {
             setTreasureGolem({ isActive: false, timer: 0 });
         } else {
             const isBossDefeated = monsterStats.isBoss;
-            const rewardMultiplier = (isBossDefeated ? BOSS_REWARD_MULTIPLIER : 1) * difficultyMultipliers.monsterReward;
+            const monsterRewardMultiplier = monsterStats.rewardMultiplier || 1.0;
+            const rewardMultiplier = (isBossDefeated ? BOSS_REWARD_MULTIPLIER : 1) * difficultyMultipliers.monsterReward * monsterRewardMultiplier;
             xpGained = Math.ceil(currentMonsterLevel * 2.5 * rewardMultiplier * (1 + finalAbilityStats.xpGainBonus / 100));
             coinsGained = Math.ceil(MONSTER_REWARD_BASE * Math.pow(MONSTER_REWARD_MULTIPLIER, currentMonsterLevel - 1) * rewardMultiplier * (1 + finalAbilityStats.goldGainBonus / 100));
             
@@ -2328,7 +2333,7 @@ const App = () => {
                 hp: Math.ceil(golemHp),
                 maxHp: Math.ceil(golemHp),
                 isBoss: false,
-                element: null,
+                attribute: null,
             });
             needsSave.current = true;
             return;
@@ -2336,18 +2341,21 @@ const App = () => {
         
         const nextMonsterLevel = newLevel;
         const isNextBoss = (nextMonsterLevel > 0 && nextMonsterLevel % BOSS_LEVEL_INTERVAL === 0);
-        const difficultyMultiplier = difficultyMultipliers.monsterHp;
-        const newMonsterHp = isNextBoss
-            ? MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextMonsterLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultiplier
-            : MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextMonsterLevel - 1) * difficultyMultiplier;
         
         const availableMonsters = MONSTER_TYPES.filter(m => m.minLevel <= nextMonsterLevel);
         const monsterData = isNextBoss
             ? BOSS_TYPES[Math.floor(Math.random() * BOSS_TYPES.length)]
             : availableMonsters[Math.floor(Math.random() * availableMonsters.length)];
+
+        const difficultyMultiplier = difficultyMultipliers.monsterHp;
+        const monsterHpMultiplier = monsterData.hpMultiplier || 1.0;
+
+        const newMonsterHp = isNextBoss
+            ? MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextMonsterLevel - 1) * BOSS_HP_MULTIPLIER * difficultyMultiplier * monsterHpMultiplier
+            : MONSTER_HP_BASE * Math.pow(MONSTER_HP_MULTIPLIER, nextMonsterLevel - 1) * difficultyMultiplier * monsterHpMultiplier;
         
-        const elementKeys = Object.keys(ELEMENT_TYPES);
-        const newElement = elementKeys[Math.floor(Math.random() * elementKeys.length)];
+        const attributeKeys = Object.keys(ATTRIBUTE_TYPES);
+        const newAttribute = attributeKeys[Math.floor(Math.random() * attributeKeys.length)];
 
         setMonsterStats({
             name: monsterData.name,
@@ -2356,7 +2364,9 @@ const App = () => {
             hp: Math.ceil(newMonsterHp),
             maxHp: Math.ceil(newMonsterHp),
             isBoss: isNextBoss,
-            element: newElement,
+            attribute: newAttribute,
+            hpMultiplier: monsterData.hpMultiplier || 1.0,
+            rewardMultiplier: monsterData.rewardMultiplier || 1.0,
         });
         
         needsSave.current = true;
@@ -2385,52 +2395,52 @@ const App = () => {
         
         const isCrit = isStunned || (Math.random() * 100 < finalStats.critChance);
         const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
-        const elementalEffect = getElementalEffect();
-        let damageDealt = Math.floor(finalStats.clickDamage * critMultiplier * bossMultiplier * elementalEffect.multiplier * overwhelmMultiplier);
+        const attributeEffect = getAttributeEffect();
+        let damageDealt = Math.floor(finalStats.clickDamage * critMultiplier * bossMultiplier * attributeEffect.multiplier * overwhelmMultiplier);
         
         if (magicStormDebuff.active && magicStormDebuff.expires > Date.now()) {
             damageDealt = Math.floor(damageDealt * 1.20);
         }
 
-        // Elemental Procs
-        const powerMultiplier = 1 + (abilityStats.elementalPowerBonus / 100);
+        // Attribute Procs
+        const powerMultiplier = 1 + (abilityStats.attributePowerBonus / 100);
         let bonusDamage = 0;
-        let popupType = elementalEffect.type;
+        let popupType = attributeEffect.type;
 
-        if (playerElement === 'WATER' && Math.random() < (0.05 * powerMultiplier)) {
+        if (playerAttribute === 'WATER' && Math.random() < (0.05 * powerMultiplier)) {
             bonusDamage = Math.floor(finalStats.clickDamage * 2.0);
-            addLog(`<strong class="text-blue-400">물의 원소: 추가 피해 +${formatNumber(bonusDamage)}!</strong>`);
-        } else if (playerElement === 'EARTH' && isCrit && Math.random() < (0.20 * powerMultiplier)) {
+            addLog(`<strong class="text-blue-400">물의 속성: 추가 피해 +${formatNumber(bonusDamage)}!</strong>`);
+        } else if (playerAttribute === 'EARTH' && isCrit && Math.random() < (0.20 * powerMultiplier)) {
             if(!isMonsterStunned) {
                 setIsMonsterStunned(true);
                 setTimeout(() => setIsMonsterStunned(false), 500);
-                addLog('<strong class="text-yellow-700">땅의 원소: 몬스터 0.5초 기절!</strong>');
+                addLog('<strong class="text-yellow-700">땅의 속성: 몬스터 0.5초 기절!</strong>');
             }
-        } else if (playerElement === 'FIRE' && Math.random() < (0.10 * powerMultiplier) && !elementalEffects.fire_dot) {
+        } else if (playerAttribute === 'FIRE' && Math.random() < (0.10 * powerMultiplier) && !attributeEffects.fire_dot) {
             const dotDamage = finalStats.autoAttackDamage * 0.20 * powerMultiplier;
-            setElementalEffects(prev => ({ ...prev, fire_dot: { expires: Date.now() + 3000, damagePerTick: dotDamage } }));
-            addLog('<strong class="text-red-500">불의 원소: 몬스터에게 화상!</strong>');
+            setAttributeEffects(prev => ({ ...prev, fire_dot: { expires: Date.now() + 3000, damagePerTick: dotDamage } }));
+            addLog('<strong class="text-red-500">불의 속성: 몬스터에게 화상!</strong>');
         }
 
-        if (playerElement === 'WIND') {
+        if (playerAttribute === 'WIND') {
             if(windStackDecayTimer.current) clearTimeout(windStackDecayTimer.current);
             windStackDecayTimer.current = setTimeout(() => {
-                setElementalEffects(prev => ({...prev, wind_stacks: 0}));
-                addLog('<strong class="text-gray-400">바람의 원소: 중첩 초기화.</strong>');
+                setAttributeEffects(prev => ({...prev, wind_stacks: 0}));
+                addLog('<strong class="text-gray-400">바람의 속성: 중첩 초기화.</strong>');
             }, 5000);
-            setElementalEffects(prev => ({...prev, wind_stacks: Math.min(20, prev.wind_stacks + 1)}));
+            setAttributeEffects(prev => ({...prev, wind_stacks: Math.min(20, prev.wind_stacks + 1)}));
         }
 
         damageDealt += bonusDamage;
 
-        if (bonusDamage > 0) popupType = 'elemental';
+        if (bonusDamage > 0) popupType = 'attribute';
         else if (popupType === 'normal' && isCrit) popupType = 'crit';
 
-        createDamagePopup(damageDealt, popupType, elementalEffect.prefix);
+        createDamagePopup(damageDealt, popupType, attributeEffect.prefix);
 
         setMonsterStats(prev => {
             const newHp = prev.hp - damageDealt;
-            return { ...prev, hp: newHp };
+            return { ...prev, hp: Math.max(0, newHp) };
         });
     };
 
@@ -2483,7 +2493,7 @@ const App = () => {
                            return prev;
                         }
                         const newHp = prev.hp - damage;
-                        return { ...prev, hp: newHp };
+                        return { ...prev, hp: Math.max(0, newHp) };
                     });
                     ticks++;
                 }, duration / 5);
@@ -2492,7 +2502,7 @@ const App = () => {
             case 'ARCHER': { // 집중의 시간
                 const damage = Math.floor(finalStats.autoAttackDamage * 3.0 * skillPower);
                 createDamagePopup(damage, 'skill');
-                setMonsterStats(prev => ({ ...prev, hp: prev.hp - damage }));
+                setMonsterStats(prev => ({ ...prev, hp: Math.max(0, prev.hp - damage) }));
 
                 setFocusTimeActive(true);
                 setTimeout(() => setFocusTimeActive(false), 10000 * skillDuration);
@@ -2503,8 +2513,8 @@ const App = () => {
                 const damage = Math.floor(totalAtk * 25 * skillPower);
                 createDamagePopup(damage, 'skill');
                 
-                const elementalEffect = getElementalEffect();
-                if (elementalEffect.type === 'elemental') {
+                const attributeEffect = getAttributeEffect();
+                if (attributeEffect.type === 'attribute') {
                     addLog('몬스터가 빙결되었습니다!');
                     setIsMonsterStunned(true);
                     setTimeout(() => setIsMonsterStunned(false), 3000 * skillDuration);
@@ -2512,12 +2522,12 @@ const App = () => {
 
                 setMonsterStats(prev => {
                     const newHp = prev.hp - damage;
-                    return { ...prev, hp: newHp };
+                    return { ...prev, hp: Math.max(0, newHp) };
                 });
                 break;
             }
         }
-    }, [playerClass, activeSkillCooldown, finalStats, finalAbilityStats, monsterStats.hp, addLog, createDamagePopup, getElementalEffect]);
+    }, [playerClass, activeSkillCooldown, finalStats, finalAbilityStats, monsterStats.hp, addLog, createDamagePopup, getAttributeEffect]);
 
     const handleUseSkill2 = useCallback(() => {
         if (!playerClass || secondSkillCooldown > 0 || monsterStats.hp <= 0) return;
@@ -2544,7 +2554,7 @@ const App = () => {
                 createDamagePopup(damage, 'crit');
                 setMonsterStats(prev => {
                     const newHp = prev.hp - damage;
-                    return { ...prev, hp: newHp };
+                    return { ...prev, hp: Math.max(0, newHp) };
                 });
                 break;
             }
@@ -2552,7 +2562,7 @@ const App = () => {
                 const totalAtk = finalStats.clickDamage + finalStats.autoAttackDamage;
                 const damage = Math.floor(totalAtk * 5.0 * skillPower);
                 createDamagePopup(damage, 'skill');
-                setMonsterStats(prev => ({ ...prev, hp: prev.hp - damage }));
+                setMonsterStats(prev => ({ ...prev, hp: Math.max(0, prev.hp - damage) }));
 
                 setTimeWarpActive(true);
                 setTimeout(() => setTimeWarpActive(false), 10000 * skillDuration);
@@ -2582,13 +2592,13 @@ const App = () => {
                     setTimeout(() => setIsMonsterStunned(false), 1000 * skillDuration);
                     addLog('대지 분쇄! 몬스터를 1초간 기절시킵니다!');
                 }
-                setMonsterStats(prev => ({ ...prev, hp: prev.hp - damage }));
+                setMonsterStats(prev => ({ ...prev, hp: Math.max(0, prev.hp - damage) }));
                 break;
             }
             case 'ARCHER': { // 약점 탐색
                 damage = Math.floor(finalStats.autoAttackDamage * 5.0 * skillPower);
                 createDamagePopup(damage, 'skill');
-                setMonsterStats(prev => ({ ...prev, hp: prev.hp - damage }));
+                setMonsterStats(prev => ({ ...prev, hp: Math.max(0, prev.hp - damage) }));
                 setWeaknessFoundActive(true);
                 setTimeout(() => setWeaknessFoundActive(false), 15000 * skillDuration);
                 break;
@@ -2597,7 +2607,7 @@ const App = () => {
                 const totalAtk = finalStats.clickDamage + finalStats.autoAttackDamage;
                 damage = Math.floor(totalAtk * 15.0 * skillPower);
                 createDamagePopup(damage, 'skill');
-                setMonsterStats(prev => ({ ...prev, hp: prev.hp - damage }));
+                setMonsterStats(prev => ({ ...prev, hp: Math.max(0, prev.hp - damage) }));
                 setMagicStormDebuff({ active: true, expires: Date.now() + (5000 * skillDuration) });
                 break;
             }
@@ -2667,9 +2677,9 @@ const App = () => {
             setAbilityStats(prev => ({...prev, skillDurationBonus: prev.skillDurationBonus + 2}));
             setUpgrades(prev => ({...prev, skillDurationUpgradeCost: Math.floor(prev.skillDurationUpgradeCost * SKILL_DURATION_UPGRADE_COST_MULTIPLIER)}));
         }),
-        onUpgradeElementalPower: () => handleGenericUpgrade('elementalPowerUpgradeCost', null, ELEMENTAL_POWER_UPGRADE_COST_BASE * difficultyMultipliers.upgradeCost, ELEMENTAL_POWER_UPGRADE_COST_MULTIPLIER, () => {
-            setAbilityStats(prev => ({...prev, elementalPowerBonus: prev.elementalPowerBonus + 2}));
-            setUpgrades(prev => ({...prev, elementalPowerUpgradeCost: Math.floor(prev.elementalPowerUpgradeCost * ELEMENTAL_POWER_UPGRADE_COST_MULTIPLIER)}));
+        onUpgradeAttributePower: () => handleGenericUpgrade('attributePowerUpgradeCost', null, ATTRIBUTE_POWER_UPGRADE_COST_BASE * difficultyMultipliers.upgradeCost, ATTRIBUTE_POWER_UPGRADE_COST_MULTIPLIER, () => {
+            setAbilityStats(prev => ({...prev, attributePowerBonus: prev.attributePowerBonus + 2}));
+            setUpgrades(prev => ({...prev, attributePowerUpgradeCost: Math.floor(prev.attributePowerUpgradeCost * ATTRIBUTE_POWER_UPGRADE_COST_MULTIPLIER)}));
         }),
         onUpgradeOfflineRewards: () => handleGenericUpgrade('offlineRewardsUpgradeCost', null, OFFLINE_REWARDS_UPGRADE_COST_BASE * difficultyMultipliers.upgradeCost, OFFLINE_REWARDS_UPGRADE_COST_MULTIPLIER, () => {
             setAbilityStats(prev => ({...prev, offlineRewardsBonus: prev.offlineRewardsBonus + 2}));
@@ -2923,8 +2933,8 @@ const App = () => {
                 const bossMultiplier = monsterStats.isBoss ? (1 + finalAbilityStats.bossDamageBonus / 100) : 1;
                 const isCrit = isStunned || focusTimeActive || (Math.random() * 100 < finalStats.critChance);
                 const critMultiplier = isCrit ? finalStats.critDamage / 100 : 1;
-                const elementalEffect = getElementalEffect();
-                let damageDealt = Math.floor(finalStats.autoAttackDamage * critMultiplier * bossMultiplier * elementalEffect.multiplier);
+                const attributeEffect = getAttributeEffect();
+                let damageDealt = Math.floor(finalStats.autoAttackDamage * critMultiplier * bossMultiplier * attributeEffect.multiplier);
                 
                 if (magicStormDebuff.active && magicStormDebuff.expires > Date.now()) {
                     damageDealt = Math.floor(damageDealt * 1.20);
@@ -2934,12 +2944,12 @@ const App = () => {
 
                 setMonsterStats(prev => {
                     const newHp = prev.hp - damageDealt;
-                    return { ...prev, hp: newHp };
+                    return { ...prev, hp: Math.max(0, newHp) };
                 });
             }
         }, 1000 / finalStats.attackSpeed);
         return () => clearInterval(attackInterval);
-    }, [finalStats, monsterStats.hp, finalAbilityStats.bossDamageBonus, isMonsterStunned, newItemDrop, isJobSelectionOpen, selectedInventoryItem, createDamagePopup, getElementalEffect, focusTimeActive, magicStormDebuff]);
+    }, [finalStats, monsterStats.hp, finalAbilityStats.bossDamageBonus, isMonsterStunned, newItemDrop, isJobSelectionOpen, selectedInventoryItem, createDamagePopup, getAttributeEffect, focusTimeActive, magicStormDebuff]);
     
     // Monster defeat check
     useEffect(() => { if (monsterStats.hp <= 0 && !treasureGolem.isActive) { handleMonsterDefeat(); } }, [monsterStats.hp, treasureGolem.isActive, handleMonsterDefeat]);
@@ -2987,20 +2997,20 @@ const App = () => {
         }
     }, [treasureGolem, handleMonsterDefeat, addLog]);
 
-    // Elemental DoT timer
+    // Attribute DoT timer
     useEffect(() => {
-        if (elementalEffects.fire_dot) {
-            if (Date.now() > elementalEffects.fire_dot.expires || monsterStats.hp <= 0) {
-                setElementalEffects(prev => ({ ...prev, fire_dot: null }));
+        if (attributeEffects.fire_dot) {
+            if (Date.now() > attributeEffects.fire_dot.expires || monsterStats.hp <= 0) {
+                setAttributeEffects(prev => ({ ...prev, fire_dot: null }));
                 return;
             }
             const timer = setInterval(() => {
-                createDamagePopup(elementalEffects.fire_dot.damagePerTick, 'elemental', '🔥');
-                setMonsterStats(prev => ({...prev, hp: prev.hp - elementalEffects.fire_dot.damagePerTick}));
+                createDamagePopup(attributeEffects.fire_dot.damagePerTick, 'attribute', '🔥');
+                setMonsterStats(prev => ({...prev, hp: Math.max(0, prev.hp - attributeEffects.fire_dot.damagePerTick)}));
             }, 1000);
             return () => clearInterval(timer);
         }
-    }, [elementalEffects.fire_dot, monsterStats.hp, createDamagePopup]);
+    }, [attributeEffects.fire_dot, monsterStats.hp, createDamagePopup]);
 
     // Initial setup
     useEffect(() => {
@@ -3031,7 +3041,7 @@ const App = () => {
                 />
             )}
             {isDifficultyModalOpen && <DifficultyChangeModal currentDifficulty={difficulty} onSelect={handleChangeDifficulty} onClose={() => setIsDifficultyModalOpen(false)} />}
-            {isElementModalOpen && <ElementSelectionModal currentElement={playerElement} onSelect={handleSelectElement} onClose={() => setIsElementModalOpen(false)} />}
+            {isAttributeModalOpen && <AttributeSelectionModal currentAttribute={playerAttribute} onSelect={handleSelectAttribute} onClose={() => setIsAttributeModalOpen(false)} />}
             {offlineProgress && <OfflineProgressModal progress={offlineProgress} onClaim={() => {
                 setPlayerStats(prev => ({...prev, coins: prev.coins + offlineProgress.gold, xp: prev.xp + offlineProgress.xp}));
                 setOfflineProgress(null);
@@ -3071,7 +3081,7 @@ const App = () => {
                     )}
                 </MonsterDisplay>
                 <div className="w-full max-w-lg mt-4 grid grid-cols-2 gap-2">
-                    <ElementPanel playerElement={playerElement} onOpenModal={() => setIsElementModalOpen(true)} />
+                    <AttributePanel playerAttribute={playerAttribute} onOpenModal={() => setIsAttributeModalOpen(false)} />
                     <EquippedArtifactsPanel equipped={equippedArtifacts} onSlotClick={() => setActiveTab('artifacts')} />
                 </div>
                 <div className="w-full max-w-lg mt-4">
