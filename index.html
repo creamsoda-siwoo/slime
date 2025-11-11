@@ -179,7 +179,7 @@ const OFFLINE_REWARDS_UPGRADE_COST_MULTIPLIER = 1.70;
 const LIBERATION_COST_BASE = 1000;
 const LIBERATION_COST_MULTIPLIER = 100;
 
-const BASE_SKILL_COOLDOWN = 3000; // 30 seconds
+const BASE_SKILL_COOLDOWN = 30000; // 30 seconds
 
 const EQUIPMENT_DROP_CHANCE_BASE = 0.15;
 const EQUIPMENT_GACHA_COST_BASE = 100;
@@ -1298,16 +1298,22 @@ const RebirthButton = ({ onRebirth, level, count }) => {
 
 const ActiveSkillButton = ({ skill, onClick, cooldown, maxCooldown }) => {
     const isDisabled = cooldown > 0;
-    const cooldownPercentage = (cooldown / maxCooldown) * 100;
+    const cooldownPercentage = maxCooldown > 0 ? (cooldown / maxCooldown) * 100 : 0;
 
     return (
         <button
             onClick={onClick}
             disabled={isDisabled}
             className="relative w-full bg-red-700 hover:bg-red-800 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-2 px-2 rounded-lg transition-colors shadow-lg overflow-hidden h-16 flex items-center justify-center">
+            
+            {/* Cooldown overlay that fills from top to bottom */}
             {cooldown > 0 && (
-                 <div className="absolute top-0 left-0 h-full bg-black opacity-50" style={{ width: `${100 - cooldownPercentage}%` }}></div>
+                 <div 
+                    className="absolute top-0 left-0 w-full bg-black opacity-60 pointer-events-none" 
+                    style={{ height: `${cooldownPercentage}%`, transition: 'height 0.1s linear' }}
+                ></div>
             )}
+
             <div className="relative z-10 text-center">
                 <p className="text-md font-bold">{skill.name}</p>
                 <p className="text-xs">{cooldown > 0 ? `${Math.ceil(cooldown / 1000)}초` : `사용 가능`}</p>
